@@ -1,0 +1,526 @@
+"""
+"Collega account": sostituisce la configurazione manuale di client id,
+secret e refresh token dentro il .env con un normale login OAuth.
+
+L'utente clicca "Collega YouTube", si apre il browser sulla pagina di
+Google, autorizza, e il token torna indietro da solo. Funziona con il
+flusso "installed app" (redirect su 127.0.0.1 con porta effimera), lo
+stesso che Google prevede per le applicazioni desktop: nessun server
+pubblico da esporre, nessun copia-incolla di token.
+
+Le connessioni vivono in cache.db e vengono lette dagli adapter delle
+piattaforme insieme a quelle eventualmente gia' presenti nel .env, cosi'
+una configurazione manuale esistente continua a funzionare.
+"""
+import json
+import os
+import sqlite3
+import threading
+import time
+
+import cache
+
+YOUTUBE_SCOPES = ["https://www.googleapis.com/auth/youtube.readonly"]
+
+# Stato del collegamento in corso: il flusso OAuth blocca finche' l'utente
+# non completa il login nel browser, quindi gira in un thread e il frontend
+# ne segue l'avanzamento in polling (stessa logica del refresh).
+_connect_state = {"running": False, "platform": None, "error": None, "done": False, "account": None}
+_connect_lock = threading.Lock()
+
+
+def _conn() -> sqlite3.Connection:
+    conn = sqlite3.connect(cache.DB_PATH)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS connections (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            platform TEXT NOT NULL,
+            account_name TEXT NOT NULL,
+            account_id TEXT,
+            data TEXT NOT NULL,
+            created_at INTEGER NOT NULL,
+            UNIQUE(platform, account_id)
+        )
+    """)
+    return conn
+
+
+def list_connections(platform: str | None = None) -> list[dict]:
+    conn = _conn()
+    if platform:
+        rows = conn.execute(
+            "SELECT id, platform, account_name, account_id, data, created_at FROM connections WHERE platform = ? ORDER BY created_at",
+            (platform,),
+        ).fetchall()
+    else:
+        rows = conn.execute(
+            "SELECT id, platform, account_name, account_id, data, created_at FROM connections ORDER BY platform, created_at"
+        ).fetchall()
+    conn.close()
+    return [
+        {"id": r[0], "platform": r[1], "account_name": r[2], "account_id": r[3],
+         "data": json.loads(r[4]), "created_at": r[5]}
+        for r in rows
+    ]
+
+
+def public_connections() -> list[dict]:
+    """Come list_connections ma senza i token: questa e' la versione che
+    puo' uscire verso il frontend."""
+    return [
+        {k: v for k, v in c.items() if k != "data"}
+        for c in list_connections()
+    ]
+
+
+def save_connection(platform: str, account_name: str, account_id: str, data: dict) -> None:
+    conn = _conn()
+    conn.execute(
+        """INSERT INTO connections (platform, account_name, account_id, data, created_at)
+           VALUES (?, ?, ?, ?, ?)
+           ON CONFLICT(platform, account_id) DO UPDATE SET
+             account_name = excluded.account_name,
+             data = excluded.data,
+             created_at = excluded.created_at""",
+        (platform, account_name, account_id, json.dumps(data), int(time.time())),
+    )
+    conn.commit()
+    conn.close()
+
+
+def delete_connection(connection_id: int) -> None:
+    conn = _conn()
+    conn.execute("DELETE FROM connections WHERE id = ?", (connection_id,))
+    conn.commit()
+    conn.close()
+
+
+def _google_client() -> tuple[str, str] | None:
+    """Credenziali dell'app OAuth usate per il login Google.
+
+    In una build distribuita sono quelle dell'applicazione (per le desktop
+    app Google non considera il secret una vera credenziale segreta). Qui
+    si accetta anche un client gia' presente nel .env, cosi' la funzione e'
+    utilizzabile subito senza doverne registrare un altro."""
+    import brand
+    if brand.configured("GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET"):
+        return brand.get("GOOGLE_CLIENT_ID"), brand.get("GOOGLE_CLIENT_SECRET")
+
+    client_id = os.environ.get("OAUTH_GOOGLE_CLIENT_ID")
+    client_secret = os.environ.get("OAUTH_GOOGLE_CLIENT_SECRET")
+    if client_id and client_secret:
+        return client_id, client_secret
+
+    for key, value in os.environ.items():
+        if key.endswith("_YOUTUBE_CLIENT_ID") and value:
+            secret = os.environ.get(key.replace("_CLIENT_ID", "_CLIENT_SECRET"))
+            if secret:
+                return value, secret
+    return None
+
+
+def connect_status() -> dict:
+    return dict(_connect_state)
+
+
+def _connect_youtube() -> None:
+    from google_auth_oauthlib.flow import InstalledAppFlow
+    from googleapiclient.discovery import build
+
+    creds_pair = _google_client()
+    if not creds_pair:
+        raise RuntimeError(
+            "Nessuna app OAuth Google configurata: imposta OAUTH_GOOGLE_CLIENT_ID e "
+            "OAUTH_GOOGLE_CLIENT_SECRET nel .env."
+        )
+    client_id, client_secret = creds_pair
+
+    flow = InstalledAppFlow.from_client_config(
+        {
+            "installed": {
+                "client_id": client_id,
+                "client_secret": client_secret,
+                "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                "token_uri": "https://oauth2.googleapis.com/token",
+            }
+        },
+        scopes=YOUTUBE_SCOPES,
+    )
+    # port=0 => porta libera scelta dal sistema; Google accetta qualunque
+    # porta su 127.0.0.1 per i client di tipo "Desktop app".
+    creds = flow.run_local_server(port=0, prompt="consent", open_browser=True)
+
+    service = build("youtube", "v3", credentials=creds)
+    resp = service.channels().list(part="snippet", mine=True).execute()
+    item = resp["items"][0]
+    channel_id = item["id"]
+    channel_name = item["snippet"]["title"]
+
+    save_connection("youtube", channel_name, channel_id, {
+        "refresh_token": creds.refresh_token,
+        "client_id": client_id,
+        "client_secret": client_secret,
+        "scopes": YOUTUBE_SCOPES,
+    })
+    _connect_state["account"] = channel_name
+
+
+CONNECTORS = {"youtube": _connect_youtube}
+
+
+# ---------------------------------------------------------------------------
+# Instagram e TikTok: collegamento guidato
+#
+# Nessuna delle due accetta un redirect su 127.0.0.1 (pretendono un URL
+# HTTPS), quindi il login automatico in stile YouTube non e' possibile senza
+# un endpoint pubblico. Il flusso guidato riduce comunque tutto a: apri il
+# link, autorizza, incolla l'URL su cui sei atterrato. Un solo incolla al
+# posto di tre variabili da scrivere a mano nel .env per ogni account.
+# ---------------------------------------------------------------------------
+
+def _oauth_window_available() -> bool:
+    """True se la finestra nativa dell'app e' attiva e possiamo aprirci
+    dentro il login. Nell'eseguibile lo e' sempre; avviando solo il server
+    (sviluppo) no, e allora si ricade sul flusso con incolla."""
+    try:
+        import webview
+        return bool(webview.windows)
+    except Exception:
+        return False
+
+
+def _connect_in_window(auth_url: str, redirect_uri: str, title: str, timeout: int = 300) -> str:
+    """Apre il login dentro una finestra dell'app e intercetta il redirect.
+
+    E' questo che rende il collegamento un solo clic: Instagram e TikTok
+    pretendono un redirect HTTPS (niente 127.0.0.1), ma non serve che quella
+    pagina esista davvero - basta accorgersi che la finestra ci sta
+    navigando sopra e leggere il codice dall'URL prima ancora che carichi.
+    Nessun token da incollare, nessuna configurazione lato utente.
+    """
+    import webview
+
+    window = webview.create_window(title, auth_url, width=520, height=720)
+    result = {}
+
+    deadline = time.time() + timeout
+    while time.time() < deadline:
+        time.sleep(0.35)
+        try:
+            current = window.get_current_url()
+        except Exception:
+            break  # finestra chiusa dall'utente
+        if not current:
+            continue
+        if current.startswith(redirect_uri):
+            result["url"] = current
+            break
+
+    try:
+        window.destroy()
+    except Exception:
+        pass
+
+    if "url" not in result:
+        raise RuntimeError("Collegamento annullato: la finestra e' stata chiusa prima di completare l'accesso.")
+    if "error" in result["url"] and "code=" not in result["url"]:
+        raise RuntimeError("Autorizzazione negata dalla piattaforma.")
+    return _clean_code(result["url"])
+
+
+def _clean_code(raw: str) -> str:
+    """Accetta sia il codice nudo sia l'intero URL di ritorno, da cui estrae
+    il parametro code. Instagram accoda '#_' al codice: va tolto o lo
+    scambio del token fallisce."""
+    raw = (raw or "").strip()
+    if not raw:
+        raise RuntimeError("Incolla il codice o l'URL su cui sei atterrato dopo l'autorizzazione.")
+    if "code=" in raw:
+        raw = raw.split("code=", 1)[1].split("&", 1)[0]
+    raw = raw.split("#", 1)[0]
+    try:
+        from urllib.parse import unquote
+        raw = unquote(raw)
+    except Exception:
+        pass
+    if not raw:
+        raise RuntimeError("Non sono riuscito a trovare il codice nell'URL incollato.")
+    return raw
+
+
+NOT_SET = "Collegamento non ancora disponibile in questa versione dell'app."
+
+
+def _env_pair(id_suffix: str, secret_suffix: str) -> tuple[str, str] | None:
+    """Recupera una coppia id/secret gia' presente nel .env con un prefisso
+    qualsiasi (es. SOLOFOUNDED_TIKTOK_CLIENT_KEY). Evita di richiedere di
+    nuovo credenziali che l'utente ha gia' configurato altrove."""
+    for key, value in os.environ.items():
+        if key.endswith(id_suffix) and value:
+            secret = os.environ.get(key[: -len(id_suffix)] + secret_suffix)
+            if secret:
+                return value, secret
+    return None
+
+
+def _instagram_app() -> tuple[str, str, str]:
+    import brand
+    app_id = brand.get("INSTAGRAM_APP_ID")
+    secret = brand.get("INSTAGRAM_APP_SECRET")
+    redirect = brand.get("INSTAGRAM_REDIRECT_URI")
+    if not (app_id and secret):
+        found = _env_pair("_IG_APP_ID", "_IG_APP_SECRET")
+        if found:
+            app_id, secret = found
+    if not (app_id and secret and redirect):
+        raise RuntimeError(NOT_SET)
+    return app_id, secret, redirect
+
+
+def _tiktok_app() -> tuple[str, str, str]:
+    import brand
+    key = brand.get("TIKTOK_CLIENT_KEY")
+    secret = brand.get("TIKTOK_CLIENT_SECRET")
+    redirect = brand.get("TIKTOK_REDIRECT_URI")
+    if not (key and secret):
+        found = _env_pair("_TIKTOK_CLIENT_KEY", "_TIKTOK_CLIENT_SECRET")
+        if found:
+            key, secret = found
+    if not (key and secret and redirect):
+        raise RuntimeError(NOT_SET)
+    return key, secret, redirect
+
+
+APP_CHECKS = {"instagram": _instagram_app, "tiktok": _tiktok_app, "youtube": lambda: _google_client() or (_ for _ in ()).throw(RuntimeError(NOT_SET))}
+
+
+def credentials_ready(platform: str) -> bool:
+    """Le credenziali dell'app per questa piattaforma sono disponibili?
+    Serve a non mostrare un pulsante che porterebbe a un vicolo cieco."""
+    check = APP_CHECKS.get(platform)
+    if not check:
+        return False
+    try:
+        check()
+        return True
+    except Exception:
+        return False
+
+
+def authorize_url(platform: str) -> dict:
+    """URL da aprire nel browser per autorizzare l'account."""
+    from urllib.parse import urlencode
+
+    try:
+        if platform == "instagram":
+            app_id, _, redirect = _instagram_app()
+            params = {
+                "client_id": app_id,
+                "redirect_uri": redirect,
+                "response_type": "code",
+                "scope": "instagram_business_basic,instagram_business_manage_insights",
+            }
+            return {"ok": True, "url": "https://www.instagram.com/oauth/authorize?" + urlencode(params)}
+
+        if platform == "tiktok":
+            key, _, redirect = _tiktok_app()
+            params = {
+                "client_key": key,
+                "scope": "user.info.basic,video.list",
+                "response_type": "code",
+                "redirect_uri": redirect,
+                "state": secrets.token_urlsafe(8),
+            }
+            return {"ok": True, "url": "https://www.tiktok.com/v2/auth/authorize/?" + urlencode(params)}
+    except RuntimeError as exc:
+        return {"ok": False, "message": str(exc)}
+
+    return {"ok": False, "message": f"Collegamento guidato non disponibile per {platform}."}
+
+
+def _finish_instagram(code: str) -> str:
+    import requests
+
+    app_id, app_secret, redirect = _instagram_app()
+    token_resp = requests.post(
+        "https://api.instagram.com/oauth/access_token",
+        data={
+            "client_id": app_id,
+            "client_secret": app_secret,
+            "grant_type": "authorization_code",
+            "redirect_uri": redirect,
+            "code": code,
+        },
+        timeout=30,
+    )
+    if not token_resp.ok:
+        raise RuntimeError(f"Instagram ha rifiutato il codice: {token_resp.text[:200]}")
+    short = token_resp.json()
+
+    # Il token breve dura un'ora: si scambia subito con quello a 60 giorni,
+    # altrimenti il collegamento smetterebbe di funzionare quasi subito.
+    long_resp = requests.get(
+        "https://graph.instagram.com/access_token",
+        params={"grant_type": "ig_exchange_token", "client_secret": app_secret,
+                "access_token": short["access_token"]},
+        timeout=30,
+    )
+    if not long_resp.ok:
+        raise RuntimeError(f"Scambio del token fallito: {long_resp.text[:200]}")
+    long_token = long_resp.json()["access_token"]
+
+    me = requests.get(
+        "https://graph.instagram.com/v21.0/me",
+        params={"fields": "id,username"},
+        headers={"Authorization": f"Bearer {long_token}"},
+        timeout=30,
+    )
+    me.raise_for_status()
+    info = me.json()
+    username = info.get("username") or "Instagram"
+
+    save_connection("instagram", username, str(info["id"]), {
+        "access_token": long_token, "user_id": str(info["id"]), "api_kind": "instagram",
+    })
+    return username
+
+
+def _finish_tiktok(code: str) -> str:
+    import requests
+
+    key, secret, redirect = _tiktok_app()
+    resp = requests.post(
+        "https://open.tiktokapis.com/v2/oauth/token/",
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
+        data={
+            "client_key": key, "client_secret": secret,
+            "code": code, "grant_type": "authorization_code", "redirect_uri": redirect,
+        },
+        timeout=30,
+    )
+    if not resp.ok:
+        raise RuntimeError(f"TikTok ha rifiutato il codice: {resp.text[:200]}")
+    data = resp.json()
+    if "access_token" not in data:
+        raise RuntimeError(f"Risposta inattesa da TikTok: {str(data)[:200]}")
+
+    granted = data.get("scope", "")
+    if "video.list" not in granted:
+        raise RuntimeError(
+            f"Account collegato ma senza permesso 'video.list' (concesso: {granted or 'nessuno'}). "
+            "Serve l'approvazione di quel permesso su TikTok for Developers per leggere le statistiche."
+        )
+
+    username = "TikTok"
+    try:
+        info = requests.get(
+            "https://open.tiktokapis.com/v2/user/info/",
+            headers={"Authorization": f"Bearer {data['access_token']}"},
+            params={"fields": "display_name"},
+            timeout=30,
+        )
+        if info.ok:
+            username = info.json().get("data", {}).get("user", {}).get("display_name") or username
+    except Exception:
+        pass
+
+    save_connection("tiktok", username, str(data.get("open_id", username)), {
+        "refresh_token": data["refresh_token"], "client_key": key, "client_secret": secret,
+    })
+    return username
+
+
+GUIDED = {"instagram": _finish_instagram, "tiktok": _finish_tiktok}
+
+REDIRECT_GETTERS = {
+    "instagram": lambda: _instagram_app()[2],
+    "tiktok": lambda: _tiktok_app()[2],
+}
+
+WINDOW_TITLES = {"instagram": "Collega Instagram", "tiktok": "Collega TikTok"}
+
+
+def _connect_oneclick(platform: str) -> None:
+    """Login a un clic dentro la finestra dell'app, per le piattaforme che
+    non accettano un redirect su 127.0.0.1."""
+    info = authorize_url(platform)
+    if not info.get("ok"):
+        raise RuntimeError(info.get("message", "Configurazione mancante."))
+
+    code = _connect_in_window(
+        info["url"], REDIRECT_GETTERS[platform](), WINDOW_TITLES.get(platform, "Collega account")
+    )
+    _connect_state["account"] = GUIDED[platform](code)
+
+
+def finish_guided(platform: str, pasted: str) -> dict:
+    finisher = GUIDED.get(platform)
+    if not finisher:
+        return {"ok": False, "message": f"Collegamento guidato non disponibile per {platform}."}
+    try:
+        account = finisher(_clean_code(pasted))
+        return {"ok": True, "account": account}
+    except Exception as exc:
+        return {"ok": False, "message": str(exc)}
+
+
+def connect_mode(platform: str) -> str:
+    """Come si collega questa piattaforma, cosi' il frontend mostra un solo
+    bottone quando basta un clic e i passaggi manuali solo se indispensabili.
+
+    Se le credenziali dell'app non ci sono, si dichiara "unavailable" fin
+    da subito: meglio dirlo prima che far premere un pulsante destinato a
+    fallire."""
+    if platform in UNAVAILABLE:
+        return "unavailable"
+    if not credentials_ready(platform):
+        return "unavailable"
+    if platform in CONNECTORS:
+        return "oneclick"
+    if platform in GUIDED:
+        return "oneclick" if _oauth_window_available() else "guided"
+    return "unsupported"
+
+
+def unavailable_reason(platform: str) -> str | None:
+    """Motivo leggibile per cui una piattaforma non e' collegabile."""
+    if platform in UNAVAILABLE:
+        return UNAVAILABLE[platform]
+    if platform in (set(CONNECTORS) | set(GUIDED)) and not credentials_ready(platform):
+        return NOT_SET
+    return None
+
+
+# Piattaforme senza alcun collegamento possibile.
+UNAVAILABLE = {
+    "x": "X non espone le statistiche di lettura sul piano gratuito.",
+}
+
+
+def start_connect(platform: str) -> dict:
+    if platform in UNAVAILABLE:
+        return {"ok": False, "message": UNAVAILABLE[platform]}
+
+    if platform in CONNECTORS:
+        runner = CONNECTORS[platform]
+    elif platform in GUIDED and _oauth_window_available():
+        runner = lambda: _connect_oneclick(platform)
+    else:
+        return {"ok": False, "message": f"Piattaforma non supportata: {platform}"}
+
+    with _connect_lock:
+        if _connect_state["running"]:
+            return {"ok": False, "message": "C'e' gia' un collegamento in corso."}
+        _connect_state.update({"running": True, "platform": platform, "error": None, "done": False, "account": None})
+
+    def worker():
+        try:
+            runner()
+            _connect_state["done"] = True
+        except Exception as exc:
+            _connect_state["error"] = str(exc)
+        finally:
+            _connect_state["running"] = False
+
+    threading.Thread(target=worker, daemon=True).start()
+    return {"ok": True}

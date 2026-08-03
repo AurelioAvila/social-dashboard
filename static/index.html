@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>Social Dashboard</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <nav class="sidebar">
+    <div class="brand">Social Dashboard</div>
+
+    <div class="nav-scroll">
+      <div class="nav-group">
+        <div class="nav-group-label" data-i18n="group_general">Generale</div>
+        <button class="nav-item active" data-section="overview">
+          <span class="nav-ico">◎</span><span data-i18n="nav_overview">Panoramica</span>
+        </button>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-group-label" data-i18n="group_platforms">Piattaforme</div>
+        <button class="nav-item" data-section="youtube"><span class="nav-ico">▶</span>YouTube<span class="nav-dot" id="dot-youtube"></span></button>
+        <button class="nav-item" data-section="instagram"><span class="nav-ico">◈</span>Instagram<span class="nav-dot" id="dot-instagram"></span></button>
+        <button class="nav-item" data-section="tiktok"><span class="nav-ico">♪</span>TikTok<span class="nav-dot" id="dot-tiktok"></span></button>
+        <button class="nav-item" data-section="x"><span class="nav-ico">✕</span>X<span class="nav-dot" id="dot-x"></span></button>
+        <button class="nav-item" data-section="certsprint"><span class="nav-ico">🛡</span>CertSprint<span class="nav-dot" id="dot-certsprint"></span></button>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-group-label" data-i18n="group_insights">Insight</div>
+        <button class="nav-item" data-section="analytics"><span class="nav-ico">◫</span><span data-i18n="nav_analytics">Analitiche</span></button>
+        <button class="nav-item" data-section="diagnostics"><span class="nav-ico">⚕</span><span data-i18n="nav_diagnostics">Diagnostica</span><span class="nav-badge hidden" id="diag-badge">0</span></button>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-group-label" data-i18n="group_connections">Account collegati</div>
+        <button class="nav-item" data-section="connections"><span class="nav-ico">⚯</span><span data-i18n="nav_connections">Collega account</span></button>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-group-label" data-i18n="group_account">Account</div>
+        <button class="nav-item" data-section="account"><span class="nav-ico">☺</span><span data-i18n="nav_account">Il tuo account</span></button>
+        <button class="nav-item" data-section="pricing"><span class="nav-ico">✦</span><span data-i18n="nav_pricing">Piani e prezzi</span></button>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-group-label" data-i18n="group_settings">Impostazioni</div>
+        <button class="nav-item" data-section="themes"><span class="nav-ico">◐</span><span data-i18n="nav_themes">Temi</span></button>
+        <button class="nav-item" data-section="language"><span class="nav-ico">⌘</span><span data-i18n="nav_language">Lingua</span></button>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <button class="user-chip" id="user-chip" data-section="account">
+        <span class="user-avatar" id="user-avatar">?</span>
+        <span class="user-meta">
+          <span class="user-name" id="user-name" data-i18n="account_guest">Ospite</span>
+          <span class="user-plan" id="user-plan" data-i18n="account_signin_hint">Accedi per salvare</span>
+        </span>
+      </button>
+      <span id="last-refresh" class="muted"></span>
+      <button id="btn-refresh">↻ <span data-i18n="btn_refresh">Refresh</span></button>
+      <div id="refresh-progress" class="progress-wrap hidden">
+        <div class="progress-track"><div id="refresh-progress-bar" class="progress-fill"></div></div>
+        <span id="refresh-progress-label" class="progress-label">0%</span>
+      </div>
+      <button class="kbd-hint" id="palette-trigger"><span data-i18n="palette_hint">Cerca</span> <kbd>Ctrl</kbd><kbd>K</kbd></button>
+    </div>
+  </nav>
+
+  <main class="content">
+    <section id="section-overview" class="section active">
+      <div class="section-header">
+        <div>
+          <h1 data-i18n="nav_overview">Panoramica</h1>
+          <p class="muted" id="overview-sub"></p>
+        </div>
+        <button class="btn-ghost" id="btn-export">⤓ <span data-i18n="btn_export">Esporta CSV</span></button>
+      </div>
+      <div id="hero-tiles" class="hero-tiles"></div>
+      <h2 class="subhead" data-i18n="overview_by_platform">Per piattaforma</h2>
+      <div id="overview-grid" class="grid"></div>
+    </section>
+
+    <section id="section-youtube" class="section">
+      <div class="section-header">
+        <h1><span class="sec-ico">▶</span> YouTube</h1>
+        <button class="btn-link-account" data-link-platform="youtube" title="Collega account"><span class="link-ico">🔗</span> <span data-i18n="btn_link_account">Collega</span></button>
+        <button class="btn-analyze" data-platform="youtube">✨ <span data-i18n="btn_analyze">Analizza</span></button>
+      </div>
+      <div id="youtube-insight" class="insight-box hidden"></div>
+      <div id="youtube-detail" class="detail"></div>
+    </section>
+
+    <section id="section-instagram" class="section">
+      <div class="section-header">
+        <h1><span class="sec-ico">◈</span> Instagram</h1>
+        <button class="btn-link-account" data-link-platform="instagram" title="Collega account"><span class="link-ico">🔗</span> <span data-i18n="btn_link_account">Collega</span></button>
+        <button class="btn-analyze" data-platform="instagram">✨ <span data-i18n="btn_analyze">Analizza</span></button>
+      </div>
+      <div id="instagram-insight" class="insight-box hidden"></div>
+      <div id="instagram-detail" class="detail"></div>
+    </section>
+
+    <section id="section-tiktok" class="section">
+      <div class="section-header">
+        <h1><span class="sec-ico">♪</span> TikTok</h1>
+        <button class="btn-link-account" data-link-platform="tiktok" title="Collega account"><span class="link-ico">🔗</span> <span data-i18n="btn_link_account">Collega</span></button>
+        <button class="btn-analyze" data-platform="tiktok">✨ <span data-i18n="btn_analyze">Analizza</span></button>
+      </div>
+      <div id="tiktok-insight" class="insight-box hidden"></div>
+      <div id="tiktok-detail" class="detail"></div>
+    </section>
+
+    <section id="section-x" class="section">
+      <div class="section-header">
+        <h1><span class="sec-ico">✕</span> X</h1>
+        <button class="btn-link-account" data-link-platform="x" title="Collega account"><span class="link-ico">🔗</span> <span data-i18n="btn_link_account">Collega</span></button>
+        <button class="btn-analyze" data-platform="x">✨ <span data-i18n="btn_analyze">Analizza</span></button>
+      </div>
+      <div id="x-insight" class="insight-box hidden"></div>
+      <div id="x-detail" class="detail"></div>
+    </section>
+
+    <section id="section-certsprint" class="section">
+      <div class="section-header">
+        <h1><span class="sec-ico">🛡</span> CertSprint</h1>
+        <button class="btn-analyze" data-platform="certsprint">✨ <span data-i18n="btn_analyze">Analizza</span></button>
+      </div>
+      <div id="certsprint-insight" class="insight-box hidden"></div>
+      <div id="certsprint-detail" class="detail"></div>
+    </section>
+
+    <section id="section-analytics" class="section">
+      <h1><span class="sec-ico">◫</span> <span data-i18n="nav_analytics">Analitiche</span></h1>
+      <p class="muted" data-i18n="analytics_subtitle">Calcolate dal codice sui dati raccolti — post migliori e fasce orarie più performanti, zero costo AI.</p>
+      <p class="muted" id="analytics-last-refresh"></p>
+      <div id="analytics-tiles" class="hero-tiles"></div>
+
+      <h2 class="subhead" data-i18n="analytics_top_posts">🏆 Top post/video (per views)</h2>
+      <div id="top-posts-list" class="rank-list"></div>
+
+      <h2 class="subhead" data-i18n="analytics_best_hours">🕐 Quando conviene pubblicare</h2>
+      <p class="muted" data-i18n="analytics_hours_hint">Media di views per fascia oraria di pubblicazione (UTC). Le barre piene sono le ore in cui i tuoi contenuti rendono di più.</p>
+      <div id="hours-chart" class="hours-chart"></div>
+      <div id="best-hours-list" class="rank-list"></div>
+    </section>
+
+    <section id="section-diagnostics" class="section">
+      <h1><span class="sec-ico">⚕</span> <span data-i18n="nav_diagnostics">Diagnostica</span></h1>
+      <p class="muted" data-i18n="diagnostics_subtitle">Controlla i tuoi account e ti dice cosa fare — calcolata dal codice, senza costi.</p>
+
+      <div class="health-panel" id="health-panel">
+        <div class="health-ring-wrap">
+          <svg class="health-ring" viewBox="0 0 100 100">
+            <circle class="ring-bg" cx="50" cy="50" r="42"/>
+            <circle class="ring-fg" id="health-ring-fg" cx="50" cy="50" r="42"/>
+          </svg>
+          <div class="health-score"><span id="health-score-num">–</span><small>%</small></div>
+        </div>
+        <div class="health-info">
+          <div class="health-title" id="health-title"></div>
+          <div class="health-sub muted" id="health-sub"></div>
+          <div class="health-counts">
+            <span class="health-count red"><span class="badge red"></span><b id="hc-red">0</b> <span data-i18n="diag_problems">problemi</span></span>
+            <span class="health-count yellow"><span class="badge yellow"></span><b id="hc-yellow">0</b> <span data-i18n="diag_warnings">avvisi</span></span>
+            <span class="health-count green"><span class="badge green"></span><b id="hc-green">0</b> <span data-i18n="diag_ok">a posto</span></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="diag-filters" id="diag-filters">
+        <button class="filter-chip active" data-filter="all" data-i18n="diag_filter_all">Tutto</button>
+        <button class="filter-chip" data-filter="problems" data-i18n="diag_filter_problems">Da sistemare</button>
+        <button class="filter-chip" data-filter="green" data-i18n="diag_filter_ok">A posto</button>
+      </div>
+
+      <div id="diagnostics-list" class="diag-list"></div>
+    </section>
+
+    <!-- ---------------- Collega account ---------------- -->
+    <section id="section-connections" class="section">
+      <h1><span class="sec-ico">⚯</span> <span data-i18n="nav_connections">Collega account</span></h1>
+      <p class="muted" data-i18n="connections_subtitle">Accedi con il tuo account e la dashboard fa il resto. Nessun token da copiare.</p>
+
+      <div class="connect-grid" id="connect-grid"></div>
+
+      <div class="connect-note muted">
+        <span class="lock-ico">🔒</span>
+        <span data-i18n="connections_privacy">Le autorizzazioni restano salvate solo sul tuo computer, in locale. Non passano da nessun server.</span>
+      </div>
+    </section>
+
+    <!-- ---------------- Account ---------------- -->
+    <section id="section-account" class="section">
+      <div id="account-logged-out">
+        <div class="auth-split">
+          <div class="auth-pane">
+            <div class="auth-tabs">
+              <button class="auth-tab active" data-mode="login" data-i18n="auth_tab_login">Accedi</button>
+              <button class="auth-tab" data-mode="register" data-i18n="auth_tab_register">Registrati</button>
+            </div>
+
+            <h2 class="auth-title" id="auth-title" data-i18n="auth_title_login">Bentornato</h2>
+            <p class="muted" id="auth-sub" data-i18n="auth_sub_login">Accedi per sincronizzare piani e preferenze.</p>
+
+            <form id="auth-form" autocomplete="on" novalidate>
+              <div class="field-row hidden" id="field-name-row">
+                <div class="field">
+                  <label for="auth-first-name" data-i18n="auth_first_name">Nome</label>
+                  <input type="text" id="auth-first-name" autocomplete="given-name" placeholder="Aurelio">
+                  <span class="field-error" id="err-first-name"></span>
+                </div>
+                <div class="field">
+                  <label for="auth-last-name" data-i18n="auth_last_name">Cognome</label>
+                  <input type="text" id="auth-last-name" autocomplete="family-name" placeholder="Avila">
+                  <span class="field-error" id="err-last-name"></span>
+                </div>
+              </div>
+
+              <div class="field hidden" id="field-birth-date">
+                <label for="auth-birth-date" data-i18n="auth_birth_date">Data di nascita</label>
+                <input type="date" id="auth-birth-date" autocomplete="bday">
+                <span class="field-error" id="err-birth-date"></span>
+              </div>
+
+              <div class="field">
+                <label for="auth-email" data-i18n="auth_email">Email</label>
+                <input type="email" id="auth-email" autocomplete="email" placeholder="tu@esempio.com" required>
+                <span class="field-error" id="err-email"></span>
+              </div>
+
+              <div class="field">
+                <label for="auth-password" data-i18n="auth_password">Password</label>
+                <div class="input-wrap">
+                  <input type="password" id="auth-password" autocomplete="current-password" placeholder="••••••••" required>
+                  <button type="button" class="reveal" id="toggle-password" aria-label="Mostra password">👁</button>
+                </div>
+                <div class="strength hidden" id="strength">
+                  <div class="strength-track"><div class="strength-fill" id="strength-fill"></div></div>
+                  <span class="strength-label" id="strength-label"></span>
+                </div>
+                <span class="field-error" id="err-password"></span>
+              </div>
+
+              <div class="field hidden" id="field-password-confirm">
+                <label for="auth-password-confirm" data-i18n="auth_password_confirm">Conferma password</label>
+                <div class="input-wrap">
+                  <input type="password" id="auth-password-confirm" autocomplete="new-password" placeholder="••••••••">
+                  <button type="button" class="reveal" id="toggle-password-confirm" aria-label="Mostra password">👁</button>
+                </div>
+                <span class="field-error" id="err-password-confirm"></span>
+              </div>
+
+              <div class="form-error hidden" id="auth-error"></div>
+
+              <button type="submit" class="btn-primary-lg" id="auth-submit">
+                <span id="auth-submit-label" data-i18n="auth_tab_login">Accedi</span>
+              </button>
+            </form>
+
+            <p class="auth-switch muted">
+              <span id="auth-switch-text" data-i18n="auth_switch_to_register">Non hai un account?</span>
+              <button type="button" class="link-btn" id="auth-switch-btn" data-i18n="auth_tab_register">Registrati</button>
+            </p>
+          </div>
+
+          <aside class="auth-aside">
+            <div class="auth-aside-glow"></div>
+            <div class="auth-aside-inner">
+              <div class="aside-badge" data-i18n="auth_aside_badge">Tutto in un posto solo</div>
+              <h3 data-i18n="auth_aside_title">Smetti di aprire sei app per capire come stai andando.</h3>
+              <ul class="aside-list">
+                <li><span class="tick">✓</span><span data-i18n="auth_aside_1">Tutti i tuoi account, un solo colpo d'occhio</span></li>
+                <li><span class="tick">✓</span><span data-i18n="auth_aside_2">Ti dice quando un numero scende, non solo quanto vale</span></li>
+                <li><span class="tick">✓</span><span data-i18n="auth_aside_3">Trova gli orari in cui i tuoi post rendono di più</span></li>
+                <li><span class="tick">✓</span><span data-i18n="auth_aside_4">I token restano sul tuo computer, non su un server</span></li>
+              </ul>
+              <div class="aside-foot" data-i18n="auth_aside_foot">Nessuna carta richiesta per iniziare.</div>
+            </div>
+          </aside>
+        </div>
+      </div>
+
+      <div id="account-logged-in" class="hidden">
+        <div class="section-header">
+          <h1 data-i18n="nav_account">Il tuo account</h1>
+          <button class="btn-ghost" id="btn-logout" data-i18n="auth_logout">Esci</button>
+        </div>
+        <div class="account-card">
+          <div class="account-id">
+            <span class="user-avatar big" id="acc-avatar">?</span>
+            <div>
+              <div class="account-name" id="acc-name"></div>
+              <div class="muted" id="acc-email"></div>
+            </div>
+          </div>
+          <div class="account-plan">
+            <span class="plan-pill" id="acc-plan">Free</span>
+            <button class="btn-analyze" data-goto="pricing" data-i18n="account_upgrade">Passa a Pro</button>
+          </div>
+        </div>
+        <div id="acc-since" class="muted"></div>
+      </div>
+    </section>
+
+    <!-- ---------------- Piani ---------------- -->
+    <section id="section-pricing" class="section">
+      <div class="pricing-head">
+        <h1 data-i18n="pricing_title">Scegli quanto vuoi vedere</h1>
+        <p class="muted" data-i18n="pricing_sub">Inizia gratis. Passa a Pro quando i numeri iniziano a contare davvero.</p>
+        <div class="cycle-toggle">
+          <button class="cycle-btn active" data-cycle="monthly" data-i18n="pricing_monthly">Mensile</button>
+          <button class="cycle-btn" data-cycle="yearly">
+            <span data-i18n="pricing_yearly">Annuale</span>
+            <span class="save-badge" data-i18n="pricing_save">2 mesi gratis</span>
+          </button>
+        </div>
+      </div>
+      <div id="plans-grid" class="plans-grid"></div>
+      <div class="pricing-note muted" id="pricing-note"></div>
+    </section>
+
+    <section id="section-themes" class="section">
+      <h1><span class="sec-ico">◐</span> <span data-i18n="nav_themes">Temi</span></h1>
+      <p class="muted" data-i18n="themes_subtitle">Scegli l'aspetto della dashboard — resta salvato anche alla prossima apertura.</p>
+      <div id="theme-grid" class="theme-grid"></div>
+    </section>
+
+    <section id="section-language" class="section">
+      <h1><span class="sec-ico">⌘</span> <span data-i18n="nav_language">Lingua</span></h1>
+      <p class="muted" data-i18n="language_subtitle">Scegli la lingua dell'interfaccia — resta salvata anche alla prossima apertura.</p>
+      <div id="language-grid" class="theme-grid"></div>
+    </section>
+  </main>
+</div>
+
+<!-- Modale "Collega account" -->
+<div class="modal-overlay hidden" id="connect-modal">
+  <div class="modal">
+    <button class="modal-close" id="connect-modal-close" aria-label="Chiudi">✕</button>
+    <div class="modal-head">
+      <span class="connect-logo" id="cm-logo">▶</span>
+      <div>
+        <div class="modal-title" id="cm-title">YouTube</div>
+        <div class="modal-sub muted" id="cm-sub"></div>
+      </div>
+    </div>
+
+    <div id="cm-linked" class="modal-linked"></div>
+
+    <div id="cm-auto" class="hidden">
+      <p class="modal-text" data-i18n="cm_auto_text">Si aprirà il browser: accedi e autorizza l'accesso in sola lettura. Tutto il resto lo fa la dashboard.</p>
+      <button class="btn-primary-lg" id="cm-auto-btn"><span id="cm-auto-label">Accedi</span></button>
+    </div>
+
+    <div id="cm-guided" class="hidden">
+      <ol class="modal-steps">
+        <li><span data-i18n="cm_step1">Autorizza l'account nella scheda che si apre.</span>
+          <button class="btn-analyze cm-open-btn" id="cm-open-btn" data-i18n="cm_open">Apri autorizzazione</button>
+        </li>
+        <li><span data-i18n="cm_step2">Incolla qui l'indirizzo della pagina su cui atterri.</span>
+          <input type="text" class="guided-input" id="cm-paste" placeholder="https://…">
+        </li>
+      </ol>
+      <button class="btn-primary-lg" id="cm-finish" data-i18n="cm_finish">Completa collegamento</button>
+    </div>
+
+    <div id="cm-unavailable" class="hidden modal-unavailable"></div>
+    <div id="cm-error" class="form-error hidden"></div>
+  </div>
+</div>
+
+<!-- Command palette -->
+<div class="palette-overlay hidden" id="palette-overlay">
+  <div class="palette">
+    <input type="text" id="palette-input" placeholder="Vai a…" autocomplete="off">
+    <div class="palette-results" id="palette-results"></div>
+  </div>
+</div>
+
+<div class="toasts" id="toasts"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
