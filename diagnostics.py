@@ -44,6 +44,33 @@ def _latest_days(items, field, is_unix=False) -> float | None:
     return best
 
 
+def _has_accounts(platform: str) -> bool:
+    """C'e' almeno un account per questa piattaforma, collegato dall'app o
+    configurato a mano? Serve a distinguere "non hai ancora dati" da "non
+    hai ancora collegato niente": al primo avvio suggerire un Refresh che
+    non puo' trovare nulla manderebbe l'utente contro un muro."""
+    import os
+
+    env_lists = {"youtube": "YT_CHANNELS", "instagram": "IG_ACCOUNTS", "tiktok": "TT_ACCOUNTS"}
+    var = env_lists.get(platform)
+    if var and os.environ.get(var, "").strip():
+        return True
+    try:
+        import connections
+        return bool(connections.list_connections(platform))
+    except Exception:
+        return False
+
+
+def _no_account_issue(platform: str, label: str) -> dict:
+    return _issue(
+        "yellow", "Da collegare", f"Nessun account {label}",
+        f"Non hai ancora collegato nessun account {label}.",
+        "Premi Collega e accedi: bastano pochi secondi.",
+        platform, {"type": "goto", "section": "connections"},
+    )
+
+
 def _issue(severity, category, title, text, next_step, platform=None, action=None) -> dict:
     out = {
         "severity": severity, "category": category, "title": title,
@@ -98,6 +125,8 @@ def _check_content_freshness(label: str, name: str, days: float | None, platform
 
 
 def _check_youtube(data: dict) -> list[dict]:
+    if not _has_accounts("youtube"):
+        return [_no_account_issue("youtube", "YouTube")]
     if not data:
         return [_issue("yellow", "Dati mancanti", "YouTube senza dati", "Nessun dato ancora caricato.", "Premi Refresh per caricare i dati.", "youtube")]
     issues = []
@@ -133,6 +162,8 @@ def _check_youtube(data: dict) -> list[dict]:
 
 
 def _check_instagram(data: dict) -> list[dict]:
+    if not _has_accounts("instagram"):
+        return [_no_account_issue("instagram", "Instagram")]
     if not data:
         return [_issue("yellow", "Dati mancanti", "Instagram senza dati", "Nessun dato ancora caricato.", "Premi Refresh per caricare i dati.", "instagram")]
     issues = []
@@ -162,6 +193,8 @@ def _check_instagram(data: dict) -> list[dict]:
 
 
 def _check_tiktok(data: dict) -> list[dict]:
+    if not _has_accounts("tiktok"):
+        return [_no_account_issue("tiktok", "TikTok")]
     if not data:
         return [_issue("yellow", "Dati mancanti", "TikTok senza dati", "Nessun dato ancora caricato.", "Premi Refresh per caricare i dati.", "tiktok")]
     issues = []
