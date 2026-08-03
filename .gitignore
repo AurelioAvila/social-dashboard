@@ -20,6 +20,11 @@ credentials.json
 *.pem
 *.key
 
+# Credenziali delle app OAuth del prodotto (Instagram/TikTok/Google) -
+# compilate nell'eseguibile distribuito, ma MAI nel repository pubblico.
+# Il template senza segreti e' brand.example.py.
+brand.py
+
 # ---------------------------------------------------------------------
 # Artefatti di build
 # ---------------------------------------------------------------------

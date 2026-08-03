@@ -67,14 +67,33 @@ python -m uvicorn app:app --port 8787 --reload
 La configurazione manuale (facoltativa) si fa copiando `.env.example` in
 `.env`. Per l'uso normale non serve: gli account si collegano dall'app.
 
+### Credenziali delle app OAuth (per chi distribuisce l'app)
+
+Il login a un clic di Instagram/TikTok/YouTube richiede le credenziali
+dell'app del prodotto, non quelle dell'utente finale. Copia
+`brand.example.py` in `brand.py` e riempi i valori con le credenziali
+create sui rispettivi portali sviluppatori:
+
+- **Instagram**: [developers.facebook.com/apps](https://developers.facebook.com/apps) →
+  crea un'app → aggiungi il caso d'uso "Gestisci i messaggi e i contenuti
+  su Instagram" → nella configurazione con Instagram Login trovi App ID e
+  App Secret, e imposti l'URL di reindirizzamento
+- **TikTok**: [developers.tiktok.com/apps](https://developers.tiktok.com/apps) →
+  crea un'app → aggiungi "Login Kit" → richiedi lo scope `video.list`
+
+`brand.py` **non va mai committato**: una volta riempito contiene segreti
+reali. È già escluso da `.gitignore`.
+
 ### Compilare l'eseguibile
 
 ```bash
 pyinstaller --noconfirm "Social Dashboard.spec"
 ```
 
-Il risultato finisce in `dist/Social Dashboard/`. `.env` e `cache.db` non
-fanno parte della build e non vanno mai distribuiti.
+Il risultato finisce in `dist/Social Dashboard/`. `.env`, `cache.db` e
+`brand.py` non fanno parte della build e non vanno mai distribuiti nel
+codice sorgente — solo le credenziali di `brand.py` finiscono compilate
+dentro l'eseguibile stesso.
 
 ### Modalità
 

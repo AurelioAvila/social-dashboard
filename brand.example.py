@@ -13,6 +13,12 @@ regola di non riusare qui le credenziali dei bot personali.
 
 Ogni valore puo' essere sovrascritto da .env con lo stesso nome, utile in
 sviluppo senza dover ricompilare.
+
+--------------------------------------------------------------------------
+COME USARLO: copia questo file in brand.py (che resta fuori da git, vedi
+.gitignore) e riempi i valori con le credenziali della tua app. brand.py
+non va MAI committato: contiene segreti reali una volta compilato.
+--------------------------------------------------------------------------
 """
 import os
 
