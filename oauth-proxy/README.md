@@ -21,30 +21,42 @@ n'è traccia.
 
 ## Deploy (Cloudflare Workers, piano gratuito)
 
+Due comandi in tutto:
+
 ```bash
-npm install -g wrangler
-wrangler login
+npx wrangler login       # una volta sola: apre il browser sul tuo account
+python deploy_proxy.py   # dalla cartella del progetto
+```
+
+`deploy_proxy.py` fa il resto da solo: pubblica il Worker, ci carica i quattro
+segreti leggendoli da `brand.py`, scrive l'URL del Worker in `brand.py` e
+**svuota** `INSTAGRAM_APP_SECRET` e `TIKTOK_CLIENT_SECRET`, così non finiscono
+più nella build. Se qualcosa fallisce si ferma senza toccare `brand.py`.
+
+Il login è l'unico passo che non può essere automatizzato: autentica il tuo
+account Cloudflare.
+
+Poi ricompila l'app e verifica:
+
+```bash
+python check_release.py --dist
+```
+
+<details>
+<summary>Farlo a mano, se preferisci</summary>
+
+```bash
 cd oauth-proxy
-wrangler deploy
+npx wrangler deploy
+npx wrangler secret put INSTAGRAM_APP_ID
+npx wrangler secret put INSTAGRAM_APP_SECRET
+npx wrangler secret put TIKTOK_CLIENT_KEY
+npx wrangler secret put TIKTOK_CLIENT_SECRET
 ```
 
-Poi carica i segreti — restano sul server, non finiscono nel repository:
-
-```bash
-wrangler secret put INSTAGRAM_APP_ID
-wrangler secret put INSTAGRAM_APP_SECRET
-wrangler secret put TIKTOK_CLIENT_KEY
-wrangler secret put TIKTOK_CLIENT_SECRET
-```
-
-Infine metti l'URL del Worker in `brand.py`:
-
-```python
-OAUTH_PROXY_URL = "https://social-dashboard-oauth.<tuo-sottodominio>.workers.dev"
-```
-
-e **svuota** `INSTAGRAM_APP_SECRET` e `TIKTOK_CLIENT_SECRET` nello stesso file.
-Da quel momento `python check_release.py` conferma che la build è pulita.
+Poi in `brand.py`: metti l'URL del Worker in `OAUTH_PROXY_URL` e svuota i due
+`*_SECRET`.
+</details>
 
 ## Verificare che funzioni
 

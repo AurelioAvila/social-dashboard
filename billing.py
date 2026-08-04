@@ -27,7 +27,7 @@ PLANS = [
         "tagline_code": "plan_free_tagline",
         "tagline": "Per iniziare e capire i tuoi numeri.",
         "accounts_code": "plan_free_accounts",
-        "accounts": "2 account collegati",
+        "accounts": "1 account collegato",
         "features": [
             ("plan_feat_all_socials", "Statistiche di tutti i social supportati"),
             ("plan_feat_manual_refresh", "Refresh manuale on-demand"),
@@ -48,7 +48,7 @@ PLANS = [
         "tagline_code": "plan_pro_tagline",
         "tagline": "Per chi pubblica ogni giorno e vuole crescere.",
         "accounts_code": "plan_pro_accounts",
-        "accounts": "15 account collegati",
+        "accounts": "3 account collegati",
         "popular": True,
         "features": [
             ("plan_feat_all_free", "Tutto quello che c'e' nel Free"),
@@ -67,7 +67,7 @@ PLANS = [
         "tagline_code": "plan_studio_tagline",
         "tagline": "Per agenzie e chi gestisce piu' brand.",
         "accounts_code": "plan_studio_accounts",
-        "accounts": "Account illimitati",
+        "accounts": "10 account collegati",
         "features": [
             ("plan_feat_all_pro", "Tutto quello che c'e' nel Pro"),
             ("plan_feat_workspaces", "Spazi di lavoro separati per cliente"),

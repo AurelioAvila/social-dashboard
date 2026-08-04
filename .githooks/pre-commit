@@ -21,10 +21,13 @@ done
 # 2. Valori che sembrano credenziali reali dentro il contenuto in stage.
 #    Si ignorano i file di esempio, che per definizione contengono
 #    segnaposto, e le righe di commento.
+#    Un valore che e' a sua volta un NOME_DI_VARIABILE tutto maiuscolo non
+#    e' una credenziale: capita nelle tabelle di corrispondenza fra nomi.
 suspect=$(git diff --cached -U0 -- . ':(exclude)*example*' ':(exclude)*.md' \
     | grep '^+' \
     | grep -vE '^\+\s*(#|//|\*)' \
-    | grep -inE '(APP_SECRET|CLIENT_SECRET|API_KEY|ACCESS_TOKEN|REFRESH_TOKEN|PASSWORD)[^=:]*[=:]\s*["'"'"'][A-Za-z0-9_/+-]{16,}["'"'"']')
+    | grep -inE '(APP_SECRET|CLIENT_SECRET|API_KEY|ACCESS_TOKEN|REFRESH_TOKEN|PASSWORD)[^=:]*[=:]\s*["'"'"'][A-Za-z0-9_/+-]{16,}["'"'"']' \
+    | grep -vE '[=:]\s*["'"'"'][A-Z][A-Z0-9_]*["'"'"']')
 
 if [ -n "$suspect" ]; then
     echo "BLOCCATO: sembra esserci una credenziale reale nel commit:"

@@ -18,22 +18,22 @@ STUDIO = "studio"
 
 DEFAULT_PLAN = FREE
 
-# max_accounts: None = senza limite.
+# max_accounts: None = senza limite (nessun piano lo usa al momento).
 ENTITLEMENTS = {
     FREE: {
-        "max_accounts": 2,
+        "max_accounts": 1,
         "history": False,      # storico e grafici di trend
         "best_hours": False,   # fasce orarie consigliate
         "csv_export": False,
     },
     PRO: {
-        "max_accounts": 15,
+        "max_accounts": 3,
         "history": True,
         "best_hours": True,
         "csv_export": True,
     },
     STUDIO: {
-        "max_accounts": None,
+        "max_accounts": 10,
         "history": True,
         "best_hours": True,
         "csv_export": True,
