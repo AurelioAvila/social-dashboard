@@ -1,55 +1,58 @@
 # Social Dashboard
 
-Tutti i tuoi account social in un'unica finestra. Collega gli account, premi
-Refresh e vedi come stai andando davvero — senza aprire sei app diverse.
+All your social accounts in one window. Connect your accounts, hit Refresh,
+and see how you're actually doing — without opening six different apps.
 
 ![Social Dashboard](icon_preview.png)
 
-## Cosa fa
+## [Download the latest version](https://github.com/AurelioAvila/social-dashboard/releases/latest)
 
-- **Panoramica unica** di YouTube, Instagram, TikTok e X, con andamento nel tempo
-- **Analitiche** che rispondono a "cosa funziona e quando conviene pubblicare":
-  contenuti migliori e grafico delle 24 ore per fascia di pubblicazione
-- **Diagnostica** che non si limita a dire se le API rispondono: segnala gli
-  account fermi da troppi giorni, i contenuti senza visualizzazioni e i
-  problemi di accesso, con il prossimo passo da fare
-- **Analisi AI on-demand** (facoltativa, a consumo) su richiesta esplicita
-- **Esportazione CSV** dei dati raccolti
-- 8 temi, 6 lingue (IT/EN/ES/FR/DE/JA)
+## What it does
+
+- **Single overview** of YouTube, Instagram, TikTok and X, with trends over time
+- **Analytics** that answer "what's working and when should I post": top
+  content and a 24-hour chart of the best posting windows
+- **Diagnostics** that go beyond "is the API responding": flags accounts
+  stalled for too many days, content with zero views, and access problems,
+  each with a concrete next step
+- **Automatic insights** computed locally from your own data — no AI calls,
+  no extra cost
+- **CSV export** of the collected data
+- 8 themes, 6 languages (IT/EN/ES/FR/DE/JA)
 
 ## Privacy
 
-Le autorizzazioni degli account restano **solo sul tuo computer**, in un
-database locale accanto all'applicazione. Non passano da nessun server:
-l'app parla direttamente con le API delle piattaforme.
+Account permissions stay **only on your computer**, in a local database next
+to the application. Nothing goes through an external server: the app talks
+directly to each platform's API.
 
-L'unica funzione che invia dati all'esterno è l'analisi AI, e solo quando
-premi tu il pulsante "Analizza".
+The only external calls are the OAuth token exchange for Instagram/TikTok,
+routed through a minimal proxy that only forwards the authorization code —
+it never sees or stores your data.
 
-## Installazione
+## Installation
 
-Scarica l'ultima release, estrai lo ZIP e avvia `Social Dashboard.exe`.
-Nessuna installazione, nessuna configurazione.
+Download the latest release, extract the ZIP and launch
+`Social Dashboard.exe`. No install, no configuration.
 
-Al primo avvio Windows può mostrare un avviso SmartScreen perché
-l'eseguibile non è firmato digitalmente: "Ulteriori informazioni" →
-"Esegui comunque".
+On first launch Windows may show a SmartScreen warning because the
+executable isn't digitally signed: "More info" → "Run anyway".
 
-## Collegare gli account
+## Connecting accounts
 
-Apri **Collega account**, premi il pulsante della piattaforma, accedi.
-L'app chiede solo l'accesso in **sola lettura** alle statistiche.
+Open **Connect account**, press the platform button, sign in. The app only
+requests **read-only** access to your statistics.
 
-Disponibilità per piattaforma:
+Availability by platform:
 
-| Piattaforma | Stato |
+| Platform | Status |
 |---|---|
-| YouTube | Collegamento diretto |
-| Instagram | Richiede le credenziali dell'app nella build |
-| TikTok | Richiede l'approvazione del permesso di lettura statistiche |
-| X | Le metriche di lettura non esistono sul piano gratuito |
+| YouTube | Direct connection |
+| Instagram | Direct connection |
+| TikTok | Requires approval of the statistics read permission |
+| X | Read metrics don't exist on the free API tier |
 
-## Sviluppo
+## Development
 
 ```bash
 python -m venv venv
@@ -58,67 +61,72 @@ pip install -r requirements.txt
 python desktop_app.py
 ```
 
-Per lavorare solo sul backend/frontend senza finestra nativa:
+To work on backend/frontend only, without the native window:
 
 ```bash
 python -m uvicorn app:app --port 8787 --reload
 ```
 
-La configurazione manuale (facoltativa) si fa copiando `.env.example` in
-`.env`. Per l'uso normale non serve: gli account si collegano dall'app.
+Manual configuration (optional) is done by copying `.env.example` to `.env`.
+Not needed for normal use: accounts are connected from within the app.
 
-### Credenziali delle app OAuth (per chi distribuisce l'app)
+### OAuth app credentials (for people distributing the app)
 
-Il login a un clic di Instagram/TikTok/YouTube richiede le credenziali
-dell'app del prodotto, non quelle dell'utente finale. Copia
-`brand.example.py` in `brand.py` e riempi i valori con le credenziali
-create sui rispettivi portali sviluppatori:
+One-click login for Instagram/TikTok/YouTube requires the product's own app
+credentials, not the end user's. Copy `brand.example.py` to `brand.py` and
+fill in the values created on the respective developer portals:
 
 - **Instagram**: [developers.facebook.com/apps](https://developers.facebook.com/apps) →
-  crea un'app → aggiungi il caso d'uso "Gestisci i messaggi e i contenuti
-  su Instagram" → nella configurazione con Instagram Login trovi App ID e
-  App Secret, e imposti l'URL di reindirizzamento
+  create an app → add the "Manage messages and content on Instagram" use
+  case → find the App ID and App Secret under the Instagram Login
+  configuration, and set the redirect URL
 - **TikTok**: [developers.tiktok.com/apps](https://developers.tiktok.com/apps) →
-  crea un'app → aggiungi "Login Kit" → richiedi lo scope `video.list`
+  create an app → add "Login Kit" → request the `video.list` scope
 
-`brand.py` **non va mai committato**: una volta riempito contiene segreti
-reali. È già escluso da `.gitignore`.
+`brand.py` **must never be committed**: once filled in it contains real
+secrets. It's already excluded via `.gitignore`.
 
-### Compilare l'eseguibile
+Instagram and TikTok additionally require a **token exchange proxy** so the
+client secret never ships inside the executable — see
+[oauth-proxy/README.md](oauth-proxy/README.md).
+
+### Building the executable
 
 ```bash
 pyinstaller --noconfirm "Social Dashboard.spec"
 ```
 
-Il risultato finisce in `dist/Social Dashboard/`. `.env`, `cache.db` e
-`brand.py` non fanno parte della build e non vanno mai distribuiti nel
-codice sorgente — solo le credenziali di `brand.py` finiscono compilate
-dentro l'eseguibile stesso.
+The result lands in `dist/Social Dashboard/`. `.env`, `cache.db` and
+`brand.py` are not part of the build and must never be distributed as
+source — only the credentials from `brand.py` end up compiled into the
+executable itself (with the confidential Instagram/TikTok secrets kept out
+via the proxy — run `python check_release.py --dist` to verify before
+distributing).
 
-### Modalità
+### Modes
 
-`APP_MODE` distingue la build pubblica da quella personale:
+`APP_MODE` distinguishes the public build from the personal one:
 
-- `customer` (default) — solo le piattaforme social
-- `personal` — include anche i moduli personali
+- `customer` (default) — social platforms only
+- `personal` — also includes the personal modules
 
-Il default è volutamente `customer`: una build distribuita per errore senza
-la variabile non espone i moduli personali.
+The default is deliberately `customer`: a build distributed by mistake
+without the variable set never exposes the personal modules.
 
-## Struttura
+## Structure
 
 ```
-app.py            API FastAPI e orchestrazione del refresh
-connections.py    Collegamento account via OAuth
-platforms/        Un adapter per piattaforma
-diagnostics.py    Controlli automatici (nessuna chiamata AI)
-analytics.py      Statistiche calcolate localmente
-trends.py         Serie storiche e variazioni
-auth.py           Registrazione e login locali
-billing.py        Piani e checkout Stripe
-static/           Interfaccia (HTML/CSS/JS, senza framework)
+app.py            FastAPI API and refresh orchestration
+connections.py    Account linking via OAuth
+platforms/        One adapter per platform
+diagnostics.py    Automated checks (no AI calls)
+analytics.py      Locally computed statistics
+trends.py         Historical series and trends
+auth.py           Local registration and login
+billing.py        Plans and Stripe checkout
+static/           UI (HTML/CSS/JS, no framework)
 ```
 
-## Licenza
+## License
 
-Tutti i diritti riservati.
+All rights reserved.
