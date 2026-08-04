@@ -439,6 +439,23 @@ button:disabled { opacity: 0.5; cursor: wait; transform: none; }
   border-color: color-mix(in srgb, var(--accent) 45%, var(--card-border));
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 12%, transparent);
 }
+/* Riquadro per una funzione inclusa in un piano superiore: si spiega cosa
+   manca e come ottenerlo, invece di lasciare una sezione vuota. */
+.locked-box {
+  display: flex; align-items: center; gap: 14px;
+  padding: 18px 20px; border-radius: 12px;
+  border: 1px dashed var(--card-border);
+  background: color-mix(in srgb, var(--accent) 5%, transparent);
+}
+.locked-box > div { flex: 1; min-width: 0; }
+.locked-ico { font-size: 20px; line-height: 1; opacity: .8; }
+.locked-title { font-weight: 600; font-size: 14px; margin-bottom: 3px; }
+.locked-text { color: var(--muted); font-size: 13px; line-height: 1.5; }
+.locked-box .btn-analyze { flex: 0 0 auto; }
+@media (max-width: 560px) {
+  .locked-box { flex-direction: column; align-items: flex-start; }
+}
+
 .insight-box.hidden { display: none; }
 .insight-box ul { margin: 0; padding-left: 0; list-style: none; }
 .insight-box li {

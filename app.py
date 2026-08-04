@@ -67,11 +67,16 @@ _units_lock = threading.Lock()
 
 
 @app.get("/api/snapshot")
-def get_snapshot():
+def get_snapshot(authorization: str | None = Header(default=None)):
     """Dati piu' recenti gia' salvati - nessuna chiamata esterna, per un
-    caricamento istantaneo e a costo zero ogni volta che si apre l'app."""
-    import insights
+    caricamento istantaneo e a costo zero ogni volta che si apre l'app.
 
+    Storico e fasce orarie consigliate sono funzioni Pro: vengono tolte dalla
+    risposta, non solo nascoste dall'interfaccia."""
+    import insights
+    import plans
+
+    plan = _current_plan(authorization)
     out = {}
     for platform in PLATFORM_NAMES:
         out[platform] = cache.latest_snapshot(platform)
@@ -81,9 +86,14 @@ def get_snapshot():
     out["insights"] = {p: insights.generate_insights(out, platform=p) for p in PLATFORM_NAMES}
     out["diagnostics"] = diagnostics.run_diagnostics(out)
     out["analytics"] = analytics.compute_analytics(out)
-    out["trends"] = trends.compute_trends()
+    out["trends"] = trends.compute_trends() if plans.allows(plan, "history") else {}
+    if not plans.allows(plan, "best_hours"):
+        out["analytics"]["best_hours"] = []
+        out["analytics"]["hours_locked"] = True
+
     fetch_times = [out[p]["fetched_at"] for p in PLATFORM_NAMES if out.get(p) and out[p].get("fetched_at")]
     out["analytics"]["last_refresh_at"] = max(fetch_times) if fetch_times else None
+    out["entitlements"] = plans.public_entitlements(plan)
     return out
 
 
@@ -199,11 +209,21 @@ def get_connections():
 
 
 @app.post("/api/connections/connect/{platform}")
-def connect_platform(platform: str):
+def connect_platform(platform: str, authorization: str | None = Header(default=None)):
     """Avvia il login OAuth: apre il browser sulla pagina della piattaforma
     e attende il ritorno su 127.0.0.1. Torna subito, il progresso si legge
-    da /api/connections/status."""
+    da /api/connections/status.
+
+    Il numero di account collegabili dipende dal piano, e il controllo sta
+    qui: nasconderlo solo nell'interfaccia non sarebbe un limite."""
     import connections
+    import plans
+
+    plan = _current_plan(authorization)
+    limit = plans.max_accounts(plan)
+    if limit is not None and len(connections.public_connections()) >= limit:
+        return {"ok": False, "code": "plan_account_limit", "limit": limit, "plan": plan,
+                "message": "plan_account_limit"}
     return connections.start_connect(platform)
 
 
@@ -249,6 +269,16 @@ def _token_from_header(authorization: str | None) -> str:
         return ""
     parts = authorization.split(None, 1)
     return parts[1].strip() if len(parts) == 2 and parts[0].lower() == "bearer" else ""
+
+
+def _current_plan(authorization: str | None) -> str:
+    """Piano dell'utente della richiesta. Chi non ha una sessione valida vale
+    come Free: il piano non si deduce mai da quello che dice il client."""
+    import auth
+    import plans
+
+    user = auth.user_for_token(_token_from_header(authorization))
+    return plans.normalize(user.get("plan") if user else None)
 
 
 @app.post("/api/auth/register")
@@ -329,11 +359,18 @@ def billing_checkout(payload: dict = Body(...), authorization: str | None = Head
 # ---------------------------------------------------------------- export
 
 @app.get("/api/export.csv", response_class=PlainTextResponse)
-def export_csv():
+def export_csv(authorization: str | None = Header(default=None)):
     """Esporta i dati dell'ultimo snapshot in CSV, per aprirli in Excel o
-    incrociarli con altri fogli senza doverli ricopiare a mano."""
+    incrociarli con altri fogli senza doverli ricopiare a mano.
+
+    Funzione Pro: il controllo e' qui, non solo sul pulsante."""
     import csv
     import io
+
+    import plans
+
+    if not plans.allows(_current_plan(authorization), "csv_export"):
+        raise HTTPException(403, "plan_feature_locked")
 
     buf = io.StringIO()
     writer = csv.writer(buf)

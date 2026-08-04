@@ -1,0 +1,10 @@
+name = "social-dashboard-oauth"
+main = "worker.js"
+compatibility_date = "2026-08-04"
+
+# I segreti NON vanno scritti qui: questo file finisce nel repository.
+# Si caricano con `wrangler secret put NOME`, vedi README.md.
+#   INSTAGRAM_APP_ID
+#   INSTAGRAM_APP_SECRET
+#   TIKTOK_CLIENT_KEY
+#   TIKTOK_CLIENT_SECRET

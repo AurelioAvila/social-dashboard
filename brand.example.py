@@ -34,6 +34,11 @@ INSTAGRAM_APP_ID = ""
 INSTAGRAM_APP_SECRET = ""
 INSTAGRAM_REDIRECT_URI = ""
 
+# Endpoint che custodisce i client secret al posto dell'eseguibile: con
+# questo valorizzato, i due *_SECRET qui sotto restano vuoti e non finiscono
+# nella build. Vedi oauth-proxy/README.md.
+OAUTH_PROXY_URL = ""
+
 # --- TikTok -----------------------------------------------------------
 TIKTOK_CLIENT_KEY = ""
 TIKTOK_CLIENT_SECRET = ""

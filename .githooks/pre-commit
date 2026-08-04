@@ -1,0 +1,37 @@
+#!/bin/sh
+# Blocca il commit se stanno per finire nel repository dei segreti.
+#
+# Attivazione (una volta sola, per ogni clone):
+#     git config core.hooksPath .githooks
+#
+# E' successo davvero di committare brand.py: allora conteneva solo
+# segnaposto vuoti, ma la volta dopo poteva andare diversamente.
+
+staged=$(git diff --cached --name-only)
+
+# 1. File che non devono mai essere tracciati.
+for f in brand.py .env; do
+    if printf '%s\n' "$staged" | grep -qx "$f"; then
+        echo "BLOCCATO: $f contiene credenziali e non va committato."
+        echo "  Rimuovilo dallo stage con:  git restore --staged $f"
+        exit 1
+    fi
+done
+
+# 2. Valori che sembrano credenziali reali dentro il contenuto in stage.
+#    Si ignorano i file di esempio, che per definizione contengono
+#    segnaposto, e le righe di commento.
+suspect=$(git diff --cached -U0 -- . ':(exclude)*example*' ':(exclude)*.md' \
+    | grep '^+' \
+    | grep -vE '^\+\s*(#|//|\*)' \
+    | grep -inE '(APP_SECRET|CLIENT_SECRET|API_KEY|ACCESS_TOKEN|REFRESH_TOKEN|PASSWORD)[^=:]*[=:]\s*["'"'"'][A-Za-z0-9_/+-]{16,}["'"'"']')
+
+if [ -n "$suspect" ]; then
+    echo "BLOCCATO: sembra esserci una credenziale reale nel commit:"
+    echo "$suspect" | head -5
+    echo ""
+    echo "  Se e' un falso positivo:  git commit --no-verify"
+    exit 1
+fi
+
+exit 0

@@ -325,7 +325,47 @@ def _env_pair(id_suffix: str, secret_suffix: str) -> tuple[str, str] | None:
     return None
 
 
+# ---------------------------------------------------------------------------
+# Scambio del token tramite proxy
+#
+# Instagram e TikTok pretendono il client secret per trasformare il `code` in
+# un token. Compilarlo dentro l'eseguibile significa consegnarlo a chiunque
+# scarichi l'app: basta decomprimere il binario per rileggerlo in chiaro
+# (verificato). Meta lo dice esplicitamente: l'app secret non va mai messo in
+# codice distribuito.
+#
+# Con OAUTH_PROXY_URL configurato lo scambio avviene su un endpoint nostro che
+# custodisce i segreti, e nella build non ne finisce nessuno. Senza, si ricade
+# sul comportamento storico (utile in sviluppo, sconsigliato per distribuire).
+# ---------------------------------------------------------------------------
+
+def proxy_url() -> str:
+    import brand
+    return (brand.get("OAUTH_PROXY_URL") or "").rstrip("/")
+
+
+def using_proxy() -> bool:
+    return bool(proxy_url())
+
+
+def proxy_call(action: str, payload: dict) -> dict:
+    import requests
+
+    base = proxy_url()
+    if not base:
+        raise RuntimeError("proxy_not_configured")
+    resp = requests.post(f"{base}/{action}", json=payload, timeout=30)
+    if not resp.ok:
+        raise RuntimeError(f"Il servizio di autorizzazione ha risposto {resp.status_code}: {resp.text[:200]}")
+    data = resp.json()
+    if data.get("error"):
+        raise RuntimeError(str(data["error"])[:200])
+    return data
+
+
 def _instagram_app() -> tuple[str, str, str]:
+    """(app_id, secret, redirect). Con il proxy attivo il secret non e' nella
+    build e resta vuoto: serve solo all'endpoint che fa lo scambio."""
     import brand
     app_id = brand.get("INSTAGRAM_APP_ID")
     secret = brand.get("INSTAGRAM_APP_SECRET")
@@ -334,12 +374,14 @@ def _instagram_app() -> tuple[str, str, str]:
         found = _env_pair("_IG_APP_ID", "_IG_APP_SECRET")
         if found:
             app_id, secret = found
-    if not (app_id and secret and redirect):
+    required = (app_id, redirect) if using_proxy() else (app_id, secret, redirect)
+    if not all(required):
         raise RuntimeError(NOT_SET)
     return app_id, secret, redirect
 
 
 def _tiktok_app() -> tuple[str, str, str]:
+    """(client_key, secret, redirect). Vedi _instagram_app per il secret."""
     import brand
     key = brand.get("TIKTOK_CLIENT_KEY")
     secret = brand.get("TIKTOK_CLIENT_SECRET")
@@ -348,7 +390,8 @@ def _tiktok_app() -> tuple[str, str, str]:
         found = _env_pair("_TIKTOK_CLIENT_KEY", "_TIKTOK_CLIENT_SECRET")
         if found:
             key, secret = found
-    if not (key and secret and redirect):
+    required = (key, redirect) if using_proxy() else (key, secret, redirect)
+    if not all(required):
         raise RuntimeError(NOT_SET)
     return key, secret, redirect
 
@@ -412,32 +455,40 @@ def _finish_instagram(code: str) -> str:
     import requests
 
     app_id, app_secret, redirect = _instagram_app()
-    token_resp = requests.post(
-        "https://api.instagram.com/oauth/access_token",
-        data={
-            "client_id": app_id,
-            "client_secret": app_secret,
-            "grant_type": "authorization_code",
-            "redirect_uri": redirect,
-            "code": code,
-        },
-        timeout=30,
-    )
-    if not token_resp.ok:
-        raise RuntimeError(f"Instagram ha rifiutato il codice: {token_resp.text[:200]}")
-    short = token_resp.json()
 
-    # Il token breve dura un'ora: si scambia subito con quello a 60 giorni,
-    # altrimenti il collegamento smetterebbe di funzionare quasi subito.
-    long_resp = requests.get(
-        "https://graph.instagram.com/access_token",
-        params={"grant_type": "ig_exchange_token", "client_secret": app_secret,
-                "access_token": short["access_token"]},
-        timeout=30,
-    )
-    if not long_resp.ok:
-        raise RuntimeError(f"Scambio del token fallito: {long_resp.text[:200]}")
-    long_token = long_resp.json()["access_token"]
+    if using_proxy():
+        # Il secret non e' in questa build: code -> token a lunga durata
+        # avviene sull'endpoint che lo custodisce.
+        long_token = proxy_call("exchange", {
+            "platform": "instagram", "code": code, "redirect_uri": redirect,
+        })["access_token"]
+    else:
+        token_resp = requests.post(
+            "https://api.instagram.com/oauth/access_token",
+            data={
+                "client_id": app_id,
+                "client_secret": app_secret,
+                "grant_type": "authorization_code",
+                "redirect_uri": redirect,
+                "code": code,
+            },
+            timeout=30,
+        )
+        if not token_resp.ok:
+            raise RuntimeError(f"Instagram ha rifiutato il codice: {token_resp.text[:200]}")
+        short = token_resp.json()
+
+        # Il token breve dura un'ora: si scambia subito con quello a 60 giorni,
+        # altrimenti il collegamento smetterebbe di funzionare quasi subito.
+        long_resp = requests.get(
+            "https://graph.instagram.com/access_token",
+            params={"grant_type": "ig_exchange_token", "client_secret": app_secret,
+                    "access_token": short["access_token"]},
+            timeout=30,
+        )
+        if not long_resp.ok:
+            raise RuntimeError(f"Scambio del token fallito: {long_resp.text[:200]}")
+        long_token = long_resp.json()["access_token"]
 
     me = requests.get(
         "https://graph.instagram.com/v21.0/me",
@@ -459,18 +510,24 @@ def _finish_tiktok(code: str) -> str:
     import requests
 
     key, secret, redirect = _tiktok_app()
-    resp = requests.post(
-        "https://open.tiktokapis.com/v2/oauth/token/",
-        headers={"Content-Type": "application/x-www-form-urlencoded"},
-        data={
-            "client_key": key, "client_secret": secret,
-            "code": code, "grant_type": "authorization_code", "redirect_uri": redirect,
-        },
-        timeout=30,
-    )
-    if not resp.ok:
-        raise RuntimeError(f"TikTok ha rifiutato il codice: {resp.text[:200]}")
-    data = resp.json()
+
+    if using_proxy():
+        data = proxy_call("exchange", {
+            "platform": "tiktok", "code": code, "redirect_uri": redirect,
+        })
+    else:
+        resp = requests.post(
+            "https://open.tiktokapis.com/v2/oauth/token/",
+            headers={"Content-Type": "application/x-www-form-urlencoded"},
+            data={
+                "client_key": key, "client_secret": secret,
+                "code": code, "grant_type": "authorization_code", "redirect_uri": redirect,
+            },
+            timeout=30,
+        )
+        if not resp.ok:
+            raise RuntimeError(f"TikTok ha rifiutato il codice: {resp.text[:200]}")
+        data = resp.json()
     if "access_token" not in data:
         raise RuntimeError(f"Risposta inattesa da TikTok: {str(data)[:200]}")
 
@@ -494,10 +551,14 @@ def _finish_tiktok(code: str) -> str:
     except Exception:
         pass
 
-    save_connection("tiktok", username, str(data.get("open_id", username)), {
-        "refresh_token": data["refresh_token"], "client_key": key, "client_secret": secret,
-        "granted_scope": granted,
-    })
+    # Col proxy il secret non viene salvato nemmeno in locale: il rinnovo del
+    # token passera' anch'esso dall'endpoint che lo custodisce.
+    stored = {"refresh_token": data["refresh_token"], "client_key": key, "granted_scope": granted}
+    if using_proxy():
+        stored["via_proxy"] = True
+    else:
+        stored["client_secret"] = secret
+    save_connection("tiktok", username, str(data.get("open_id", username)), stored)
     return username
 
 

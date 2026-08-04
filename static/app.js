@@ -82,6 +82,12 @@ const I18N = {
     label_eslint: "ESLint", val_not_configured: "non configurato", val_errors_warnings: "{e} errori, {w} warning",
     insight_loading: "Analisi in corso…", insight_error: "Errore durante l'analisi: ",
     ins_no_items: "{name}: nessun contenuto recente da analizzare.",
+    locked_title: "Funzione del piano Pro",
+    locked_cta: "Vedi i piani",
+    locked_best_hours: "Le fasce orarie consigliate sono incluse nel piano Pro.",
+    locked_history: "Lo storico e i grafici di trend sono inclusi nel piano Pro.",
+    plan_feature_locked: "Questa funzione è inclusa nel piano Pro.",
+    plan_account_limit: "Il tuo piano include {n} account collegati. Passa a Pro per aggiungerne altri.",
     plan_free_tagline: "Per iniziare e capire i tuoi numeri.",
     plan_free_accounts: "2 account collegati",
     plan_pro_tagline: "Per chi pubblica ogni giorno e vuole crescere.",
@@ -248,6 +254,12 @@ const I18N = {
     label_eslint: "ESLint", val_not_configured: "not configured", val_errors_warnings: "{e} errors, {w} warnings",
     insight_loading: "Analyzing…", insight_error: "Error during analysis: ",
     ins_no_items: "{name}: no recent content to analyze.",
+    locked_title: "Pro plan feature",
+    locked_cta: "See plans",
+    locked_best_hours: "Recommended time slots are included in the Pro plan.",
+    locked_history: "History and trend charts are included in the Pro plan.",
+    plan_feature_locked: "This feature is included in the Pro plan.",
+    plan_account_limit: "Your plan includes {n} linked accounts. Upgrade to Pro to add more.",
     plan_free_tagline: "To get started and understand your numbers.",
     plan_free_accounts: "2 linked accounts",
     plan_pro_tagline: "For those posting daily who want to grow.",
@@ -414,6 +426,12 @@ const I18N = {
     label_eslint: "ESLint", val_not_configured: "no configurado", val_errors_warnings: "{e} errores, {w} avisos",
     insight_loading: "Analizando…", insight_error: "Error durante el análisis: ",
     ins_no_items: "{name}: no hay contenido reciente que analizar.",
+    locked_title: "Función del plan Pro",
+    locked_cta: "Ver planes",
+    locked_best_hours: "Las franjas horarias recomendadas se incluyen en el plan Pro.",
+    locked_history: "El historial y los gráficos de tendencia se incluyen en el plan Pro.",
+    plan_feature_locked: "Esta función se incluye en el plan Pro.",
+    plan_account_limit: "Tu plan incluye {n} cuentas vinculadas. Pasa a Pro para añadir más.",
     plan_free_tagline: "Para empezar y entender tus números.",
     plan_free_accounts: "2 cuentas vinculadas",
     plan_pro_tagline: "Para quien publica a diario y quiere crecer.",
@@ -580,6 +598,12 @@ const I18N = {
     label_eslint: "ESLint", val_not_configured: "non configuré", val_errors_warnings: "{e} erreurs, {w} avertissements",
     insight_loading: "Analyse en cours…", insight_error: "Erreur pendant l'analyse : ",
     ins_no_items: "{name} : aucun contenu récent à analyser.",
+    locked_title: "Fonction de l'offre Pro",
+    locked_cta: "Voir les offres",
+    locked_best_hours: "Les créneaux recommandés sont inclus dans l'offre Pro.",
+    locked_history: "L'historique et les graphiques de tendance sont inclus dans l'offre Pro.",
+    plan_feature_locked: "Cette fonction est incluse dans l'offre Pro.",
+    plan_account_limit: "Votre offre inclut {n} comptes liés. Passez à Pro pour en ajouter.",
     plan_free_tagline: "Pour débuter et comprendre vos chiffres.",
     plan_free_accounts: "2 comptes liés",
     plan_pro_tagline: "Pour ceux qui publient chaque jour et veulent grandir.",
@@ -746,6 +770,12 @@ const I18N = {
     label_eslint: "ESLint", val_not_configured: "nicht konfiguriert", val_errors_warnings: "{e} Fehler, {w} Warnungen",
     insight_loading: "Analyse läuft…", insight_error: "Fehler bei der Analyse: ",
     ins_no_items: "{name}: keine aktuellen Inhalte zum Auswerten.",
+    locked_title: "Funktion des Pro-Tarifs",
+    locked_cta: "Tarife ansehen",
+    locked_best_hours: "Empfohlene Zeitfenster sind im Pro-Tarif enthalten.",
+    locked_history: "Verlauf und Trenddiagramme sind im Pro-Tarif enthalten.",
+    plan_feature_locked: "Diese Funktion ist im Pro-Tarif enthalten.",
+    plan_account_limit: "Dein Tarif umfasst {n} verknüpfte Konten. Wechsle zu Pro für mehr.",
     plan_free_tagline: "Zum Einstieg und um deine Zahlen zu verstehen.",
     plan_free_accounts: "2 verknüpfte Konten",
     plan_pro_tagline: "Für alle, die täglich posten und wachsen wollen.",
@@ -912,6 +942,12 @@ const I18N = {
     label_eslint: "ESLint", val_not_configured: "未設定", val_errors_warnings: "エラー{e}件、警告{w}件",
     insight_loading: "分析中…", insight_error: "分析中にエラーが発生しました: ",
     ins_no_items: "{name}: 分析できる最近のコンテンツがありません。",
+    locked_title: "Pro プランの機能",
+    locked_cta: "プランを見る",
+    locked_best_hours: "おすすめの時間帯は Pro プランに含まれています。",
+    locked_history: "履歴とトレンドグラフは Pro プランに含まれています。",
+    plan_feature_locked: "この機能は Pro プランに含まれています。",
+    plan_account_limit: "現在のプランでは連携アカウントは {n} 件までです。Pro にすると追加できます。",
     plan_free_tagline: "まずは数字を把握するために。",
     plan_free_accounts: "連携アカウント 2 件",
     plan_pro_tagline: "毎日投稿して伸ばしたい方へ。",
@@ -1578,6 +1614,15 @@ function renderAnalytics(a) {
       <div class="rank-meta">${esc(p.account)}</div>
     </div>`).join("");
 
+  // Funzione Pro: il server non manda nemmeno i dati, qui si spiega perché
+  // invece di lasciare una sezione vuota senza motivo.
+  if (a.hours_locked) {
+    hoursEl.innerHTML = lockedBox("locked_best_hours");
+    chartEl.innerHTML = "";
+    wireLocked(hoursEl);
+    return;
+  }
+
   // Con pochi contenuti una classifica di fasce orarie sarebbe solo
   // l'elenco dei singoli post travestito da consiglio: meglio dire
   // apertamente quanti dati mancano.
@@ -1933,8 +1978,20 @@ async function startConnect(platform, btn) {
   btn.textContent = t("connect_waiting");
   cmError("");
   try {
-    const resp = await (await fetch(`/api/connections/connect/${platform}`, { method: "POST" })).json();
-    if (!resp.ok) { cmError(resp.message || t("generic_error")); toast(resp.message || t("generic_error"), "err"); return; }
+    const resp = await (await fetch(`/api/connections/connect/${platform}`, {
+      method: "POST", headers: authHeaders(),
+    })).json();
+    if (!resp.ok) {
+      // Limite di piano: si dice quanti account include il piano attuale e
+      // si offre la strada per alzarlo, invece di un rifiuto secco.
+      const msg = resp.code === "plan_account_limit"
+        ? t("plan_account_limit", { n: resp.limit })
+        : (tServer(resp.message) || t("generic_error"));
+      cmError(msg);
+      toast(msg, "err");
+      if (resp.code === "plan_account_limit") closeConnectModal(), goTo("pricing");
+      return;
+    }
     toast(t("connect_browser_opened"));
 
     // Il login avviene nel browser: si attende che il flusso finisca.
@@ -2340,15 +2397,69 @@ document.addEventListener("keydown", e => {
   else if (e.key === "Enter" && items[paletteSel]) { goTo(items[paletteSel].section); closePalette(); }
 });
 
+// ---------- Limiti di piano ----------
+/** Diritti dell'utente corrente. Arrivano dallo snapshot: è il server a
+ *  deciderli, qui servono solo a disegnare lucchetti e inviti coerenti. */
+let entitlements = null;
+
+function planAllows(feature) {
+  // Prima che lo snapshot arrivi non si blocca nulla: il server rifiuta
+  // comunque, quindi al massimo si vede un attimo il contenuto sbloccato
+  // invece di un lucchetto che poi sparisce.
+  return !entitlements || !!entitlements[feature];
+}
+
+function showUpgradeNeeded(feature) {
+  toast(t("plan_feature_locked"), "err");
+  goTo("pricing");
+}
+
+/** Riquadro "questa funzione è del piano Pro" con il pulsante per passare. */
+function lockedBox(featureKey) {
+  return `<div class="locked-box">
+    <span class="locked-ico">🔒</span>
+    <div>
+      <div class="locked-title">${t("locked_title")}</div>
+      <div class="locked-text">${t(featureKey)}</div>
+    </div>
+    <button class="btn-analyze" data-goto="pricing">${t("locked_cta")}</button>
+  </div>`;
+}
+
+function wireLocked(root) {
+  (root || document).querySelectorAll(".locked-box [data-goto]").forEach(btn => {
+    btn.addEventListener("click", () => goTo(btn.dataset.goto));
+  });
+}
+
 // ---------- Export ----------
-document.getElementById("btn-export").addEventListener("click", () => {
-  window.location.href = "/api/export.csv";
-  toast(t("toast_export_done"), "ok");
+// Una navigazione diretta non puo' portarsi dietro l'intestazione di
+// autenticazione, e senza quella il server non sa quale piano applicare:
+// si scarica via fetch e si salva il file a mano.
+document.getElementById("btn-export").addEventListener("click", async () => {
+  try {
+    const resp = await fetch("/api/export.csv", { headers: authHeaders() });
+    if (resp.status === 403) { showUpgradeNeeded("csv_export"); return; }
+    if (!resp.ok) { toast(t("generic_error"), "err"); return; }
+
+    const url = URL.createObjectURL(await resp.blob());
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "social-dashboard.csv";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    toast(t("toast_export_done"), "ok");
+  } catch (e) {
+    toast(t("generic_error"), "err");
+  }
 });
 
 // ---------- Orchestrazione ----------
 function renderAll(snapshot) {
   currentSnapshot = snapshot;
+  entitlements = snapshot.entitlements || null;
   renderOverview(snapshot);
   activePlatforms().forEach(key => {
     DETAIL_RENDERERS[key]?.(snapshot[key]);
@@ -2369,7 +2480,9 @@ function renderAll(snapshot) {
 }
 
 async function loadSnapshot() {
-  const resp = await fetch("/api/snapshot");
+  // Con il token il server sa quale piano applicare: storico e fasce orarie
+  // arrivano solo a chi ne ha diritto.
+  const resp = await fetch("/api/snapshot", { headers: authHeaders() });
   renderAll(await resp.json());
 }
 

@@ -84,7 +84,11 @@ def _sources() -> list[dict]:
         sources.append({
             "name": conn["account_name"], "kind": "oauth",
             "refresh_token": data["refresh_token"],
-            "client_key": data["client_key"], "client_secret": data["client_secret"],
+            "client_key": data.get("client_key", ""),
+            # Assente quando il collegamento e' passato dal proxy: in quel
+            # caso il secret non e' mai stato salvato qui.
+            "client_secret": data.get("client_secret", ""),
+            "via_proxy": bool(data.get("via_proxy")),
         })
     return sources
 
@@ -92,6 +96,19 @@ def _sources() -> list[dict]:
 def _access_token_from(source: dict) -> str:
     if source["kind"] == "env":
         return _get_access_token(source["prefix"])
+    if source.get("via_proxy"):
+        # Anche il rinnovo richiede il secret: lo fa l'endpoint che lo tiene.
+        import connections
+        data = connections.proxy_call("refresh", {
+            "platform": "tiktok", "refresh_token": source["refresh_token"],
+        })
+        granted = data.get("scope", "")
+        if "video.list" not in granted:
+            raise RuntimeError(
+                f"Token valido ma senza permesso 'video.list' (scope concesso: {granted or 'nessuno'}) - "
+                "serve una TikTok App Review per abilitare la lettura statistiche."
+            )
+        return data["access_token"]
     return _exchange_refresh(source["client_key"], source["client_secret"], source["refresh_token"])
 
 
