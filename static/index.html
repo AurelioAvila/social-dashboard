@@ -86,8 +86,7 @@
     <section id="section-youtube" class="section">
       <div class="section-header">
         <h1><span class="sec-ico">▶</span> YouTube</h1>
-        <button class="btn-link-account" data-link-platform="youtube" title="Collega account"><span class="link-ico">🔗</span> <span data-i18n="btn_link_account">Collega</span></button>
-        <button class="btn-analyze" data-platform="youtube">✨ <span data-i18n="btn_analyze">Analizza</span></button>
+        <button class="btn-link-account" data-link-platform="youtube" data-i18n-title="btn_link_account_full"><span class="link-ico">🔗</span> <span data-i18n="btn_link_account">Collega</span></button>
       </div>
       <div id="youtube-insight" class="insight-box hidden"></div>
       <div id="youtube-detail" class="detail"></div>
@@ -96,8 +95,7 @@
     <section id="section-instagram" class="section">
       <div class="section-header">
         <h1><span class="sec-ico">◈</span> Instagram</h1>
-        <button class="btn-link-account" data-link-platform="instagram" title="Collega account"><span class="link-ico">🔗</span> <span data-i18n="btn_link_account">Collega</span></button>
-        <button class="btn-analyze" data-platform="instagram">✨ <span data-i18n="btn_analyze">Analizza</span></button>
+        <button class="btn-link-account" data-link-platform="instagram" data-i18n-title="btn_link_account_full"><span class="link-ico">🔗</span> <span data-i18n="btn_link_account">Collega</span></button>
       </div>
       <div id="instagram-insight" class="insight-box hidden"></div>
       <div id="instagram-detail" class="detail"></div>
@@ -106,8 +104,7 @@
     <section id="section-tiktok" class="section">
       <div class="section-header">
         <h1><span class="sec-ico">♪</span> TikTok</h1>
-        <button class="btn-link-account" data-link-platform="tiktok" title="Collega account"><span class="link-ico">🔗</span> <span data-i18n="btn_link_account">Collega</span></button>
-        <button class="btn-analyze" data-platform="tiktok">✨ <span data-i18n="btn_analyze">Analizza</span></button>
+        <button class="btn-link-account" data-link-platform="tiktok" data-i18n-title="btn_link_account_full"><span class="link-ico">🔗</span> <span data-i18n="btn_link_account">Collega</span></button>
       </div>
       <div id="tiktok-insight" class="insight-box hidden"></div>
       <div id="tiktok-detail" class="detail"></div>
@@ -116,8 +113,7 @@
     <section id="section-x" class="section">
       <div class="section-header">
         <h1><span class="sec-ico">✕</span> X</h1>
-        <button class="btn-link-account" data-link-platform="x" title="Collega account"><span class="link-ico">🔗</span> <span data-i18n="btn_link_account">Collega</span></button>
-        <button class="btn-analyze" data-platform="x">✨ <span data-i18n="btn_analyze">Analizza</span></button>
+        <button class="btn-link-account" data-link-platform="x" data-i18n-title="btn_link_account_full"><span class="link-ico">🔗</span> <span data-i18n="btn_link_account">Collega</span></button>
       </div>
       <div id="x-insight" class="insight-box hidden"></div>
       <div id="x-detail" class="detail"></div>
@@ -126,7 +122,6 @@
     <section id="section-certsprint" class="section">
       <div class="section-header">
         <h1><span class="sec-ico">🛡</span> CertSprint</h1>
-        <button class="btn-analyze" data-platform="certsprint">✨ <span data-i18n="btn_analyze">Analizza</span></button>
       </div>
       <div id="certsprint-insight" class="insight-box hidden"></div>
       <div id="certsprint-detail" class="detail"></div>
@@ -209,12 +204,12 @@
               <div class="field-row hidden" id="field-name-row">
                 <div class="field">
                   <label for="auth-first-name" data-i18n="auth_first_name">Nome</label>
-                  <input type="text" id="auth-first-name" autocomplete="given-name" placeholder="Aurelio">
+                  <input type="text" id="auth-first-name" autocomplete="given-name" data-i18n-placeholder="auth_first_name_ph">
                   <span class="field-error" id="err-first-name"></span>
                 </div>
                 <div class="field">
                   <label for="auth-last-name" data-i18n="auth_last_name">Cognome</label>
-                  <input type="text" id="auth-last-name" autocomplete="family-name" placeholder="Avila">
+                  <input type="text" id="auth-last-name" autocomplete="family-name" data-i18n-placeholder="auth_last_name_ph">
                   <span class="field-error" id="err-last-name"></span>
                 </div>
               </div>
@@ -227,7 +222,7 @@
 
               <div class="field">
                 <label for="auth-email" data-i18n="auth_email">Email</label>
-                <input type="email" id="auth-email" autocomplete="email" placeholder="tu@esempio.com" required>
+                <input type="email" id="auth-email" autocomplete="email" data-i18n-placeholder="auth_email_ph" required>
                 <span class="field-error" id="err-email"></span>
               </div>
 
@@ -235,7 +230,7 @@
                 <label for="auth-password" data-i18n="auth_password">Password</label>
                 <div class="input-wrap">
                   <input type="password" id="auth-password" autocomplete="current-password" placeholder="••••••••" required>
-                  <button type="button" class="reveal" id="toggle-password" aria-label="Mostra password">👁</button>
+                  <button type="button" class="reveal" id="toggle-password" data-i18n-aria="aria_toggle_password">👁</button>
                 </div>
                 <div class="strength hidden" id="strength">
                   <div class="strength-track"><div class="strength-fill" id="strength-fill"></div></div>
@@ -248,7 +243,7 @@
                 <label for="auth-password-confirm" data-i18n="auth_password_confirm">Conferma password</label>
                 <div class="input-wrap">
                   <input type="password" id="auth-password-confirm" autocomplete="new-password" placeholder="••••••••">
-                  <button type="button" class="reveal" id="toggle-password-confirm" aria-label="Mostra password">👁</button>
+                  <button type="button" class="reveal" id="toggle-password-confirm" data-i18n-aria="aria_toggle_password">👁</button>
                 </div>
                 <span class="field-error" id="err-password-confirm"></span>
               </div>
@@ -375,7 +370,7 @@
 <!-- Command palette -->
 <div class="palette-overlay hidden" id="palette-overlay">
   <div class="palette">
-    <input type="text" id="palette-input" placeholder="Vai a…" autocomplete="off">
+    <input type="text" id="palette-input" data-i18n-placeholder="palette_placeholder" autocomplete="off">
     <div class="palette-results" id="palette-results"></div>
   </div>
 </div>

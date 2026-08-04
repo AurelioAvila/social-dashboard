@@ -9,10 +9,25 @@ import sqlite3
 import sys
 import time
 
-# Vedi commento analogo in app.py: in un .exe compilato serve una cartella
-# persistente accanto all'eseguibile, non quella temporanea di estrazione.
-_APP_DIR = os.path.dirname(sys.executable) if getattr(sys, "frozen", False) else os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(_APP_DIR, "cache.db")
+# cache.db contiene le connessioni account dell'utente (YouTube/Instagram/
+# TikTok): deve sopravvivere a reinstallazioni e rebuild dell'exe, quindi non
+# puo' stare accanto all'eseguibile (quella cartella viene ricreata da zero
+# a ogni build/installer, cancellando tutto). Va in una cartella utente
+# stabile fuori dalla cartella dell'app.
+if getattr(sys, "frozen", False):
+    DATA_DIR = os.path.join(os.getenv("APPDATA") or os.path.expanduser("~"), "SocialDashboard")
+    os.makedirs(DATA_DIR, exist_ok=True)
+else:
+    DATA_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.path.join(DATA_DIR, "cache.db")
+
+# Migrazione una tantum: se un'installazione precedente aveva il db accanto
+# all'exe, spostalo nella nuova posizione stabile invece di perdere i dati.
+if getattr(sys, "frozen", False) and not os.path.exists(DB_PATH):
+    _legacy_path = os.path.join(os.path.dirname(sys.executable), "cache.db")
+    if os.path.exists(_legacy_path):
+        import shutil
+        shutil.move(_legacy_path, DB_PATH)
 
 
 def _conn():

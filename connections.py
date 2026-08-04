@@ -14,6 +14,7 @@ una configurazione manuale esistente continua a funzionare.
 """
 import json
 import os
+import secrets
 import sqlite3
 import threading
 import time
@@ -25,8 +26,37 @@ YOUTUBE_SCOPES = ["https://www.googleapis.com/auth/youtube.readonly"]
 # Stato del collegamento in corso: il flusso OAuth blocca finche' l'utente
 # non completa il login nel browser, quindi gira in un thread e il frontend
 # ne segue l'avanzamento in polling (stessa logica del refresh).
-_connect_state = {"running": False, "platform": None, "error": None, "done": False, "account": None}
+#
+# started_at serve a non restare bloccati: se un tentativo precedente e'
+# morto male (finestra chiusa in un modo che non solleva eccezioni, thread
+# appeso), senza scadenza lo stato resterebbe "running" e ogni collegamento
+# successivo verrebbe respinto con "C'e' gia' un collegamento in corso".
+_connect_state = {"running": False, "platform": None, "error": None, "done": False,
+                  "account": None, "started_at": 0}
 _connect_lock = threading.Lock()
+
+# Oltre questo tempo un collegamento "in corso" e' considerato abbandonato:
+# e' piu' del tempo che serve a un login reale, ma abbastanza poco da non
+# lasciare l'utente bloccato ad aspettare.
+CONNECT_STALE_SECONDS = 330
+
+
+def _connect_is_active() -> bool:
+    """True solo se c'e' davvero un collegamento vivo, non un residuo."""
+    if not _connect_state["running"]:
+        return False
+    if time.time() - (_connect_state.get("started_at") or 0) > CONNECT_STALE_SECONDS:
+        _connect_state["running"] = False
+        _connect_state["error"] = _connect_state["error"] or "Collegamento scaduto: riprova."
+        return False
+    return True
+
+
+def cancel_connect() -> dict:
+    """Annulla il collegamento in corso, cosi' l'utente non deve aspettare
+    la scadenza se ha chiuso la finestra o ha cambiato idea."""
+    _connect_state.update({"running": False, "done": False, "error": None, "account": None})
+    return {"ok": True}
 
 
 def _conn() -> sqlite3.Connection:
@@ -148,7 +178,10 @@ def _connect_youtube() -> None:
     )
     # port=0 => porta libera scelta dal sistema; Google accetta qualunque
     # porta su 127.0.0.1 per i client di tipo "Desktop app".
-    creds = flow.run_local_server(port=0, prompt="consent", open_browser=True)
+    # select_account e' quello che rende possibile collegare piu' canali:
+    # senza, Google riusa in silenzio l'account gia' loggato nel browser e
+    # si finisce per ricollegare sempre lo stesso.
+    creds = flow.run_local_server(port=0, prompt="consent select_account", open_browser=True)
 
     service = build("youtube", "v3", credentials=creds)
     resp = service.channels().list(part="snippet", mine=True).execute()
@@ -203,8 +236,24 @@ def _connect_in_window(auth_url: str, redirect_uri: str, title: str, timeout: in
     window = webview.create_window(title, auth_url, width=520, height=720)
     result = {}
 
+    # Chiudere la finestra non sempre fa fallire get_current_url(): su alcuni
+    # backend continua a restituire l'ultimo URL, e il ciclo restava in piedi
+    # fino al timeout tenendo lo stato bloccato su "collegamento in corso".
+    # L'evento closed e' il segnale attendibile.
+    closed = threading.Event()
+    try:
+        window.events.closed += closed.set
+    except Exception:
+        pass
+
+    from urllib.parse import urlparse
+
+    auth_host = urlparse(auth_url).netloc
+
     deadline = time.time() + timeout
     while time.time() < deadline:
+        if closed.is_set():
+            break
         time.sleep(0.35)
         try:
             current = window.get_current_url()
@@ -212,14 +261,23 @@ def _connect_in_window(auth_url: str, redirect_uri: str, title: str, timeout: in
             break  # finestra chiusa dall'utente
         if not current:
             continue
+        # Il confronto esatto sul prefisso non basta: se la pagina di
+        # atterraggio e' un'applicazione web, il suo router riscrive l'URL
+        # (senza redirect HTTP) prima che il polling se ne accorga, e il
+        # codice andava perso restando appesi fino al timeout. Appena
+        # siamo fuori dal dominio di login e c'e' un `code`, e' il nostro.
         if current.startswith(redirect_uri):
             result["url"] = current
             break
+        if "code=" in current and urlparse(current).netloc != auth_host:
+            result["url"] = current
+            break
 
-    try:
-        window.destroy()
-    except Exception:
-        pass
+    if not closed.is_set():
+        try:
+            window.destroy()
+        except Exception:
+            pass
 
     if "url" not in result:
         raise RuntimeError("Collegamento annullato: la finestra e' stata chiusa prima di completare l'accesso.")
@@ -248,7 +306,11 @@ def _clean_code(raw: str) -> str:
     return raw
 
 
-NOT_SET = "Collegamento non ancora disponibile in questa versione dell'app."
+# Questi due valori finiscono dritti nell'interfaccia. Sono codici e non
+# frasi perche' il testo va scritto nella lingua scelta dall'utente: una
+# stringa italiana decisa qui resterebbe italiana anche con l'app in
+# inglese (era esattamente il caso di "X non espone le statistiche...").
+NOT_SET = "unavail_not_configured"
 
 
 def _env_pair(id_suffix: str, secret_suffix: str) -> tuple[str, str] | None:
@@ -312,6 +374,11 @@ def authorize_url(platform: str) -> dict:
     from urllib.parse import urlencode
 
     try:
+        # force_reauth / disable_auto_auth: la finestra dell'app conserva i
+        # cookie della piattaforma, quindi senza questi parametri il secondo
+        # collegamento salta login e consenso e ricollega in silenzio lo
+        # stesso account. Sono loro a rendere possibile "collega un altro
+        # account" davvero.
         if platform == "instagram":
             app_id, _, redirect = _instagram_app()
             params = {
@@ -319,6 +386,8 @@ def authorize_url(platform: str) -> dict:
                 "redirect_uri": redirect,
                 "response_type": "code",
                 "scope": "instagram_business_basic,instagram_business_manage_insights",
+                "force_reauth": "true",
+                "state": secrets.token_urlsafe(8),
             }
             return {"ok": True, "url": "https://www.instagram.com/oauth/authorize?" + urlencode(params)}
 
@@ -326,10 +395,11 @@ def authorize_url(platform: str) -> dict:
             key, _, redirect = _tiktok_app()
             params = {
                 "client_key": key,
-                "scope": "user.info.basic,video.list",
+                "scope": "user.info.basic,user.info.stats,video.list",
                 "response_type": "code",
                 "redirect_uri": redirect,
                 "state": secrets.token_urlsafe(8),
+                "disable_auto_auth": "1",
             }
             return {"ok": True, "url": "https://www.tiktok.com/v2/auth/authorize/?" + urlencode(params)}
     except RuntimeError as exc:
@@ -404,12 +474,12 @@ def _finish_tiktok(code: str) -> str:
     if "access_token" not in data:
         raise RuntimeError(f"Risposta inattesa da TikTok: {str(data)[:200]}")
 
+    # Se manca 'video.list' il login e' comunque riuscito: buttare via la
+    # connessione lascerebbe l'utente senza account collegato e senza capire
+    # perche'. Si salva lo stesso e si annota lo scope concesso - sara' la
+    # diagnostica a spiegare che manca l'approvazione del permesso, con un
+    # messaggio tradotto invece di un errore secco al momento del login.
     granted = data.get("scope", "")
-    if "video.list" not in granted:
-        raise RuntimeError(
-            f"Account collegato ma senza permesso 'video.list' (concesso: {granted or 'nessuno'}). "
-            "Serve l'approvazione di quel permesso su TikTok for Developers per leggere le statistiche."
-        )
 
     username = "TikTok"
     try:
@@ -426,6 +496,7 @@ def _finish_tiktok(code: str) -> str:
 
     save_connection("tiktok", username, str(data.get("open_id", username)), {
         "refresh_token": data["refresh_token"], "client_key": key, "client_secret": secret,
+        "granted_scope": granted,
     })
     return username
 
@@ -491,9 +562,10 @@ def unavailable_reason(platform: str) -> str | None:
     return None
 
 
-# Piattaforme senza alcun collegamento possibile.
+# Piattaforme senza alcun collegamento possibile. Anche qui: codice, non
+# frase (vedi il commento su NOT_SET).
 UNAVAILABLE = {
-    "x": "X non espone le statistiche di lettura sul piano gratuito.",
+    "x": "unavail_x_no_read_api",
 }
 
 
@@ -509,9 +581,10 @@ def start_connect(platform: str) -> dict:
         return {"ok": False, "message": f"Piattaforma non supportata: {platform}"}
 
     with _connect_lock:
-        if _connect_state["running"]:
+        if _connect_is_active():
             return {"ok": False, "message": "C'e' gia' un collegamento in corso."}
-        _connect_state.update({"running": True, "platform": platform, "error": None, "done": False, "account": None})
+        _connect_state.update({"running": True, "platform": platform, "error": None,
+                               "done": False, "account": None, "started_at": time.time()})
 
     def worker():
         try:

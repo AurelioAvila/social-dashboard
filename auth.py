@@ -27,7 +27,11 @@ BIRTH_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
 class AuthError(Exception):
     """Errore lato utente (credenziali/validazione) - il chiamante lo mappa
-    su un 400/401 invece che su un 500."""
+    su un 400/401 invece che su un 500.
+
+    Il messaggio e' un codice, non una frase: l'interfaccia esiste in sei
+    lingue e il testo va scritto in quella scelta dall'utente. La traduzione
+    vive nel catalogo del frontend."""
 
 
 def _conn() -> sqlite3.Connection:
@@ -104,19 +108,19 @@ def _row_to_user(row) -> dict:
 def _validate_birth_date(birth_date: str) -> str:
     birth_date = (birth_date or "").strip()
     if not BIRTH_DATE_RE.match(birth_date):
-        raise AuthError("Inserisci una data di nascita valida.")
+        raise AuthError("err_birth_invalid")
     try:
         parsed = datetime.date.fromisoformat(birth_date)
     except ValueError:
-        raise AuthError("Inserisci una data di nascita valida.")
+        raise AuthError("err_birth_invalid")
     today = datetime.date.today()
     if parsed > today:
-        raise AuthError("La data di nascita non puo' essere nel futuro.")
+        raise AuthError("err_birth_date_future")
     age = today.year - parsed.year - ((today.month, today.day) < (parsed.month, parsed.day))
     if age < MIN_AGE_YEARS:
-        raise AuthError(f"Devi avere almeno {MIN_AGE_YEARS} anni per registrarti.")
+        raise AuthError("err_birth_too_young")
     if age > 120:
-        raise AuthError("Inserisci una data di nascita valida.")
+        raise AuthError("err_birth_invalid")
     return birth_date
 
 
@@ -126,15 +130,15 @@ def register(email: str, password: str, password_confirm: str, first_name: str, 
     last_name = (last_name or "").strip()
 
     if not EMAIL_RE.match(email):
-        raise AuthError("Inserisci un indirizzo email valido.")
+        raise AuthError("err_email_invalid")
     if not first_name:
-        raise AuthError("Inserisci il tuo nome.")
+        raise AuthError("err_first_name_required")
     if not last_name:
-        raise AuthError("Inserisci il tuo cognome.")
+        raise AuthError("err_last_name_required")
     if len(password or "") < MIN_PASSWORD_LENGTH:
-        raise AuthError(f"La password deve avere almeno {MIN_PASSWORD_LENGTH} caratteri.")
+        raise AuthError("err_password_short")
     if password != password_confirm:
-        raise AuthError("Le due password non coincidono.")
+        raise AuthError("err_password_mismatch")
     birth_date = _validate_birth_date(birth_date)
 
     salt = secrets.token_bytes(16)
@@ -151,7 +155,7 @@ def register(email: str, password: str, password_confirm: str, first_name: str, 
         conn.commit()
         user_id = cur.lastrowid
     except sqlite3.IntegrityError:
-        raise AuthError("Esiste gia' un account con questa email.")
+        raise AuthError("err_email_taken")
     finally:
         conn.close()
 
@@ -170,11 +174,11 @@ def login(email: str, password: str) -> dict:
     # cosi' il tempo di risposta non rivela quali email sono registrate.
     if not row:
         _hash_password(password or "", b"\x00" * 16)
-        raise AuthError("Email o password non corretti.")
+        raise AuthError("err_bad_credentials")
 
     user_id, salt, stored_hash = row
     if not hmac.compare_digest(_hash_password(password or "", salt), stored_hash):
-        raise AuthError("Email o password non corretti.")
+        raise AuthError("err_bad_credentials")
 
     return _issue_session(user_id)
 

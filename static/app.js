@@ -27,6 +27,8 @@ const I18N = {
     tile_health: "Salute", tile_accounts_foot: "account attivi",
     tile_analyzed: "Contenuti analizzati", tile_analyzed_foot: "post e video con dati",
     tile_avg_per_post: "Media per contenuto", tile_avg_per_post_foot: "views medie",
+    tile_avg_per_post_foot_n: "views medie su {n} contenuti con dati", tile_best_hour_insufficient: "servono più contenuti",
+    analytics_hours_insufficient: "Dati ancora insufficienti per indicare una fascia oraria affidabile: servono almeno {n} contenuti in più con visualizzazioni.",
     tile_best_hour: "Ora migliore", tile_best_hour_foot: "{v} views medie",
     tile_best_platform: "Piattaforma top", tile_best_platform_foot: "{v} views totali",
     analytics_hours_hint: "Media di views per fascia oraria di pubblicazione (UTC). Le barre piene sono le ore in cui i tuoi contenuti rendono di piu'.",
@@ -43,6 +45,9 @@ const I18N = {
     connections_subtitle: "Accedi con il tuo account e la dashboard fa il resto. Nessun token da copiare.",
     connections_privacy: "Le autorizzazioni restano salvate solo sul tuo computer, in locale. Non passano da nessun server.",
     connect_now: "Collega {p}", connect_add_another: "Collega un altro account", connect_soon: "In arrivo",
+    generic_error: "Si è verificato un errore.", connect_timeout: "Tempo scaduto: il collegamento non è stato completato.",
+    unavail_not_configured: "Collegamento non ancora disponibile in questa versione dell'app.",
+    unavail_x_no_read_api: "X non espone le statistiche di lettura sul piano gratuito.",
     connect_not_linked: "Non collegato", connect_linked_n: "{n} collegato/i", connect_unlink: "Scollega",
     connect_desc: "Accedi con {p} per vedere qui le tue statistiche.",
     connect_waiting: "In attesa del browser...", connect_browser_opened: "Ho aperto il browser: completa l'accesso.",
@@ -76,12 +81,72 @@ const I18N = {
     val_online_latency: "Online ({ms}ms)", val_down_error: "Down / errore", label_npm_vulns: "Vulnerabilità npm",
     label_eslint: "ESLint", val_not_configured: "non configurato", val_errors_warnings: "{e} errori, {w} warning",
     insight_loading: "Analisi in corso…", insight_error: "Errore durante l'analisi: ",
+    ins_no_items: "{name}: nessun contenuto recente da analizzare.",
+    plan_free_tagline: "Per iniziare e capire i tuoi numeri.",
+    plan_free_accounts: "2 account collegati",
+    plan_pro_tagline: "Per chi pubblica ogni giorno e vuole crescere.",
+    plan_pro_accounts: "15 account collegati",
+    plan_studio_tagline: "Per agenzie e chi gestisce più brand.",
+    plan_studio_accounts: "Account illimitati",
+    plan_feat_all_socials: "Statistiche di tutti i social supportati",
+    plan_feat_manual_refresh: "Refresh manuale on-demand",
+    plan_feat_analytics: "Analitiche: top post e fasce orarie",
+    plan_feat_diagnostics: "Diagnostica automatica degli errori",
+    plan_feat_insights: "Osservazioni automatiche sui tuoi contenuti",
+    plan_feat_history: "Storico completo con grafici di trend",
+    plan_feat_reports: "Report automatici",
+    plan_feat_all_free: "Tutto quello che c'è nel Free",
+    plan_feat_compare: "Confronto tra periodi e alert sui cali",
+    plan_feat_hours: "Suggerimenti sugli orari di pubblicazione",
+    plan_feat_csv: "Esportazione dei dati in CSV",
+    plan_feat_all_pro: "Tutto quello che c'è nel Pro",
+    plan_feat_workspaces: "Spazi di lavoro separati per cliente",
+    plan_feat_whitelabel: "Report PDF white-label automatici",
+    plan_feat_multiuser: "Accesso multi-utente al team",
+    plan_feat_priority: "Supporto prioritario",
+    aria_toggle_password: "Mostra password",
+    ins_some_zero: "{name}: {n} degli ultimi {tot} contenuti sono ancora a zero visualizzazioni.",
+    ins_some_zero_one: "{name}: 1 degli ultimi {tot} contenuti è ancora a zero visualizzazioni.",
+    ins_all_zero_one: "{name}: l'unico contenuto recente non ha ancora visualizzazioni.",
+    ins_flop_one: "{name}: 1 contenuto sotto il 40% della media: «{title}» con {v} views.",
+    ins_cadence_daily: "{name}: pubblichi circa {n} volte al giorno.",
+    ins_cadence_broken_daily: "{name}: di solito pubblichi più volte al giorno, ma l'ultimo contenuto risale a {d} giorni fa.",
+    ins_all_zero: "{name}: nessuno degli ultimi {n} contenuti ha ancora visualizzazioni.",
+    ins_star: "{name}: «{title}» ha fatto {v} views, {x}x la media dell'account. Guarda cosa lo distingue e replicalo.",
+    ins_flop: "{name}: {n} contenuti sotto il 40% della media; il più debole è «{title}» con {v} views.",
+    ins_engagement: "{name}: {rate}% di engagement sugli ultimi contenuti ({i} interazioni su {v} views).",
+    ins_cadence_broken: "{name}: di solito pubblichi ogni {gap} giorni, ma l'ultimo contenuto risale a {d} giorni fa.",
+    ins_cadence: "{name}: pubblichi in media ogni {gap} giorni.",
+    ins_best_account: "{best} è l'account che rende di più: {bv} views contro le {wv} di {worst}.",
+    ins_x_free_plan: "X non espone le statistiche di lettura sul piano gratuito: non c'è nulla da analizzare.",
+    ins_no_data: "Nessun dato da analizzare: collega un account e premi Refresh.",
+    ins_nothing_notable: "Nessuna criticità rilevata sugli ultimi contenuti.",
     analytics_empty: "Non ci sono ancora abbastanza post/video con dati per un'analisi — premi Refresh.",
     analytics_untitled: "(senza titolo)", analytics_avg_views: "views medie", analytics_bucket_count: "post analizzati in questa fascia",
     analytics_last_refresh: "Ultimo caricamento dati: {t} ({d})", analytics_last_refresh_never: "Ultimo caricamento dati: mai — premi Refresh.",
     footer_last_refresh: "Ultimo aggiornamento: {d}", footer_never: "Mai aggiornato", footer_error: "Errore durante il refresh - riprova.",
     time_never: "mai", time_seconds_ago: "pochi secondi fa", time_min_ago: "{n} min fa", time_hours_ago: "{n} ore fa", time_days_ago: "{n} giorni fa",
     diag_next_step_label: "Prossimo passo:",
+    diag_unreachable_title: "{name}: non risponde",
+    diagerr_scope_denied_cat: "Permesso non concesso", diagerr_scope_denied_step: "Serve l'approvazione del permesso di lettura statistiche sul portale sviluppatori della piattaforma: non è risolvibile dall'app.",
+    diagerr_expired_cat: "Accesso scaduto", diagerr_expired_step: "Ricollega questo account: l'autorizzazione è scaduta o è stata revocata.",
+    diagerr_scope_mismatch_cat: "Permessi non allineati", diagerr_scope_mismatch_step: "I permessi richiesti non coincidono con quelli concessi in origine: ricollega l'account per riallinearli.",
+    diagerr_permission_cat: "Permesso mancante", diagerr_permission_step: "L'account non ha concesso il permesso richiesto: ricollegalo accettando tutte le richieste.",
+    diagerr_rate_cat: "Troppe richieste", diagerr_rate_step: "Attendi qualche minuto prima del prossimo aggiornamento: il limite della piattaforma è stato raggiunto.",
+    diagerr_auth_cat: "Credenziali non valide", diagerr_auth_step: "Ricollega l'account per rigenerare l'accesso.",
+    diagerr_notfound_cat: "Account non trovato", diagerr_notfound_step: "L'account collegato non risulta più raggiungibile: potrebbe essere stato rimosso o rinominato.",
+    diagerr_network_cat: "Problema di rete", diagerr_network_step: "Riprova l'aggiornamento: sembra un problema temporaneo di connessione.",
+    diagerr_unknown_cat: "Errore non classificato", diagerr_unknown_step: "Riprova l'aggiornamento; se persiste, ricollega l'account.",
+    diag_no_account_cat: "Da collegare", diag_no_account_title: "Nessun account {p}", diag_no_account_text: "Non hai ancora collegato nessun account {p}.", diag_no_account_step: "Premi Collega e accedi: bastano pochi secondi.",
+    diag_no_data_cat: "Dati mancanti", diag_no_data_title: "{p} senza dati", diag_no_data_text: "Nessun dato ancora caricato.", diag_no_data_step: "Premi Refresh per caricare i dati.",
+    diag_all_ok_title_one: "{p}: 1 account in regola", diag_all_ok_cat_one: "Tutto a posto", diag_all_ok_text_one: "L'account risponde e pubblica con costanza.", diag_all_ok_step_one: "Nessuna azione richiesta.",
+    diag_all_ok_cat: "Tutto a posto", diag_all_ok_title: "{p}: {n} account in regola", diag_all_ok_text: "Tutti gli account rispondono e pubblicano con costanza.", diag_all_ok_step: "Nessuna azione richiesta.",
+    diag_stale_bad_cat: "Contenuto fermo", diag_stale_bad_title: "{name}: fermo da {d} giorni", diag_stale_bad_text: "L'ultimo contenuto su {p} risale a {d} giorni fa.", diag_stale_bad_step: "Pubblica qualcosa: le piattaforme premiano la costanza e la copertura cala in fretta con i profili inattivi.",
+    diag_stale_warn_cat: "Ritmo in calo", diag_stale_warn_title: "{name}: ultimo post {d} giorni fa", diag_stale_warn_text: "Su {p} non esce nulla da {d} giorni.", diag_stale_warn_step: "Torna al ritmo abituale prima che la copertura inizi a scendere.",
+    diag_zero_views_cat: "Nessuna visualizzazione", diag_zero_views_title: "{name}: 0 views sugli ultimi video", diag_zero_views_text: "Gli ultimi video pubblicati non hanno ancora nessuna visualizzazione.", diag_zero_views_step: "Se sono appena usciti è normale; se hanno qualche giorno, rivedi titolo, miniatura e primi secondi.",
+    diag_not_configured_cat: "Da configurare", diag_not_configured_title: "{name}: non configurato", diag_not_configured_text: "L'account è elencato ma non ha credenziali associate.", diag_not_configured_step: "Collega l'account, oppure rimuovilo dall'elenco se non ti serve.",
+    diag_x_not_linked_cat: "Non collegato", diag_x_not_linked_title: "X non collegato", diag_x_not_linked_text: "Nessuna credenziale X configurata.", diag_x_not_linked_step: "X non espone le statistiche di lettura sul piano gratuito: al momento la sezione resta informativa.",
+    diag_x_linked_cat: "Collegato", diag_x_linked_title: "X collegato", diag_x_linked_text: "Credenziali presenti. Le statistiche di lettura non sono disponibili sul piano gratuito di X.", diag_x_linked_step: "Nessuna azione richiesta.",
     yt_total_views_lag_note: "YouTube a volte impiega ore/giorni ad aggiornare il totale storico su canali piccoli/nuovi — non è un errore del dashboard.",
     overview_sub: "{n} account monitorati su {p} piattaforme.", overview_sub_empty: "Premi Refresh per caricare i tuoi dati.",
     trend_since: "dal precedente", trend_no_history: "Serve un altro refresh per vedere il trend.",
@@ -90,6 +155,7 @@ const I18N = {
     auth_title_login: "Bentornato", auth_title_register: "Crea il tuo account",
     auth_sub_login: "Accedi per sincronizzare piani e preferenze.", auth_sub_register: "Bastano trenta secondi. Nessuna carta richiesta.",
     auth_name: "Come ti chiami", auth_first_name: "Nome", auth_last_name: "Cognome", auth_birth_date: "Data di nascita",
+    auth_first_name_ph: "Mario", auth_last_name_ph: "Rossi", auth_email_ph: "tu@esempio.com",
     auth_email: "Email", auth_password: "Password", auth_password_confirm: "Conferma password",
     auth_switch_to_register: "Non hai un account?", auth_switch_to_login: "Hai già un account?",
     auth_aside_badge: "Tutto in un posto solo",
@@ -102,6 +168,10 @@ const I18N = {
     auth_logout: "Esci", account_upgrade: "Passa a Pro", account_since: "Account creato il {d}",
     err_email_invalid: "Inserisci un indirizzo email valido.", err_password_short: "Almeno 8 caratteri.",
     err_required: "Campo obbligatorio.", err_birth_date_future: "La data non può essere nel futuro.",
+    err_birth_invalid: "Inserisci una data di nascita valida.", err_birth_too_young: "Devi avere almeno 13 anni per registrarti.",
+    err_first_name_required: "Inserisci il tuo nome.", err_last_name_required: "Inserisci il tuo cognome.",
+    err_email_taken: "Esiste già un account con questa email.", err_bad_credentials: "Email o password non corretti.",
+    err_session_expired: "Sessione non valida o scaduta.", err_login_required_for_plan: "Devi accedere prima di acquistare un piano.",
     err_age_min: "Devi avere almeno {n} anni.", err_password_mismatch: "Le due password non coincidono.",
     toast_welcome: "Benvenuto, {n}!", toast_logged_in: "Bentornato, {n}!", toast_logged_out: "Sei uscito dall'account.",
     toast_refresh_done: "Dati aggiornati.", toast_export_done: "CSV esportato.",
@@ -123,6 +193,8 @@ const I18N = {
     tile_health: "Health", tile_accounts_foot: "active accounts",
     tile_analyzed: "Content analyzed", tile_analyzed_foot: "posts and videos with data",
     tile_avg_per_post: "Average per post", tile_avg_per_post_foot: "average views",
+    tile_avg_per_post_foot_n: "average views across {n} posts with data", tile_best_hour_insufficient: "needs more content",
+    analytics_hours_insufficient: "Not enough data yet for a reliable time slot: {n} more posts with views are needed.",
     tile_best_hour: "Best hour", tile_best_hour_foot: "{v} average views",
     tile_best_platform: "Top platform", tile_best_platform_foot: "{v} total views",
     analytics_hours_hint: "Average views by publishing hour (UTC). The filled bars are the hours when your content performs best.",
@@ -139,6 +211,9 @@ const I18N = {
     connections_subtitle: "Sign in with your account and the dashboard does the rest. No tokens to copy.",
     connections_privacy: "Authorizations are stored only on your computer, locally. They never pass through any server.",
     connect_now: "Link {p}", connect_add_another: "Link another account", connect_soon: "Coming soon",
+    generic_error: "Something went wrong.", connect_timeout: "Timed out: the link was not completed.",
+    unavail_not_configured: "Linking is not available yet in this version of the app.",
+    unavail_x_no_read_api: "X does not expose read analytics on the free plan.",
     connect_not_linked: "Not linked", connect_linked_n: "{n} linked", connect_unlink: "Unlink",
     connect_desc: "Sign in with {p} to see your stats here.",
     connect_waiting: "Waiting for browser...", connect_browser_opened: "Browser opened: complete the sign-in.",
@@ -172,12 +247,72 @@ const I18N = {
     val_online_latency: "Online ({ms}ms)", val_down_error: "Down / error", label_npm_vulns: "npm vulnerabilities",
     label_eslint: "ESLint", val_not_configured: "not configured", val_errors_warnings: "{e} errors, {w} warnings",
     insight_loading: "Analyzing…", insight_error: "Error during analysis: ",
+    ins_no_items: "{name}: no recent content to analyze.",
+    plan_free_tagline: "To get started and understand your numbers.",
+    plan_free_accounts: "2 linked accounts",
+    plan_pro_tagline: "For those posting daily who want to grow.",
+    plan_pro_accounts: "15 linked accounts",
+    plan_studio_tagline: "For agencies and multi-brand managers.",
+    plan_studio_accounts: "Unlimited accounts",
+    plan_feat_all_socials: "Stats for every supported social network",
+    plan_feat_manual_refresh: "Manual on-demand refresh",
+    plan_feat_analytics: "Analytics: top posts and time slots",
+    plan_feat_diagnostics: "Automatic error diagnostics",
+    plan_feat_insights: "Automatic observations on your content",
+    plan_feat_history: "Full history with trend charts",
+    plan_feat_reports: "Automated reports",
+    plan_feat_all_free: "Everything in Free",
+    plan_feat_compare: "Period comparison and drop alerts",
+    plan_feat_hours: "Publishing time suggestions",
+    plan_feat_csv: "CSV data export",
+    plan_feat_all_pro: "Everything in Pro",
+    plan_feat_workspaces: "Separate workspaces per client",
+    plan_feat_whitelabel: "Automated white-label PDF reports",
+    plan_feat_multiuser: "Multi-user team access",
+    plan_feat_priority: "Priority support",
+    aria_toggle_password: "Show password",
+    ins_some_zero: "{name}: {n} of the last {tot} posts still have zero views.",
+    ins_some_zero_one: "{name}: 1 of the last {tot} posts still has zero views.",
+    ins_all_zero_one: "{name}: the only recent post has no views yet.",
+    ins_flop_one: "{name}: 1 post below 40% of the average: “{title}” with {v} views.",
+    ins_cadence_daily: "{name}: you post about {n} times a day.",
+    ins_cadence_broken_daily: "{name}: you usually post several times a day, but the latest content is {d} days old.",
+    ins_all_zero: "{name}: none of the last {n} posts has any views yet.",
+    ins_star: "{name}: “{title}” hit {v} views, {x}x the account average. Look at what sets it apart and repeat it.",
+    ins_flop: "{name}: {n} posts below 40% of the average; the weakest is “{title}” with {v} views.",
+    ins_engagement: "{name}: {rate}% engagement on recent content ({i} interactions across {v} views).",
+    ins_cadence_broken: "{name}: you usually post every {gap} days, but the latest content is {d} days old.",
+    ins_cadence: "{name}: you post every {gap} days on average.",
+    ins_best_account: "{best} is your best performing account: {bv} views versus {wv} for {worst}.",
+    ins_x_free_plan: "X doesn't expose read analytics on the free plan: there's nothing to analyze.",
+    ins_no_data: "Nothing to analyze yet: link an account and press Refresh.",
+    ins_nothing_notable: "No issues found in your recent content.",
     analytics_empty: "Not enough posts/videos with data yet for an analysis — press Refresh.",
     analytics_untitled: "(untitled)", analytics_avg_views: "avg views", analytics_bucket_count: "posts analyzed in this slot",
     analytics_last_refresh: "Last data load: {t} ({d})", analytics_last_refresh_never: "Last data load: never — press Refresh.",
     footer_last_refresh: "Last updated: {d}", footer_never: "Never updated", footer_error: "Error during refresh - try again.",
     time_never: "never", time_seconds_ago: "a few seconds ago", time_min_ago: "{n} min ago", time_hours_ago: "{n} hours ago", time_days_ago: "{n} days ago",
     diag_next_step_label: "Next step:",
+    diag_unreachable_title: "{name}: not responding",
+    diagerr_scope_denied_cat: "Permission not granted", diagerr_scope_denied_step: "The stats-read permission must be approved on the platform's developer portal — this can't be fixed from the app.",
+    diagerr_expired_cat: "Access expired", diagerr_expired_step: "Relink this account: the authorization expired or was revoked.",
+    diagerr_scope_mismatch_cat: "Permissions out of sync", diagerr_scope_mismatch_step: "The requested permissions don't match the ones originally granted: relink the account to realign them.",
+    diagerr_permission_cat: "Missing permission", diagerr_permission_step: "The account didn't grant the required permission: relink it and accept every request.",
+    diagerr_rate_cat: "Too many requests", diagerr_rate_step: "Wait a few minutes before refreshing again: the platform's rate limit was reached.",
+    diagerr_auth_cat: "Invalid credentials", diagerr_auth_step: "Relink the account to regenerate access.",
+    diagerr_notfound_cat: "Account not found", diagerr_notfound_step: "The linked account is no longer reachable: it may have been removed or renamed.",
+    diagerr_network_cat: "Network problem", diagerr_network_step: "Try refreshing again: this looks like a temporary connection issue.",
+    diagerr_unknown_cat: "Unclassified error", diagerr_unknown_step: "Try refreshing again; if it persists, relink the account.",
+    diag_no_account_cat: "To link", diag_no_account_title: "No {p} account", diag_no_account_text: "You haven't linked any {p} account yet.", diag_no_account_step: "Press Link and sign in: it only takes a few seconds.",
+    diag_no_data_cat: "Missing data", diag_no_data_title: "{p} has no data", diag_no_data_text: "No data loaded yet.", diag_no_data_step: "Press Refresh to load the data.",
+    diag_all_ok_title_one: "{p}: 1 account healthy", diag_all_ok_cat_one: "All good", diag_all_ok_text_one: "The account responds and posts consistently.", diag_all_ok_step_one: "No action needed.",
+    diag_all_ok_cat: "All good", diag_all_ok_title: "{p}: {n} accounts healthy", diag_all_ok_text: "Every account responds and posts consistently.", diag_all_ok_step: "No action needed.",
+    diag_stale_bad_cat: "Content stalled", diag_stale_bad_title: "{name}: idle for {d} days", diag_stale_bad_text: "The latest content on {p} is {d} days old.", diag_stale_bad_step: "Post something: platforms reward consistency and reach drops fast on inactive profiles.",
+    diag_stale_warn_cat: "Slowing down", diag_stale_warn_title: "{name}: last post {d} days ago", diag_stale_warn_text: "Nothing new on {p} for {d} days.", diag_stale_warn_step: "Get back to your usual pace before reach starts to fall.",
+    diag_zero_views_cat: "No views", diag_zero_views_title: "{name}: 0 views on latest videos", diag_zero_views_text: "The latest published videos have no views yet.", diag_zero_views_step: "If they just went live that's normal; if they're a few days old, revisit title, thumbnail and first seconds.",
+    diag_not_configured_cat: "To configure", diag_not_configured_title: "{name}: not configured", diag_not_configured_text: "The account is listed but has no credentials attached.", diag_not_configured_step: "Link the account, or remove it from the list if you don't need it.",
+    diag_x_not_linked_cat: "Not linked", diag_x_not_linked_title: "X not linked", diag_x_not_linked_text: "No X credentials configured.", diag_x_not_linked_step: "X doesn't expose read analytics on the free plan: for now this section stays informational.",
+    diag_x_linked_cat: "Linked", diag_x_linked_title: "X linked", diag_x_linked_text: "Credentials present. Read analytics aren't available on X's free plan.", diag_x_linked_step: "No action needed.",
     yt_total_views_lag_note: "YouTube can take hours/days to update the historical total on small/new channels — this isn't a dashboard bug.",
     overview_sub: "{n} accounts tracked across {p} platforms.", overview_sub_empty: "Press Refresh to load your data.",
     trend_since: "since last", trend_no_history: "One more refresh and the trend shows up here.",
@@ -186,6 +321,7 @@ const I18N = {
     auth_title_login: "Welcome back", auth_title_register: "Create your account",
     auth_sub_login: "Sign in to sync plans and preferences.", auth_sub_register: "Takes thirty seconds. No card required.",
     auth_name: "Your name", auth_first_name: "First name", auth_last_name: "Last name", auth_birth_date: "Date of birth",
+    auth_first_name_ph: "Jane", auth_last_name_ph: "Smith", auth_email_ph: "you@example.com",
     auth_email: "Email", auth_password: "Password", auth_password_confirm: "Confirm password",
     auth_switch_to_register: "No account yet?", auth_switch_to_login: "Already have an account?",
     auth_aside_badge: "All in one place",
@@ -198,6 +334,10 @@ const I18N = {
     auth_logout: "Sign out", account_upgrade: "Upgrade to Pro", account_since: "Account created on {d}",
     err_email_invalid: "Enter a valid email address.", err_password_short: "At least 8 characters.",
     err_required: "This field is required.", err_birth_date_future: "The date can't be in the future.",
+    err_birth_invalid: "Enter a valid date of birth.", err_birth_too_young: "You must be at least 13 to sign up.",
+    err_first_name_required: "Enter your first name.", err_last_name_required: "Enter your last name.",
+    err_email_taken: "An account with this email already exists.", err_bad_credentials: "Incorrect email or password.",
+    err_session_expired: "Session invalid or expired.", err_login_required_for_plan: "Sign in before purchasing a plan.",
     err_age_min: "You must be at least {n} years old.", err_password_mismatch: "The two passwords don't match.",
     toast_welcome: "Welcome, {n}!", toast_logged_in: "Welcome back, {n}!", toast_logged_out: "You've been signed out.",
     toast_refresh_done: "Data updated.", toast_export_done: "CSV exported.",
@@ -219,6 +359,8 @@ const I18N = {
     tile_health: "Salud", tile_accounts_foot: "cuentas activas",
     tile_analyzed: "Contenido analizado", tile_analyzed_foot: "publicaciones y videos con datos",
     tile_avg_per_post: "Media por contenido", tile_avg_per_post_foot: "vistas medias",
+    tile_avg_per_post_foot_n: "vistas medias en {n} contenidos con datos", tile_best_hour_insufficient: "faltan contenidos",
+    analytics_hours_insufficient: "Datos aún insuficientes para indicar una franja horaria fiable: faltan al menos {n} contenidos con visualizaciones.",
     tile_best_hour: "Mejor hora", tile_best_hour_foot: "{v} vistas medias",
     tile_best_platform: "Plataforma top", tile_best_platform_foot: "{v} vistas totales",
     analytics_hours_hint: "Media de vistas por franja horaria de publicacion (UTC). Las barras llenas son las horas en que tu contenido rinde mas.",
@@ -235,6 +377,9 @@ const I18N = {
     connections_subtitle: "Accede con tu cuenta y el panel hace el resto. Sin tokens que copiar.",
     connections_privacy: "Las autorizaciones se guardan solo en tu ordenador, en local. No pasan por ningun servidor.",
     connect_now: "Vincular {p}", connect_add_another: "Vincular otra cuenta", connect_soon: "Proximamente",
+    generic_error: "Se ha producido un error.", connect_timeout: "Tiempo agotado: la vinculación no se completó.",
+    unavail_not_configured: "La vinculación aún no está disponible en esta versión de la app.",
+    unavail_x_no_read_api: "X no ofrece estadísticas de lectura en el plan gratuito.",
     connect_not_linked: "No vinculado", connect_linked_n: "{n} vinculada(s)", connect_unlink: "Desvincular",
     connect_desc: "Accede con {p} para ver aqui tus estadisticas.",
     connect_waiting: "Esperando al navegador...", connect_browser_opened: "He abierto el navegador: completa el acceso.",
@@ -268,12 +413,72 @@ const I18N = {
     val_online_latency: "En línea ({ms}ms)", val_down_error: "Caído / error", label_npm_vulns: "Vulnerabilidades npm",
     label_eslint: "ESLint", val_not_configured: "no configurado", val_errors_warnings: "{e} errores, {w} avisos",
     insight_loading: "Analizando…", insight_error: "Error durante el análisis: ",
+    ins_no_items: "{name}: no hay contenido reciente que analizar.",
+    plan_free_tagline: "Para empezar y entender tus números.",
+    plan_free_accounts: "2 cuentas vinculadas",
+    plan_pro_tagline: "Para quien publica a diario y quiere crecer.",
+    plan_pro_accounts: "15 cuentas vinculadas",
+    plan_studio_tagline: "Para agencias y quien gestiona varias marcas.",
+    plan_studio_accounts: "Cuentas ilimitadas",
+    plan_feat_all_socials: "Estadísticas de todas las redes compatibles",
+    plan_feat_manual_refresh: "Actualización manual bajo demanda",
+    plan_feat_analytics: "Analíticas: mejores publicaciones y franjas",
+    plan_feat_diagnostics: "Diagnóstico automático de errores",
+    plan_feat_insights: "Observaciones automáticas sobre tu contenido",
+    plan_feat_history: "Historial completo con gráficos de tendencia",
+    plan_feat_reports: "Informes automáticos",
+    plan_feat_all_free: "Todo lo del plan Free",
+    plan_feat_compare: "Comparación de periodos y alertas de caída",
+    plan_feat_hours: "Sugerencias de horarios de publicación",
+    plan_feat_csv: "Exportación de datos en CSV",
+    plan_feat_all_pro: "Todo lo del plan Pro",
+    plan_feat_workspaces: "Espacios de trabajo separados por cliente",
+    plan_feat_whitelabel: "Informes PDF de marca blanca automáticos",
+    plan_feat_multiuser: "Acceso multiusuario para el equipo",
+    plan_feat_priority: "Soporte prioritario",
+    aria_toggle_password: "Mostrar contraseña",
+    ins_some_zero: "{name}: {n} de las últimas {tot} publicaciones siguen con cero visualizaciones.",
+    ins_some_zero_one: "{name}: 1 de las últimas {tot} publicaciones sigue con cero visualizaciones.",
+    ins_all_zero_one: "{name}: la única publicación reciente no tiene visualizaciones todavía.",
+    ins_flop_one: "{name}: 1 publicación por debajo del 40% de la media: «{title}» con {v} vistas.",
+    ins_cadence_daily: "{name}: publicas unas {n} veces al día.",
+    ins_cadence_broken_daily: "{name}: sueles publicar varias veces al día, pero el último contenido es de hace {d} días.",
+    ins_all_zero: "{name}: ninguna de las últimas {n} publicaciones tiene visualizaciones todavía.",
+    ins_star: "{name}: «{title}» alcanzó {v} vistas, {x}x la media de la cuenta. Mira qué lo diferencia y repítelo.",
+    ins_flop: "{name}: {n} publicaciones por debajo del 40% de la media; la más floja es «{title}» con {v} vistas.",
+    ins_engagement: "{name}: {rate}% de engagement en el contenido reciente ({i} interacciones sobre {v} vistas).",
+    ins_cadence_broken: "{name}: sueles publicar cada {gap} días, pero el último contenido es de hace {d} días.",
+    ins_cadence: "{name}: publicas de media cada {gap} días.",
+    ins_best_account: "{best} es la cuenta que mejor rinde: {bv} vistas frente a las {wv} de {worst}.",
+    ins_x_free_plan: "X no ofrece estadísticas de lectura en el plan gratuito: no hay nada que analizar.",
+    ins_no_data: "Nada que analizar aún: vincula una cuenta y pulsa Actualizar.",
+    ins_nothing_notable: "No se han detectado problemas en tu contenido reciente.",
     analytics_empty: "Aún no hay suficientes publicaciones/vídeos con datos para un análisis — pulsa Refresh.",
     analytics_untitled: "(sin título)", analytics_avg_views: "vistas medias", analytics_bucket_count: "publicaciones analizadas en esta franja",
     analytics_last_refresh: "Última carga de datos: {t} ({d})", analytics_last_refresh_never: "Última carga de datos: nunca — pulsa Refresh.",
     footer_last_refresh: "Última actualización: {d}", footer_never: "Nunca actualizado", footer_error: "Error durante la actualización - inténtalo de nuevo.",
     time_never: "nunca", time_seconds_ago: "hace unos segundos", time_min_ago: "hace {n} min", time_hours_ago: "hace {n} horas", time_days_ago: "hace {n} días",
     diag_next_step_label: "Próximo paso:",
+    diag_unreachable_title: "{name}: no responde",
+    diagerr_scope_denied_cat: "Permiso no concedido", diagerr_scope_denied_step: "El permiso de lectura de estadísticas debe aprobarse en el portal de desarrolladores de la plataforma: no se puede resolver desde la app.",
+    diagerr_expired_cat: "Acceso caducado", diagerr_expired_step: "Vuelve a vincular esta cuenta: la autorización caducó o fue revocada.",
+    diagerr_scope_mismatch_cat: "Permisos desalineados", diagerr_scope_mismatch_step: "Los permisos solicitados no coinciden con los concedidos originalmente: vuelve a vincular la cuenta para realinearlos.",
+    diagerr_permission_cat: "Falta un permiso", diagerr_permission_step: "La cuenta no concedió el permiso necesario: vuelve a vincularla aceptando todas las solicitudes.",
+    diagerr_rate_cat: "Demasiadas solicitudes", diagerr_rate_step: "Espera unos minutos antes de la próxima actualización: se alcanzó el límite de la plataforma.",
+    diagerr_auth_cat: "Credenciales no válidas", diagerr_auth_step: "Vuelve a vincular la cuenta para regenerar el acceso.",
+    diagerr_notfound_cat: "Cuenta no encontrada", diagerr_notfound_step: "La cuenta vinculada ya no está disponible: puede haber sido eliminada o renombrada.",
+    diagerr_network_cat: "Problema de red", diagerr_network_step: "Vuelve a intentar la actualización: parece un problema temporal de conexión.",
+    diagerr_unknown_cat: "Error sin clasificar", diagerr_unknown_step: "Vuelve a intentar la actualización; si persiste, vuelve a vincular la cuenta.",
+    diag_no_account_cat: "Por vincular", diag_no_account_title: "Ninguna cuenta de {p}", diag_no_account_text: "Aún no has vinculado ninguna cuenta de {p}.", diag_no_account_step: "Pulsa Vincular e inicia sesión: solo tarda unos segundos.",
+    diag_no_data_cat: "Faltan datos", diag_no_data_title: "{p} sin datos", diag_no_data_text: "Todavía no se han cargado datos.", diag_no_data_step: "Pulsa Actualizar para cargar los datos.",
+    diag_all_ok_title_one: "{p}: 1 cuenta en orden", diag_all_ok_cat_one: "Todo correcto", diag_all_ok_text_one: "La cuenta responde y publica con constancia.", diag_all_ok_step_one: "No se requiere ninguna acción.",
+    diag_all_ok_cat: "Todo correcto", diag_all_ok_title: "{p}: {n} cuentas en orden", diag_all_ok_text: "Todas las cuentas responden y publican con constancia.", diag_all_ok_step: "No se requiere ninguna acción.",
+    diag_stale_bad_cat: "Contenido detenido", diag_stale_bad_title: "{name}: parado desde hace {d} días", diag_stale_bad_text: "El último contenido en {p} es de hace {d} días.", diag_stale_bad_step: "Publica algo: las plataformas premian la constancia y el alcance cae rápido en perfiles inactivos.",
+    diag_stale_warn_cat: "Ritmo a la baja", diag_stale_warn_title: "{name}: última publicación hace {d} días", diag_stale_warn_text: "En {p} no sale nada desde hace {d} días.", diag_stale_warn_step: "Vuelve a tu ritmo habitual antes de que el alcance empiece a bajar.",
+    diag_zero_views_cat: "Sin visualizaciones", diag_zero_views_title: "{name}: 0 vistas en los últimos vídeos", diag_zero_views_text: "Los últimos vídeos publicados todavía no tienen visualizaciones.", diag_zero_views_step: "Si acaban de publicarse es normal; si tienen algunos días, revisa título, miniatura y primeros segundos.",
+    diag_not_configured_cat: "Por configurar", diag_not_configured_title: "{name}: sin configurar", diag_not_configured_text: "La cuenta aparece en la lista pero no tiene credenciales asociadas.", diag_not_configured_step: "Vincula la cuenta o quítala de la lista si no la necesitas.",
+    diag_x_not_linked_cat: "No vinculado", diag_x_not_linked_title: "X no vinculado", diag_x_not_linked_text: "No hay credenciales de X configuradas.", diag_x_not_linked_step: "X no ofrece estadísticas de lectura en el plan gratuito: por ahora esta sección es informativa.",
+    diag_x_linked_cat: "Vinculado", diag_x_linked_title: "X vinculado", diag_x_linked_text: "Credenciales presentes. Las estadísticas de lectura no están disponibles en el plan gratuito de X.", diag_x_linked_step: "No se requiere ninguna acción.",
     yt_total_views_lag_note: "YouTube a veces tarda horas/días en actualizar el total histórico en canales pequeños/nuevos — no es un error del panel.",
     overview_sub: "{n} cuentas monitorizadas en {p} plataformas.", overview_sub_empty: "Pulsa Refresh para cargar tus datos.",
     trend_since: "desde la anterior", trend_no_history: "Con otra actualización aparecerá la tendencia.",
@@ -282,6 +487,7 @@ const I18N = {
     auth_title_login: "Bienvenido de nuevo", auth_title_register: "Crea tu cuenta",
     auth_sub_login: "Accede para sincronizar planes y preferencias.", auth_sub_register: "Treinta segundos. Sin tarjeta.",
     auth_name: "Tu nombre", auth_first_name: "Nombre", auth_last_name: "Apellidos", auth_birth_date: "Fecha de nacimiento",
+    auth_first_name_ph: "María", auth_last_name_ph: "García", auth_email_ph: "tu@ejemplo.com",
     auth_email: "Email", auth_password: "Contraseña", auth_password_confirm: "Confirma la contraseña",
     auth_switch_to_register: "¿Aún no tienes cuenta?", auth_switch_to_login: "¿Ya tienes cuenta?",
     auth_aside_badge: "Todo en un solo sitio",
@@ -294,6 +500,10 @@ const I18N = {
     auth_logout: "Salir", account_upgrade: "Pasar a Pro", account_since: "Cuenta creada el {d}",
     err_email_invalid: "Introduce un email válido.", err_password_short: "Mínimo 8 caracteres.",
     err_required: "Campo obligatorio.", err_birth_date_future: "La fecha no puede ser futura.",
+    err_birth_invalid: "Introduce una fecha de nacimiento válida.", err_birth_too_young: "Debes tener al menos 13 años para registrarte.",
+    err_first_name_required: "Introduce tu nombre.", err_last_name_required: "Introduce tus apellidos.",
+    err_email_taken: "Ya existe una cuenta con este email.", err_bad_credentials: "Email o contraseña incorrectos.",
+    err_session_expired: "Sesión no válida o caducada.", err_login_required_for_plan: "Inicia sesión antes de comprar un plan.",
     err_age_min: "Debes tener al menos {n} años.", err_password_mismatch: "Las contraseñas no coinciden.",
     toast_welcome: "¡Bienvenido, {n}!", toast_logged_in: "¡Bienvenido de nuevo, {n}!", toast_logged_out: "Has cerrado sesión.",
     toast_refresh_done: "Datos actualizados.", toast_export_done: "CSV exportado.",
@@ -315,6 +525,8 @@ const I18N = {
     tile_health: "Sante", tile_accounts_foot: "comptes actifs",
     tile_analyzed: "Contenus analyses", tile_analyzed_foot: "posts et videos avec donnees",
     tile_avg_per_post: "Moyenne par contenu", tile_avg_per_post_foot: "vues moyennes",
+    tile_avg_per_post_foot_n: "vues moyennes sur {n} contenus avec données", tile_best_hour_insufficient: "plus de contenus requis",
+    analytics_hours_insufficient: "Données encore insuffisantes pour indiquer un créneau fiable : il faut au moins {n} contenus de plus avec des vues.",
     tile_best_hour: "Meilleure heure", tile_best_hour_foot: "{v} vues moyennes",
     tile_best_platform: "Plateforme top", tile_best_platform_foot: "{v} vues au total",
     analytics_hours_hint: "Vues moyennes par heure de publication (UTC). Les barres pleines sont les heures ou vos contenus marchent le mieux.",
@@ -331,6 +543,9 @@ const I18N = {
     connections_subtitle: "Connectez-vous avec votre compte, le tableau de bord fait le reste. Aucun jeton a copier.",
     connections_privacy: "Les autorisations sont enregistrees uniquement sur votre ordinateur, en local. Elles ne transitent par aucun serveur.",
     connect_now: "Lier {p}", connect_add_another: "Lier un autre compte", connect_soon: "Bientot",
+    generic_error: "Une erreur est survenue.", connect_timeout: "Délai dépassé : la liaison n'a pas abouti.",
+    unavail_not_configured: "La liaison n'est pas encore disponible dans cette version de l'app.",
+    unavail_x_no_read_api: "X n'expose pas les statistiques de lecture sur l'offre gratuite.",
     connect_not_linked: "Non lie", connect_linked_n: "{n} lie(s)", connect_unlink: "Delier",
     connect_desc: "Connectez-vous avec {p} pour voir vos statistiques ici.",
     connect_waiting: "En attente du navigateur...", connect_browser_opened: "Navigateur ouvert : terminez la connexion.",
@@ -364,12 +579,72 @@ const I18N = {
     val_online_latency: "En ligne ({ms}ms)", val_down_error: "Hors ligne / erreur", label_npm_vulns: "Vulnérabilités npm",
     label_eslint: "ESLint", val_not_configured: "non configuré", val_errors_warnings: "{e} erreurs, {w} avertissements",
     insight_loading: "Analyse en cours…", insight_error: "Erreur pendant l'analyse : ",
+    ins_no_items: "{name} : aucun contenu récent à analyser.",
+    plan_free_tagline: "Pour débuter et comprendre vos chiffres.",
+    plan_free_accounts: "2 comptes liés",
+    plan_pro_tagline: "Pour ceux qui publient chaque jour et veulent grandir.",
+    plan_pro_accounts: "15 comptes liés",
+    plan_studio_tagline: "Pour les agences et le multi-marque.",
+    plan_studio_accounts: "Comptes illimités",
+    plan_feat_all_socials: "Statistiques de tous les réseaux pris en charge",
+    plan_feat_manual_refresh: "Actualisation manuelle à la demande",
+    plan_feat_analytics: "Analyses : meilleurs contenus et créneaux",
+    plan_feat_diagnostics: "Diagnostic automatique des erreurs",
+    plan_feat_insights: "Observations automatiques sur vos contenus",
+    plan_feat_history: "Historique complet avec graphiques de tendance",
+    plan_feat_reports: "Rapports automatiques",
+    plan_feat_all_free: "Tout ce qu'il y a dans Free",
+    plan_feat_compare: "Comparaison de périodes et alertes de baisse",
+    plan_feat_hours: "Suggestions d'horaires de publication",
+    plan_feat_csv: "Export des données en CSV",
+    plan_feat_all_pro: "Tout ce qu'il y a dans Pro",
+    plan_feat_workspaces: "Espaces de travail séparés par client",
+    plan_feat_whitelabel: "Rapports PDF en marque blanche automatisés",
+    plan_feat_multiuser: "Accès multi-utilisateur pour l'équipe",
+    plan_feat_priority: "Support prioritaire",
+    aria_toggle_password: "Afficher le mot de passe",
+    ins_some_zero: "{name} : {n} des {tot} derniers contenus sont encore à zéro vue.",
+    ins_some_zero_one: "{name} : 1 des {tot} derniers contenus est encore à zéro vue.",
+    ins_all_zero_one: "{name} : l'unique contenu récent n'a encore aucune vue.",
+    ins_flop_one: "{name} : 1 contenu sous 40% de la moyenne : « {title} » avec {v} vues.",
+    ins_cadence_daily: "{name} : vous publiez environ {n} fois par jour.",
+    ins_cadence_broken_daily: "{name} : vous publiez d'habitude plusieurs fois par jour, mais le dernier contenu date de {d} jours.",
+    ins_all_zero: "{name} : aucun des {n} derniers contenus n'a encore de vues.",
+    ins_star: "{name} : « {title} » a fait {v} vues, {x}x la moyenne du compte. Regardez ce qui le distingue et reproduisez-le.",
+    ins_flop: "{name} : {n} contenus sous 40% de la moyenne ; le plus faible est « {title} » avec {v} vues.",
+    ins_engagement: "{name} : {rate}% d'engagement sur les contenus récents ({i} interactions pour {v} vues).",
+    ins_cadence_broken: "{name} : vous publiez d'habitude tous les {gap} jours, mais le dernier contenu date de {d} jours.",
+    ins_cadence: "{name} : vous publiez en moyenne tous les {gap} jours.",
+    ins_best_account: "{best} est le compte le plus performant : {bv} vues contre {wv} pour {worst}.",
+    ins_x_free_plan: "X n'expose pas les statistiques de lecture sur l'offre gratuite : il n'y a rien à analyser.",
+    ins_no_data: "Rien à analyser pour l'instant : liez un compte et appuyez sur Actualiser.",
+    ins_nothing_notable: "Aucun problème détecté dans vos contenus récents.",
     analytics_empty: "Pas encore assez de posts/vidéos avec des données pour une analyse — appuyez sur Refresh.",
     analytics_untitled: "(sans titre)", analytics_avg_views: "vues moyennes", analytics_bucket_count: "posts analysés dans ce créneau",
     analytics_last_refresh: "Dernier chargement des données : {t} ({d})", analytics_last_refresh_never: "Dernier chargement des données : jamais — appuyez sur Refresh.",
     footer_last_refresh: "Dernière mise à jour : {d}", footer_never: "Jamais mis à jour", footer_error: "Erreur pendant l'actualisation - réessayez.",
     time_never: "jamais", time_seconds_ago: "il y a quelques secondes", time_min_ago: "il y a {n} min", time_hours_ago: "il y a {n} heures", time_days_ago: "il y a {n} jours",
     diag_next_step_label: "Prochaine étape :",
+    diag_unreachable_title: "{name} : ne répond pas",
+    diagerr_scope_denied_cat: "Autorisation non accordée", diagerr_scope_denied_step: "L'autorisation de lecture des statistiques doit être approuvée sur le portail développeurs de la plateforme : impossible à régler depuis l'app.",
+    diagerr_expired_cat: "Accès expiré", diagerr_expired_step: "Reliez ce compte : l'autorisation a expiré ou a été révoquée.",
+    diagerr_scope_mismatch_cat: "Autorisations désalignées", diagerr_scope_mismatch_step: "Les autorisations demandées ne correspondent pas à celles accordées à l'origine : reliez le compte pour les réaligner.",
+    diagerr_permission_cat: "Autorisation manquante", diagerr_permission_step: "Le compte n'a pas accordé l'autorisation requise : reliez-le en acceptant toutes les demandes.",
+    diagerr_rate_cat: "Trop de requêtes", diagerr_rate_step: "Attendez quelques minutes avant la prochaine actualisation : la limite de la plateforme est atteinte.",
+    diagerr_auth_cat: "Identifiants invalides", diagerr_auth_step: "Reliez le compte pour régénérer l'accès.",
+    diagerr_notfound_cat: "Compte introuvable", diagerr_notfound_step: "Le compte lié n'est plus joignable : il a peut-être été supprimé ou renommé.",
+    diagerr_network_cat: "Problème réseau", diagerr_network_step: "Réessayez l'actualisation : cela ressemble à un souci de connexion temporaire.",
+    diagerr_unknown_cat: "Erreur non classée", diagerr_unknown_step: "Réessayez l'actualisation ; si cela persiste, reliez le compte.",
+    diag_no_account_cat: "À lier", diag_no_account_title: "Aucun compte {p}", diag_no_account_text: "Vous n'avez encore lié aucun compte {p}.", diag_no_account_step: "Appuyez sur Lier et connectez-vous : quelques secondes suffisent.",
+    diag_no_data_cat: "Données manquantes", diag_no_data_title: "{p} sans données", diag_no_data_text: "Aucune donnée chargée pour l'instant.", diag_no_data_step: "Appuyez sur Actualiser pour charger les données.",
+    diag_all_ok_title_one: "{p} : 1 compte en règle", diag_all_ok_cat_one: "Tout va bien", diag_all_ok_text_one: "Le compte répond et publie régulièrement.", diag_all_ok_step_one: "Aucune action requise.",
+    diag_all_ok_cat: "Tout va bien", diag_all_ok_title: "{p} : {n} comptes en règle", diag_all_ok_text: "Tous les comptes répondent et publient régulièrement.", diag_all_ok_step: "Aucune action requise.",
+    diag_stale_bad_cat: "Contenu à l'arrêt", diag_stale_bad_title: "{name} : à l'arrêt depuis {d} jours", diag_stale_bad_text: "Le dernier contenu sur {p} date de {d} jours.", diag_stale_bad_step: "Publiez quelque chose : les plateformes récompensent la régularité et la portée chute vite sur les profils inactifs.",
+    diag_stale_warn_cat: "Rythme en baisse", diag_stale_warn_title: "{name} : dernier post il y a {d} jours", diag_stale_warn_text: "Rien de nouveau sur {p} depuis {d} jours.", diag_stale_warn_step: "Revenez à votre rythme habituel avant que la portée ne commence à baisser.",
+    diag_zero_views_cat: "Aucune vue", diag_zero_views_title: "{name} : 0 vue sur les dernières vidéos", diag_zero_views_text: "Les dernières vidéos publiées n'ont encore aucune vue.", diag_zero_views_step: "Si elles viennent de sortir c'est normal ; si elles ont quelques jours, revoyez titre, miniature et premières secondes.",
+    diag_not_configured_cat: "À configurer", diag_not_configured_title: "{name} : non configuré", diag_not_configured_text: "Le compte est listé mais n'a aucun identifiant associé.", diag_not_configured_step: "Liez le compte, ou retirez-le de la liste si vous n'en avez pas besoin.",
+    diag_x_not_linked_cat: "Non lié", diag_x_not_linked_title: "X non lié", diag_x_not_linked_text: "Aucun identifiant X configuré.", diag_x_not_linked_step: "X n'expose pas les statistiques de lecture sur l'offre gratuite : cette section reste informative pour le moment.",
+    diag_x_linked_cat: "Lié", diag_x_linked_title: "X lié", diag_x_linked_text: "Identifiants présents. Les statistiques de lecture ne sont pas disponibles sur l'offre gratuite de X.", diag_x_linked_step: "Aucune action requise.",
     yt_total_views_lag_note: "YouTube peut mettre des heures/jours à actualiser le total historique sur les petites/nouvelles chaînes — ce n'est pas un bug du tableau de bord.",
     overview_sub: "{n} comptes suivis sur {p} plateformes.", overview_sub_empty: "Appuyez sur Refresh pour charger vos données.",
     trend_since: "depuis la précédente", trend_no_history: "Encore une actualisation et la tendance apparaît.",
@@ -378,6 +653,7 @@ const I18N = {
     auth_title_login: "Content de vous revoir", auth_title_register: "Créez votre compte",
     auth_sub_login: "Connectez-vous pour synchroniser offres et préférences.", auth_sub_register: "Trente secondes. Sans carte bancaire.",
     auth_name: "Votre nom", auth_first_name: "Prénom", auth_last_name: "Nom", auth_birth_date: "Date de naissance",
+    auth_first_name_ph: "Camille", auth_last_name_ph: "Martin", auth_email_ph: "vous@exemple.com",
     auth_email: "Email", auth_password: "Mot de passe", auth_password_confirm: "Confirmez le mot de passe",
     auth_switch_to_register: "Pas encore de compte ?", auth_switch_to_login: "Vous avez déjà un compte ?",
     auth_aside_badge: "Tout au même endroit",
@@ -390,6 +666,10 @@ const I18N = {
     auth_logout: "Déconnexion", account_upgrade: "Passer à Pro", account_since: "Compte créé le {d}",
     err_email_invalid: "Saisissez une adresse email valide.", err_password_short: "8 caractères minimum.",
     err_required: "Champ obligatoire.", err_birth_date_future: "La date ne peut pas être dans le futur.",
+    err_birth_invalid: "Saisissez une date de naissance valide.", err_birth_too_young: "Vous devez avoir au moins 13 ans pour vous inscrire.",
+    err_first_name_required: "Saisissez votre prénom.", err_last_name_required: "Saisissez votre nom.",
+    err_email_taken: "Un compte existe déjà avec cet email.", err_bad_credentials: "Email ou mot de passe incorrect.",
+    err_session_expired: "Session invalide ou expirée.", err_login_required_for_plan: "Connectez-vous avant d'acheter une offre.",
     err_age_min: "Vous devez avoir au moins {n} ans.", err_password_mismatch: "Les deux mots de passe ne correspondent pas.",
     toast_welcome: "Bienvenue, {n} !", toast_logged_in: "Content de vous revoir, {n} !", toast_logged_out: "Vous êtes déconnecté.",
     toast_refresh_done: "Données actualisées.", toast_export_done: "CSV exporté.",
@@ -411,6 +691,8 @@ const I18N = {
     tile_health: "Zustand", tile_accounts_foot: "aktive Konten",
     tile_analyzed: "Analysierte Inhalte", tile_analyzed_foot: "Beitraege und Videos mit Daten",
     tile_avg_per_post: "Schnitt pro Inhalt", tile_avg_per_post_foot: "durchschnittliche Views",
+    tile_avg_per_post_foot_n: "durchschnittliche Views über {n} Inhalte mit Daten", tile_best_hour_insufficient: "mehr Inhalte nötig",
+    analytics_hours_insufficient: "Noch zu wenig Daten für ein verlässliches Zeitfenster: Es fehlen mindestens {n} weitere Inhalte mit Aufrufen.",
     tile_best_hour: "Beste Stunde", tile_best_hour_foot: "{v} Views im Schnitt",
     tile_best_platform: "Top-Plattform", tile_best_platform_foot: "{v} Views gesamt",
     analytics_hours_hint: "Durchschnittliche Views nach Veroeffentlichungsstunde (UTC). Die gefuellten Balken sind die Stunden, in denen deine Inhalte am besten laufen.",
@@ -427,6 +709,9 @@ const I18N = {
     connections_subtitle: "Melde dich mit deinem Konto an, den Rest macht das Dashboard. Keine Tokens zum Kopieren.",
     connections_privacy: "Die Autorisierungen werden nur lokal auf deinem Rechner gespeichert. Sie laufen \u00fcber keinen Server.",
     connect_now: "{p} verkn\u00fcpfen", connect_add_another: "Weiteres Konto verkn\u00fcpfen", connect_soon: "Demn\u00e4chst",
+    generic_error: "Es ist ein Fehler aufgetreten.", connect_timeout: "Zeit\u00fcberschreitung: Die Verkn\u00fcpfung wurde nicht abgeschlossen.",
+    unavail_not_configured: "Das Verkn\u00fcpfen ist in dieser App-Version noch nicht verf\u00fcgbar.",
+    unavail_x_no_read_api: "X stellt im kostenlosen Tarif keine Lesestatistiken bereit.",
     connect_not_linked: "Nicht verkn\u00fcpft", connect_linked_n: "{n} verkn\u00fcpft", connect_unlink: "Trennen",
     connect_desc: "Melde dich mit {p} an, um deine Statistiken hier zu sehen.",
     connect_waiting: "Warte auf den Browser...", connect_browser_opened: "Browser ge\u00f6ffnet: schlie\u00dfe die Anmeldung ab.",
@@ -460,12 +745,72 @@ const I18N = {
     val_online_latency: "Online ({ms}ms)", val_down_error: "Offline / Fehler", label_npm_vulns: "npm-Schwachstellen",
     label_eslint: "ESLint", val_not_configured: "nicht konfiguriert", val_errors_warnings: "{e} Fehler, {w} Warnungen",
     insight_loading: "Analyse läuft…", insight_error: "Fehler bei der Analyse: ",
+    ins_no_items: "{name}: keine aktuellen Inhalte zum Auswerten.",
+    plan_free_tagline: "Zum Einstieg und um deine Zahlen zu verstehen.",
+    plan_free_accounts: "2 verknüpfte Konten",
+    plan_pro_tagline: "Für alle, die täglich posten und wachsen wollen.",
+    plan_pro_accounts: "15 verknüpfte Konten",
+    plan_studio_tagline: "Für Agenturen und mehrere Marken.",
+    plan_studio_accounts: "Unbegrenzte Konten",
+    plan_feat_all_socials: "Statistiken aller unterstützten Netzwerke",
+    plan_feat_manual_refresh: "Manuelles Aktualisieren bei Bedarf",
+    plan_feat_analytics: "Analysen: Top-Beiträge und Zeitfenster",
+    plan_feat_diagnostics: "Automatische Fehlerdiagnose",
+    plan_feat_insights: "Automatische Beobachtungen zu deinen Inhalten",
+    plan_feat_history: "Vollständiger Verlauf mit Trenddiagrammen",
+    plan_feat_reports: "Automatische Berichte",
+    plan_feat_all_free: "Alles aus Free",
+    plan_feat_compare: "Zeitraumvergleich und Warnungen bei Rückgang",
+    plan_feat_hours: "Vorschläge für Veröffentlichungszeiten",
+    plan_feat_csv: "Datenexport als CSV",
+    plan_feat_all_pro: "Alles aus Pro",
+    plan_feat_workspaces: "Getrennte Arbeitsbereiche pro Kunde",
+    plan_feat_whitelabel: "Automatische White-Label-PDF-Berichte",
+    plan_feat_multiuser: "Mehrbenutzerzugang fürs Team",
+    plan_feat_priority: "Prioritätssupport",
+    aria_toggle_password: "Passwort anzeigen",
+    ins_some_zero: "{name}: {n} der letzten {tot} Beiträge stehen noch bei null Aufrufen.",
+    ins_some_zero_one: "{name}: 1 der letzten {tot} Beiträge steht noch bei null Aufrufen.",
+    ins_all_zero_one: "{name}: der einzige aktuelle Beitrag hat noch keine Aufrufe.",
+    ins_flop_one: "{name}: 1 Beitrag unter 40% des Durchschnitts: „{title}“ mit {v} Aufrufen.",
+    ins_cadence_daily: "{name}: du postest etwa {n} Mal pro Tag.",
+    ins_cadence_broken_daily: "{name}: normalerweise postest du mehrmals täglich, der letzte Inhalt ist aber {d} Tage alt.",
+    ins_all_zero: "{name}: keiner der letzten {n} Beiträge hat bisher Aufrufe.",
+    ins_star: "{name}: „{title}“ kam auf {v} Aufrufe, {x}x den Kontodurchschnitt. Schau, was ihn auszeichnet, und wiederhole es.",
+    ins_flop: "{name}: {n} Beiträge unter 40% des Durchschnitts; der schwächste ist „{title}“ mit {v} Aufrufen.",
+    ins_engagement: "{name}: {rate}% Engagement bei den letzten Inhalten ({i} Interaktionen auf {v} Aufrufe).",
+    ins_cadence_broken: "{name}: normalerweise postest du alle {gap} Tage, der letzte Inhalt ist aber {d} Tage alt.",
+    ins_cadence: "{name}: du postest im Schnitt alle {gap} Tage.",
+    ins_best_account: "{best} ist dein stärkstes Konto: {bv} Aufrufe gegenüber {wv} bei {worst}.",
+    ins_x_free_plan: "X stellt im kostenlosen Tarif keine Lesestatistiken bereit: Es gibt nichts auszuwerten.",
+    ins_no_data: "Noch nichts auszuwerten: Verknüpfe ein Konto und drücke Refresh.",
+    ins_nothing_notable: "Keine Auffälligkeiten in deinen letzten Inhalten.",
     analytics_empty: "Noch nicht genug Beiträge/Videos mit Daten für eine Analyse — Refresh drücken.",
     analytics_untitled: "(ohne Titel)", analytics_avg_views: "Ø Views", analytics_bucket_count: "analysierte Beiträge in dieser Zeitspanne",
     analytics_last_refresh: "Letzter Datenabruf: {t} ({d})", analytics_last_refresh_never: "Letzter Datenabruf: nie — Refresh drücken.",
     footer_last_refresh: "Letzte Aktualisierung: {d}", footer_never: "Nie aktualisiert", footer_error: "Fehler beim Refresh - erneut versuchen.",
     time_never: "nie", time_seconds_ago: "vor wenigen Sekunden", time_min_ago: "vor {n} Min.", time_hours_ago: "vor {n} Std.", time_days_ago: "vor {n} Tagen",
     diag_next_step_label: "Nächster Schritt:",
+    diag_unreachable_title: "{name}: antwortet nicht",
+    diagerr_scope_denied_cat: "Berechtigung nicht erteilt", diagerr_scope_denied_step: "Die Leseberechtigung für Statistiken muss im Entwicklerportal der Plattform freigegeben werden – aus der App heraus nicht lösbar.",
+    diagerr_expired_cat: "Zugriff abgelaufen", diagerr_expired_step: "Verknüpfe dieses Konto neu: Die Autorisierung ist abgelaufen oder wurde widerrufen.",
+    diagerr_scope_mismatch_cat: "Berechtigungen abweichend", diagerr_scope_mismatch_step: "Die angeforderten Berechtigungen stimmen nicht mit den ursprünglich erteilten überein: Konto neu verknüpfen.",
+    diagerr_permission_cat: "Fehlende Berechtigung", diagerr_permission_step: "Das Konto hat die nötige Berechtigung nicht erteilt: neu verknüpfen und alle Anfragen annehmen.",
+    diagerr_rate_cat: "Zu viele Anfragen", diagerr_rate_step: "Warte einige Minuten bis zur nächsten Aktualisierung: Das Limit der Plattform wurde erreicht.",
+    diagerr_auth_cat: "Ungültige Zugangsdaten", diagerr_auth_step: "Verknüpfe das Konto neu, um den Zugriff zu erneuern.",
+    diagerr_notfound_cat: "Konto nicht gefunden", diagerr_notfound_step: "Das verknüpfte Konto ist nicht mehr erreichbar: Es wurde möglicherweise entfernt oder umbenannt.",
+    diagerr_network_cat: "Netzwerkproblem", diagerr_network_step: "Versuche die Aktualisierung erneut: Das sieht nach einem vorübergehenden Verbindungsproblem aus.",
+    diagerr_unknown_cat: "Nicht klassifizierter Fehler", diagerr_unknown_step: "Aktualisierung erneut versuchen; wenn es bestehen bleibt, Konto neu verknüpfen.",
+    diag_no_account_cat: "Zu verknüpfen", diag_no_account_title: "Kein {p}-Konto", diag_no_account_text: "Du hast noch kein {p}-Konto verknüpft.", diag_no_account_step: "Auf Verknüpfen tippen und anmelden: Das dauert nur Sekunden.",
+    diag_no_data_cat: "Fehlende Daten", diag_no_data_title: "{p} ohne Daten", diag_no_data_text: "Noch keine Daten geladen.", diag_no_data_step: "Auf Refresh tippen, um die Daten zu laden.",
+    diag_all_ok_title_one: "{p}: 1 Konto in Ordnung", diag_all_ok_cat_one: "Alles in Ordnung", diag_all_ok_text_one: "Das Konto antwortet und postet regelmäßig.", diag_all_ok_step_one: "Keine Aktion erforderlich.",
+    diag_all_ok_cat: "Alles in Ordnung", diag_all_ok_title: "{p}: {n} Konten in Ordnung", diag_all_ok_text: "Alle Konten antworten und posten regelmäßig.", diag_all_ok_step: "Keine Aktion erforderlich.",
+    diag_stale_bad_cat: "Inhalt steht still", diag_stale_bad_title: "{name}: seit {d} Tagen inaktiv", diag_stale_bad_text: "Der letzte Inhalt auf {p} ist {d} Tage alt.", diag_stale_bad_step: "Poste etwas: Plattformen belohnen Beständigkeit und die Reichweite fällt bei inaktiven Profilen schnell.",
+    diag_stale_warn_cat: "Nachlassender Rhythmus", diag_stale_warn_title: "{name}: letzter Beitrag vor {d} Tagen", diag_stale_warn_text: "Auf {p} kommt seit {d} Tagen nichts Neues.", diag_stale_warn_step: "Kehre zu deinem üblichen Rhythmus zurück, bevor die Reichweite sinkt.",
+    diag_zero_views_cat: "Keine Aufrufe", diag_zero_views_title: "{name}: 0 Aufrufe bei den letzten Videos", diag_zero_views_text: "Die zuletzt veröffentlichten Videos haben noch keine Aufrufe.", diag_zero_views_step: "Frisch veröffentlicht ist das normal; sind sie ein paar Tage alt, überarbeite Titel, Thumbnail und die ersten Sekunden.",
+    diag_not_configured_cat: "Zu konfigurieren", diag_not_configured_title: "{name}: nicht konfiguriert", diag_not_configured_text: "Das Konto ist gelistet, hat aber keine Zugangsdaten hinterlegt.", diag_not_configured_step: "Verknüpfe das Konto oder entferne es aus der Liste, wenn du es nicht brauchst.",
+    diag_x_not_linked_cat: "Nicht verknüpft", diag_x_not_linked_title: "X nicht verknüpft", diag_x_not_linked_text: "Keine X-Zugangsdaten konfiguriert.", diag_x_not_linked_step: "X stellt im kostenlosen Tarif keine Lesestatistiken bereit: Dieser Bereich bleibt vorerst informativ.",
+    diag_x_linked_cat: "Verknüpft", diag_x_linked_title: "X verknüpft", diag_x_linked_text: "Zugangsdaten vorhanden. Lesestatistiken sind im kostenlosen Tarif von X nicht verfügbar.", diag_x_linked_step: "Keine Aktion erforderlich.",
     yt_total_views_lag_note: "YouTube braucht bei kleinen/neuen Kanälen manchmal Stunden/Tage, um die historische Gesamtzahl zu aktualisieren — kein Fehler im Dashboard.",
     overview_sub: "{n} Konten auf {p} Plattformen im Blick.", overview_sub_empty: "Refresh drücken, um deine Daten zu laden.",
     trend_since: "seit dem letzten", trend_no_history: "Noch ein Refresh und der Trend erscheint hier.",
@@ -474,6 +819,7 @@ const I18N = {
     auth_title_login: "Willkommen zurück", auth_title_register: "Konto erstellen",
     auth_sub_login: "Melde dich an, um Tarife und Einstellungen zu synchronisieren.", auth_sub_register: "Dauert dreißig Sekunden. Ohne Karte.",
     auth_name: "Dein Name", auth_first_name: "Vorname", auth_last_name: "Nachname", auth_birth_date: "Geburtsdatum",
+    auth_first_name_ph: "Max", auth_last_name_ph: "Mustermann", auth_email_ph: "du@beispiel.de",
     auth_email: "E-Mail", auth_password: "Passwort", auth_password_confirm: "Passwort bestätigen",
     auth_switch_to_register: "Noch kein Konto?", auth_switch_to_login: "Schon ein Konto?",
     auth_aside_badge: "Alles an einem Ort",
@@ -486,6 +832,10 @@ const I18N = {
     auth_logout: "Abmelden", account_upgrade: "Auf Pro wechseln", account_since: "Konto erstellt am {d}",
     err_email_invalid: "Gib eine gültige E-Mail-Adresse ein.", err_password_short: "Mindestens 8 Zeichen.",
     err_required: "Pflichtfeld.", err_birth_date_future: "Das Datum darf nicht in der Zukunft liegen.",
+    err_birth_invalid: "Gib ein gültiges Geburtsdatum ein.", err_birth_too_young: "Du musst mindestens 13 Jahre alt sein, um dich zu registrieren.",
+    err_first_name_required: "Gib deinen Vornamen ein.", err_last_name_required: "Gib deinen Nachnamen ein.",
+    err_email_taken: "Mit dieser E-Mail existiert bereits ein Konto.", err_bad_credentials: "E-Mail oder Passwort falsch.",
+    err_session_expired: "Sitzung ungültig oder abgelaufen.", err_login_required_for_plan: "Melde dich an, bevor du einen Tarif kaufst.",
     err_age_min: "Du musst mindestens {n} Jahre alt sein.", err_password_mismatch: "Die Passwörter stimmen nicht überein.",
     toast_welcome: "Willkommen, {n}!", toast_logged_in: "Willkommen zurück, {n}!", toast_logged_out: "Du wurdest abgemeldet.",
     toast_refresh_done: "Daten aktualisiert.", toast_export_done: "CSV exportiert.",
@@ -507,6 +857,8 @@ const I18N = {
     tile_health: "\u30d8\u30eb\u30b9", tile_accounts_foot: "\u30a2\u30af\u30c6\u30a3\u30d6\u306a\u30a2\u30ab\u30a6\u30f3\u30c8",
     tile_analyzed: "\u5206\u6790\u3057\u305f\u30b3\u30f3\u30c6\u30f3\u30c4", tile_analyzed_foot: "\u30c7\u30fc\u30bf\u306e\u3042\u308b\u6295\u7a3f\u3068\u52d5\u753b",
     tile_avg_per_post: "1\u4ef6\u3042\u305f\u308a\u5e73\u5747", tile_avg_per_post_foot: "\u5e73\u5747\u518d\u751f\u6570",
+    tile_avg_per_post_foot_n: "\u30c7\u30fc\u30bf\u306e\u3042\u308b {n} \u4ef6\u306e\u5e73\u5747\u518d\u751f\u6570", tile_best_hour_insufficient: "\u30b3\u30f3\u30c6\u30f3\u30c4\u304c\u4e0d\u8db3",
+    analytics_hours_insufficient: "\u4fe1\u983c\u3067\u304d\u308b\u6642\u9593\u5e2f\u3092\u793a\u3059\u306b\u306f\u30c7\u30fc\u30bf\u304c\u4e0d\u8db3\u3057\u3066\u3044\u307e\u3059\u3002\u518d\u751f\u6570\u306e\u3042\u308b\u30b3\u30f3\u30c6\u30f3\u30c4\u304c\u3042\u3068 {n} \u4ef6\u5fc5\u8981\u3067\u3059\u3002",
     tile_best_hour: "\u6700\u9069\u306a\u6642\u9593", tile_best_hour_foot: "\u5e73\u5747{v}\u518d\u751f",
     tile_best_platform: "\u30c8\u30c3\u30d7\u30d7\u30e9\u30c3\u30c8\u30d5\u30a9\u30fc\u30e0", tile_best_platform_foot: "\u5408\u8a08{v}\u518d\u751f",
     analytics_hours_hint: "\u6295\u7a3f\u6642\u9593\u5e2f\uff08UTC\uff09\u3054\u3068\u306e\u5e73\u5747\u518d\u751f\u6570\u3002\u6fc3\u3044\u30d0\u30fc\u304c\u6700\u3082\u4f38\u3073\u308b\u6642\u9593\u5e2f\u3067\u3059\u3002",
@@ -523,6 +875,9 @@ const I18N = {
     connections_subtitle: "\u30a2\u30ab\u30a6\u30f3\u30c8\u3067\u30ed\u30b0\u30a4\u30f3\u3059\u308b\u3060\u3051\u3002\u30c8\u30fc\u30af\u30f3\u306e\u30b3\u30d4\u30fc\u306f\u4e0d\u8981\u3067\u3059\u3002",
     connections_privacy: "\u8a8d\u8a3c\u60c5\u5831\u306f\u304a\u4f7f\u3044\u306ePC\u5185\u306b\u306e\u307f\u4fdd\u5b58\u3055\u308c\u307e\u3059\u3002\u30b5\u30fc\u30d0\u30fc\u3092\u7d4c\u7531\u3059\u308b\u3053\u3068\u306f\u3042\u308a\u307e\u305b\u3093\u3002",
     connect_now: "{p}\u3092\u9023\u643a", connect_add_another: "\u5225\u306e\u30a2\u30ab\u30a6\u30f3\u30c8\u3092\u9023\u643a", connect_soon: "\u8fd1\u65e5\u5bfe\u5fdc",
+    generic_error: "\u30a8\u30e9\u30fc\u304c\u767a\u751f\u3057\u307e\u3057\u305f\u3002", connect_timeout: "\u30bf\u30a4\u30e0\u30a2\u30a6\u30c8\uff1a\u9023\u643a\u304c\u5b8c\u4e86\u3057\u307e\u305b\u3093\u3067\u3057\u305f\u3002",
+    unavail_not_configured: "\u3053\u306e\u30d0\u30fc\u30b8\u30e7\u30f3\u306e\u30a2\u30d7\u30ea\u3067\u306f\u307e\u3060\u9023\u643a\u3067\u304d\u307e\u305b\u3093\u3002",
+    unavail_x_no_read_api: "X \u306f\u7121\u6599\u30d7\u30e9\u30f3\u3067\u306f\u95b2\u89a7\u7d71\u8a08\u3092\u63d0\u4f9b\u3057\u3066\u3044\u307e\u305b\u3093\u3002",
     connect_not_linked: "\u672a\u9023\u643a", connect_linked_n: "{n}\u4ef6\u9023\u643a\u6e08\u307f", connect_unlink: "\u89e3\u9664",
     connect_desc: "{p}\u3067\u30ed\u30b0\u30a4\u30f3\u3059\u308b\u3068\u3001\u3053\u3053\u306b\u7d71\u8a08\u304c\u8868\u793a\u3055\u308c\u307e\u3059\u3002",
     connect_waiting: "\u30d6\u30e9\u30a6\u30b6\u3092\u5f85\u6a5f\u4e2d...", connect_browser_opened: "\u30d6\u30e9\u30a6\u30b6\u3092\u958b\u304d\u307e\u3057\u305f\u3002\u30ed\u30b0\u30a4\u30f3\u3092\u5b8c\u4e86\u3057\u3066\u304f\u3060\u3055\u3044\u3002",
@@ -556,12 +911,72 @@ const I18N = {
     val_online_latency: "オンライン（{ms}ms）", val_down_error: "ダウン / エラー", label_npm_vulns: "npmの脆弱性",
     label_eslint: "ESLint", val_not_configured: "未設定", val_errors_warnings: "エラー{e}件、警告{w}件",
     insight_loading: "分析中…", insight_error: "分析中にエラーが発生しました: ",
+    ins_no_items: "{name}: 分析できる最近のコンテンツがありません。",
+    plan_free_tagline: "まずは数字を把握するために。",
+    plan_free_accounts: "連携アカウント 2 件",
+    plan_pro_tagline: "毎日投稿して伸ばしたい方へ。",
+    plan_pro_accounts: "連携アカウント 15 件",
+    plan_studio_tagline: "代理店や複数ブランド運用向け。",
+    plan_studio_accounts: "アカウント無制限",
+    plan_feat_all_socials: "対応する全 SNS の統計",
+    plan_feat_manual_refresh: "手動での更新",
+    plan_feat_analytics: "分析：人気投稿と時間帯",
+    plan_feat_diagnostics: "エラーの自動診断",
+    plan_feat_insights: "コンテンツの自動分析",
+    plan_feat_history: "トレンドグラフ付きの完全な履歴",
+    plan_feat_reports: "レポートの自動生成",
+    plan_feat_all_free: "Free の全機能",
+    plan_feat_compare: "期間比較と低下アラート",
+    plan_feat_hours: "投稿時間の提案",
+    plan_feat_csv: "CSV でのデータ書き出し",
+    plan_feat_all_pro: "Pro の全機能",
+    plan_feat_workspaces: "クライアントごとのワークスペース",
+    plan_feat_whitelabel: "ホワイトラベル PDF レポート",
+    plan_feat_multiuser: "チームでのマルチユーザー利用",
+    plan_feat_priority: "優先サポート",
+    aria_toggle_password: "パスワードを表示",
+    ins_some_zero: "{name}: 直近 {tot} 件のうち {n} 件がまだ再生数ゼロです。",
+    ins_some_zero_one: "{name}: 直近 {tot} 件のうち 1 件がまだ再生数ゼロです。",
+    ins_all_zero_one: "{name}: 唯一の最近のコンテンツにまだ再生数がありません。",
+    ins_flop_one: "{name}: 平均の40%未満が 1 件：「{title}」で {v} 回再生。",
+    ins_cadence_daily: "{name}: 1日に約 {n} 回投稿しています。",
+    ins_cadence_broken_daily: "{name}: 普段は1日に複数回投稿していますが、最新のコンテンツは {d} 日前です。",
+    ins_all_zero: "{name}: 直近 {n} 件のコンテンツにまだ再生数がありません。",
+    ins_star: "{name}: 「{title}」は {v} 回再生され、アカウント平均の {x} 倍です。何が違ったのかを見て再現しましょう。",
+    ins_flop: "{name}: 平均の40%未満のコンテンツが {n} 件。最も弱いのは「{title}」で {v} 回再生です。",
+    ins_engagement: "{name}: 最近のコンテンツのエンゲージメントは {rate}%（{v} 回再生に対し {i} 件の反応）。",
+    ins_cadence_broken: "{name}: 普段は {gap} 日ごとに投稿していますが、最新のコンテンツは {d} 日前です。",
+    ins_cadence: "{name}: 平均して {gap} 日ごとに投稿しています。",
+    ins_best_account: "{best} が最も成果の高いアカウントです：{bv} 回再生に対し {worst} は {wv} 回。",
+    ins_x_free_plan: "X は無料プランで閲覧統計を提供していないため、分析できる項目はありません。",
+    ins_no_data: "まだ分析するデータがありません。アカウントを連携して「更新」を押してください。",
+    ins_nothing_notable: "最近のコンテンツに問題は見つかりませんでした。",
     analytics_empty: "分析に十分なデータのある投稿/動画がまだありません — Refreshを押してください。",
     analytics_untitled: "（タイトルなし）", analytics_avg_views: "平均再生数", analytics_bucket_count: "この時間帯で分析された投稿数",
     analytics_last_refresh: "最終データ取得: {t}（{d}）", analytics_last_refresh_never: "最終データ取得: なし — Refreshを押してください。",
     footer_last_refresh: "最終更新: {d}", footer_never: "未更新", footer_error: "更新中にエラーが発生しました。再試行してください。",
     time_never: "なし", time_seconds_ago: "数秒前", time_min_ago: "{n}分前", time_hours_ago: "{n}時間前", time_days_ago: "{n}日前",
     diag_next_step_label: "次のステップ:",
+    diag_unreachable_title: "{name}: 応答なし",
+    diagerr_scope_denied_cat: "権限が未承認", diagerr_scope_denied_step: "統計読み取り権限をプラットフォームの開発者ポータルで承認する必要があります。アプリ側では解決できません。",
+    diagerr_expired_cat: "アクセス期限切れ", diagerr_expired_step: "このアカウントを再連携してください。認証が期限切れか取り消されています。",
+    diagerr_scope_mismatch_cat: "権限の不一致", diagerr_scope_mismatch_step: "要求した権限と当初許可された権限が一致しません。アカウントを再連携してください。",
+    diagerr_permission_cat: "権限が不足", diagerr_permission_step: "必要な権限が許可されていません。すべての要求を承認して再連携してください。",
+    diagerr_rate_cat: "リクエスト過多", diagerr_rate_step: "次の更新まで数分お待ちください。プラットフォームの上限に達しました。",
+    diagerr_auth_cat: "認証情報が無効", diagerr_auth_step: "アカウントを再連携してアクセスを再生成してください。",
+    diagerr_notfound_cat: "アカウントが見つかりません", diagerr_notfound_step: "連携済みアカウントに到達できません。削除または名前変更された可能性があります。",
+    diagerr_network_cat: "ネットワークの問題", diagerr_network_step: "更新をもう一度お試しください。一時的な接続の問題のようです。",
+    diagerr_unknown_cat: "未分類のエラー", diagerr_unknown_step: "更新を再試行してください。続く場合はアカウントを再連携してください。",
+    diag_no_account_cat: "未連携", diag_no_account_title: "{p} のアカウントなし", diag_no_account_text: "{p} のアカウントはまだ連携されていません。", diag_no_account_step: "「連携」を押してログインしてください。数秒で完了します。",
+    diag_no_data_cat: "データなし", diag_no_data_title: "{p} のデータなし", diag_no_data_text: "まだデータが読み込まれていません。", diag_no_data_step: "「更新」を押してデータを読み込んでください。",
+    diag_all_ok_title_one: "{p}: アカウントは良好", diag_all_ok_cat_one: "問題なし", diag_all_ok_text_one: "アカウントは応答し、安定して投稿されています。", diag_all_ok_step_one: "対応は不要です。",
+    diag_all_ok_cat: "問題なし", diag_all_ok_title: "{p}: {n} 件のアカウントは良好", diag_all_ok_text: "すべてのアカウントが応答し、安定して投稿されています。", diag_all_ok_step: "対応は不要です。",
+    diag_stale_bad_cat: "投稿が停止", diag_stale_bad_title: "{name}: {d} 日間停止中", diag_stale_bad_text: "{p} の最新コンテンツは {d} 日前です。", diag_stale_bad_step: "何か投稿しましょう。継続は評価され、非アクティブなプロフィールはリーチが急速に落ちます。",
+    diag_stale_warn_cat: "ペース低下", diag_stale_warn_title: "{name}: 最終投稿は {d} 日前", diag_stale_warn_text: "{p} では {d} 日間、新規投稿がありません。", diag_stale_warn_step: "リーチが落ち始める前に、いつものペースに戻しましょう。",
+    diag_zero_views_cat: "再生数ゼロ", diag_zero_views_title: "{name}: 直近動画の再生数が 0", diag_zero_views_text: "最近公開した動画にまだ再生数がありません。", diag_zero_views_step: "公開直後なら普通ですが、数日経っているならタイトル・サムネイル・冒頭数秒を見直しましょう。",
+    diag_not_configured_cat: "未設定", diag_not_configured_title: "{name}: 未設定", diag_not_configured_text: "アカウントは一覧にありますが、認証情報が紐づいていません。", diag_not_configured_step: "アカウントを連携するか、不要なら一覧から削除してください。",
+    diag_x_not_linked_cat: "未連携", diag_x_not_linked_title: "X は未連携", diag_x_not_linked_text: "X の認証情報が設定されていません。", diag_x_not_linked_step: "X は無料プランでは閲覧統計を提供していないため、現時点でこのセクションは参考情報です。",
+    diag_x_linked_cat: "連携済み", diag_x_linked_title: "X 連携済み", diag_x_linked_text: "認証情報があります。X の無料プランでは閲覧統計を利用できません。", diag_x_linked_step: "対応は不要です。",
     yt_total_views_lag_note: "YouTubeでは小規模・新規チャンネルの累計再生数の更新に数時間〜数日かかることがあります — ダッシュボードの不具合ではありません。",
     overview_sub: "{p}個のプラットフォームで{n}件のアカウントを監視中。", overview_sub_empty: "Refreshを押してデータを読み込んでください。",
     trend_since: "前回から", trend_no_history: "もう一度更新すると推移が表示されます。",
@@ -570,6 +985,7 @@ const I18N = {
     auth_title_login: "おかえりなさい", auth_title_register: "アカウントを作成",
     auth_sub_login: "ログインしてプランと設定を同期しましょう。", auth_sub_register: "30秒で完了。カード不要です。",
     auth_name: "お名前", auth_first_name: "名", auth_last_name: "姓", auth_birth_date: "生年月日",
+    auth_first_name_ph: "太郎", auth_last_name_ph: "山田", auth_email_ph: "you@example.com",
     auth_email: "メールアドレス", auth_password: "パスワード", auth_password_confirm: "パスワード（確認）",
     auth_switch_to_register: "アカウントをお持ちでないですか？", auth_switch_to_login: "すでにアカウントをお持ちですか？",
     auth_aside_badge: "すべてが一か所に",
@@ -582,6 +998,10 @@ const I18N = {
     auth_logout: "ログアウト", account_upgrade: "Proにアップグレード", account_since: "アカウント作成日: {d}",
     err_email_invalid: "有効なメールアドレスを入力してください。", err_password_short: "8文字以上で入力してください。",
     err_required: "必須項目です。", err_birth_date_future: "未来の日付は選択できません。",
+    err_birth_invalid: "有効な生年月日を入力してください。", err_birth_too_young: "登録には13歳以上である必要があります。",
+    err_first_name_required: "名を入力してください。", err_last_name_required: "姓を入力してください。",
+    err_email_taken: "このメールアドレスのアカウントは既に存在します。", err_bad_credentials: "メールアドレスまたはパスワードが正しくありません。",
+    err_session_expired: "セッションが無効または期限切れです。", err_login_required_for_plan: "プランを購入する前にログインしてください。",
     err_age_min: "{n}歳以上である必要があります。", err_password_mismatch: "パスワードが一致しません。",
     toast_welcome: "ようこそ、{n}さん！", toast_logged_in: "おかえりなさい、{n}さん！", toast_logged_out: "ログアウトしました。",
     toast_refresh_done: "データを更新しました。", toast_export_done: "CSVを書き出しました。",
@@ -603,15 +1023,62 @@ function langMeta() { return LANGS.find(l => l.code === currentLang()) || LANGS[
 
 function t(key, vars) {
   const lang = currentLang();
+  // Singolare: se esiste una variante "<chiave>_one" e il conteggio è 1, è
+  // quella la forma giusta. Senza, si leggeva "1 contenuti".
+  if (vars && Number(vars.n) === 1) {
+    const one = `${key}_one`;
+    if ((I18N[lang] && I18N[lang][one]) || I18N.it[one]) key = one;
+  }
   let str = (I18N[lang] && I18N[lang][key]) || I18N.it[key] || key;
   if (vars) Object.keys(vars).forEach(k => { str = str.split(`{${k}}`).join(vars[k]); });
   return str;
 }
 
+/** Messaggio arrivato dal server. Il backend manda un codice quando il testo
+ *  deve seguire la lingua dell'utente (es. "unavail_x_no_read_api"); se non
+ *  corrisponde a nessuna chiave, t() restituisce la stringa originale, quindi
+ *  i messaggi liberi (errori di piattaforma) passano comunque intatti. */
+function tServer(msg, vars) {
+  if (!msg) return "";
+  return t(String(msg), vars);
+}
+
+/** Traduce se la chiave esiste, altrimenti restituisce il testo gia' pronto
+ *  arrivato dal server. Serve per la diagnostica: se una chiave manca si
+ *  vede la frase di prima invece di un codice grezzo a schermo. */
+function tOr(key, vars, fallback) {
+  const lang = currentLang();
+  const exists = (I18N[lang] && I18N[lang][key]) || I18N.it[key];
+  return exists ? t(key, vars) : (fallback || "");
+}
+
+/** Campo di una voce di diagnostica, tradotto quando il backend ha mandato
+ *  un codice. Il testo degli errori di piattaforma resta quello originale:
+ *  e' il messaggio grezzo dell'API, non una frase nostra da tradurre. */
+function diagField(issue, field, suffix) {
+  if (!issue.code) return issue[field] || "";
+  // Gli errori di piattaforma cambiano categoria e prossimo passo ma hanno
+  // tutti lo stesso titolo: una chiave sola invece di nove uguali.
+  if (suffix === "title" && issue.code.startsWith("diagerr_")) {
+    return tOr("diag_unreachable_title", issue.params || {}, issue.title);
+  }
+  return tOr(`${issue.code}_${suffix}`, issue.params || {}, issue[field]);
+}
+
 function applyStaticTranslations() {
   document.querySelectorAll("[data-i18n]").forEach(el => { el.textContent = t(el.dataset.i18n); });
-  const pi = document.getElementById("palette-input");
-  if (pi) pi.placeholder = t("palette_placeholder");
+  // I placeholder seguono la stessa strada del testo: dichiarati nell'HTML
+  // con data-i18n-placeholder invece di essere scritti a mano in una lingua
+  // sola (ed evitando di riempirli con dati personali reali).
+  document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
+    el.placeholder = t(el.dataset.i18nPlaceholder);
+  });
+  document.querySelectorAll("[data-i18n-title]").forEach(el => {
+    el.title = t(el.dataset.i18nTitle);
+  });
+  document.querySelectorAll("[data-i18n-aria]").forEach(el => {
+    el.setAttribute("aria-label", t(el.dataset.i18nAria));
+  });
 }
 
 // ---------- Utility ----------
@@ -796,6 +1263,7 @@ function renderLanguageGrid() {
       renderAuthTexts();
       if (currentSnapshot) renderAll(currentSnapshot);
       if (plansData) renderPlans();
+      if (connectionsData) { renderConnections(); applyConnectAvailability(); }
     });
   });
 }
@@ -1024,35 +1492,28 @@ const DETAIL_RENDERERS = {
 };
 
 // ---------- Insight ----------
-function showInsightBox(platform, text) {
-  const box = document.getElementById(`${platform}-insight`);
-  box.classList.remove("hidden");
-  const lines = String(text).split("\n").map(l => l.trim()).filter(Boolean);
-  box.innerHTML = `<ul>${lines.map(l => `<li>${esc(l.replace(/^[-•*]\s*/, ""))}</li>`).join("")}</ul>`;
-}
+const INSIGHT_ICONS = { good: "▲", warn: "!", info: "•" };
 
-function showInsightLoading(platform) {
+/** Le osservazioni arrivano gia' dentro lo snapshot (sono calcolate in
+ *  locale, costano zero) quindi si disegnano da sole ad ogni render: niente
+ *  pulsante da premere e, soprattutto, niente riquadro che resta appeso con
+ *  un errore vecchio quando si cambia sezione. */
+function showInsightBox(platform, items) {
   const box = document.getElementById(`${platform}-insight`);
+  if (!box) return;
+  if (!items || !items.length) { box.classList.add("hidden"); box.innerHTML = ""; return; }
   box.classList.remove("hidden");
-  box.innerHTML = `<div class="spinner-row"><div class="spinner"></div> ${t("insight_loading")}</div>`;
+  box.innerHTML = `<ul>${items.map(i => {
+    // I conteggi arrivano come numeri grezzi: vanno formattati con i
+    // separatori della lingua scelta, non lasciati come "10924".
+    const params = {};
+    Object.entries(i.params || {}).forEach(([k, v]) => {
+      params[k] = typeof v === "number" && Number.isFinite(v) ? fmtNum(v) : v;
+    });
+    const text = i.code ? tOr(i.code, params, i.text) : (i.text || "");
+    return `<li class="insight-${esc(i.kind || "info")}"><span class="insight-ico">${INSIGHT_ICONS[i.kind] || "•"}</span>${esc(text)}</li>`;
+  }).join("")}</ul>`;
 }
-
-document.querySelectorAll(".btn-analyze[data-platform]").forEach(btn => {
-  btn.addEventListener("click", async () => {
-    const platform = btn.dataset.platform;
-    btn.disabled = true;
-    showInsightLoading(platform);
-    try {
-      const resp = await fetch(`/api/insights/${platform}`, { method: "POST" });
-      const data = await resp.json();
-      showInsightBox(platform, data.text || data.detail || "");
-    } catch (e) {
-      showInsightBox(platform, `${t("insight_error")}${e}`);
-    } finally {
-      btn.disabled = false;
-    }
-  });
-});
 
 // ---------- Analitiche ----------
 function renderAnalytics(a) {
@@ -1078,13 +1539,17 @@ function renderAnalytics(a) {
   const best = a.best_hours[0];
   const bestPlatform = Object.entries(a.per_platform || {})
     .sort((x, y) => y[1].views - x[1].views)[0];
-  const avgViews = Math.round((a.total_views || 0) / a.total_items_analyzed);
+  // La media si calcola sui contenuti che hanno davvero dati: dividere per
+  // tutti (compresi quelli ancora a zero views) da' un numero corretto ma
+  // che l'utente legge come "quanto rende un mio contenuto", e non lo e'.
+  const avgViews = a.avg_views_per_item ?? Math.round((a.total_views || 0) / a.total_items_analyzed);
+  const withViews = a.items_with_views ?? a.total_items_analyzed;
 
   tilesEl.innerHTML =
     tile(t("tile_analyzed"), fmtNum(a.total_items_analyzed), t("tile_analyzed_foot"))
-    + tile(t("tile_avg_per_post"), fmtNum(avgViews), t("tile_avg_per_post_foot"))
+    + tile(t("tile_avg_per_post"), fmtNum(avgViews), t("tile_avg_per_post_foot_n", { n: fmtNum(withViews) }))
     + tile(t("tile_best_hour"), best ? `${String(best.hour).padStart(2, "0")}:00` : "–",
-           best ? t("tile_best_hour_foot", { v: fmtNum(best.avg_views) }) : "")
+           best ? t("tile_best_hour_foot", { v: fmtNum(best.avg_views) }) : t("tile_best_hour_insufficient"))
     + tile(t("tile_best_platform"), bestPlatform ? PLATFORM_LABELS[bestPlatform[0]] || bestPlatform[0] : "–",
            bestPlatform ? t("tile_best_platform_foot", { v: fmtNum(bestPlatform[1].views) }) : "");
 
@@ -1112,6 +1577,14 @@ function renderAnalytics(a) {
       <div class="rank-bar-track"><div class="rank-bar-fill" style="width:${(p.views / maxViews) * 100}%"></div></div>
       <div class="rank-meta">${esc(p.account)}</div>
     </div>`).join("");
+
+  // Con pochi contenuti una classifica di fasce orarie sarebbe solo
+  // l'elenco dei singoli post travestito da consiglio: meglio dire
+  // apertamente quanti dati mancano.
+  if (!a.best_hours.length) {
+    hoursEl.innerHTML = `<div class="empty">${t("analytics_hours_insufficient", { n: a.hours_items_needed || 0 })}</div>`;
+    return;
+  }
 
   const maxHour = Math.max(...a.best_hours.map(h => h.avg_views), 1);
   hoursEl.innerHTML = a.best_hours.map((h, idx) => `
@@ -1164,21 +1637,26 @@ function renderDiagnostics(diag) {
       : i.severity === "green"
   );
 
-  list.innerHTML = visible.length ? visible.map(i => `
+  list.innerHTML = visible.length ? visible.map(i => {
+    const title = diagField(i, "title", "title");
+    const category = diagField(i, "category", "cat");
+    const text = diagField(i, "text", "text");
+    const nextStep = diagField(i, "next_step", "step");
+    return `
     <div class="diag-item ${i.severity}">
       <span class="diag-icon ${i.severity}">${DIAG_ICONS[i.severity] || "•"}</span>
       <div class="diag-body">
         <div class="diag-head">
-          <span class="diag-title">${esc(i.title || i.text)}</span>
-          ${i.category ? `<span class="diag-category">${esc(i.category)}</span>` : ""}
+          <span class="diag-title">${esc(title || text)}</span>
+          ${category ? `<span class="diag-category">${esc(category)}</span>` : ""}
         </div>
-        ${i.title && i.text ? `<div class="diag-text">${esc(i.text)}</div>` : ""}
-        ${i.next_step && i.severity !== "green"
-          ? `<div class="diag-next-step"><b>${t("diag_next_step_label")}</b> ${esc(i.next_step)}</div>` : ""}
+        ${title && text ? `<div class="diag-text">${esc(text)}</div>` : ""}
+        ${nextStep && i.severity !== "green"
+          ? `<div class="diag-next-step"><b>${t("diag_next_step_label")}</b> ${esc(nextStep)}</div>` : ""}
         ${i.action && i.action.type === "goto"
           ? `<button class="btn-analyze diag-action" data-goto-action="${esc(i.action.section)}">${t("diag_go_connect")}</button>` : ""}
       </div>
-    </div>`).join("")
+    </div>`; }).join("")
     : `<div class="empty">${t("diag_filter_empty")}</div>`;
 
   list.querySelectorAll("[data-goto-action]").forEach(btn => {
@@ -1272,7 +1750,7 @@ function renderConnections() {
           </div>
         </div>
       </div>
-      <div class="connect-desc">${unavailable ? esc(unavailable) : t("connect_desc", { p: meta.name })}</div>
+      <div class="connect-desc">${unavailable ? esc(tServer(unavailable)) : t("connect_desc", { p: meta.name })}</div>
       ${accountsHtml}
       ${cta}
       ${guidedPanel}
@@ -1340,7 +1818,7 @@ function openConnectModal(platform) {
   document.getElementById("cm-auto").classList.toggle("hidden", !isAuto);
   document.getElementById("cm-guided").classList.toggle("hidden", !isGuided);
   document.getElementById("cm-unavailable").classList.toggle("hidden", !unavailable);
-  document.getElementById("cm-unavailable").textContent = unavailable || "";
+  document.getElementById("cm-unavailable").textContent = unavailable ? tServer(unavailable) : "";
   document.getElementById("cm-auto-label").textContent = t("connect_now", { p: meta.name });
   document.getElementById("cm-paste").value = "";
   cmError("");
@@ -1456,7 +1934,7 @@ async function startConnect(platform, btn) {
   cmError("");
   try {
     const resp = await (await fetch(`/api/connections/connect/${platform}`, { method: "POST" })).json();
-    if (!resp.ok) { cmError(resp.message || "Errore"); toast(resp.message || "Errore", "err"); return; }
+    if (!resp.ok) { cmError(resp.message || t("generic_error")); toast(resp.message || t("generic_error"), "err"); return; }
     toast(t("connect_browser_opened"));
 
     // Il login avviene nel browser: si attende che il flusso finisca.
@@ -1473,7 +1951,13 @@ async function startConnect(platform, btn) {
       }
       return;
     }
+    // Attesa esaurita: si azzera lo stato lato server, altrimenti resterebbe
+    // "in corso" e ogni tentativo successivo verrebbe rifiutato.
+    await fetch("/api/connections/cancel", { method: "POST" }).catch(() => {});
+    cmError(t("connect_timeout"));
+    toast(t("connect_timeout"), "err");
   } catch (e) {
+    await fetch("/api/connections/cancel", { method: "POST" }).catch(() => {});
     cmError(String(e));
     toast(String(e), "err");
   } finally {
@@ -1659,7 +2143,7 @@ document.getElementById("auth-form").addEventListener("submit", async e => {
     });
     const data = await resp.json();
     if (!resp.ok) {
-      errBox.textContent = data.detail || "Errore.";
+      errBox.textContent = tServer(data.detail) || t("generic_error");
       errBox.classList.remove("hidden");
       return;
     }
@@ -1723,8 +2207,11 @@ function renderPlans() {
       ? t("plan_billed_free")
       : (yearly ? t("plan_billed_yearly", { a: p.price_yearly }) : "");
 
-    const feats = p.features.map(f => `<li><span class="feat-ico">✓</span><span>${esc(f)}</span></li>`).join("")
-      + (p.missing || []).map(f => `<li class="off"><span class="feat-ico">–</span><span>${esc(f)}</span></li>`).join("");
+    // Le voci arrivano come {code, text}: si traduce il codice e si ricade
+    // sulla frase del server se quella chiave non esiste.
+    const featText = f => (typeof f === "string" ? f : tOr(f.code, {}, f.text));
+    const feats = (p.features || []).map(f => `<li><span class="feat-ico">✓</span><span>${esc(featText(f))}</span></li>`).join("")
+      + (p.missing || []).map(f => `<li class="off"><span class="feat-ico">–</span><span>${esc(featText(f))}</span></li>`).join("");
 
     let cta;
     if (isCurrent) cta = `<button class="plan-cta current" disabled>${t("plan_current")}</button>`;
@@ -1734,13 +2221,13 @@ function renderPlans() {
     return `<div class="plan-card ${p.popular ? "popular" : ""}">
       ${p.popular ? `<span class="plan-ribbon">${t("plan_popular")}</span>` : ""}
       <div class="plan-name">${esc(p.name)}</div>
-      <div class="plan-tagline">${esc(p.tagline)}</div>
+      <div class="plan-tagline">${esc(tOr(p.tagline_code, {}, p.tagline))}</div>
       <div class="plan-price">
         <span class="plan-amount">${amount === 0 ? "0" : amount}€</span>
         <span class="plan-period">${t("plan_period_month")}</span>
       </div>
       <div class="plan-billed">${billed}</div>
-      <span class="plan-accounts">${esc(p.accounts)}</span>
+      <span class="plan-accounts">${esc(tOr(p.accounts_code, {}, p.accounts))}</span>
       <ul class="plan-features">${feats}</ul>
       ${cta}
     </div>`;
@@ -1768,7 +2255,7 @@ async function startCheckout(planId) {
       body: JSON.stringify({ plan_id: planId, billing_cycle: billingCycle }),
     });
     const data = await resp.json();
-    if (!resp.ok) { toast(data.detail || "Errore", "err"); return; }
+    if (!resp.ok) { toast(tServer(data.detail) || t("generic_error"), "err"); return; }
     if (data.ok && data.checkout_url) window.location.href = data.checkout_url;
     else toast(data.message || "Checkout non disponibile.", "err");
   } catch (e) {
@@ -1870,12 +2357,11 @@ function renderAll(snapshot) {
   renderDiagnostics(snapshot.diagnostics);
   renderAnalytics(snapshot.analytics);
 
-  if (snapshot.insights) {
-    Object.keys(snapshot.insights).forEach(platform => {
-      const ins = snapshot.insights[platform];
-      if (ins && ins.text) showInsightBox(platform, ins.text);
-    });
-  }
+  // Sempre tutte le piattaforme attive, anche quelle senza osservazioni:
+  // cosi' un riquadro di una sezione precedente non resta visibile.
+  activePlatforms().forEach(platform => {
+    showInsightBox(platform, snapshot.insights?.[platform]);
+  });
 
   const times = activePlatforms().map(k => snapshot[k]?.fetched_at).filter(Boolean);
   const latest = times.length ? Math.max(...times) : null;

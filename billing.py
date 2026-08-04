@@ -10,37 +10,52 @@ import os
 
 import requests
 
+# I testi viaggiano come codice + frase italiana di riserva: la pagina dei
+# prezzi e' quella che incassa, e mostrarla in italiano a un cliente che ha
+# scelto un'altra lingua e' il posto peggiore dove farlo.
+#
+# NB: nessun piano promette piu' "analisi AI". Quella funzione chiamava un
+# modello a pagamento, e' stata sostituita da un'analisi calcolata in locale
+# ed e' inclusa ovunque: continuare a venderla come esclusiva a pagamento
+# sarebbe una promessa falsa.
 PLANS = [
     {
         "id": "free",
         "name": "Free",
         "price_monthly": 0,
         "price_yearly": 0,
+        "tagline_code": "plan_free_tagline",
         "tagline": "Per iniziare e capire i tuoi numeri.",
+        "accounts_code": "plan_free_accounts",
         "accounts": "2 account collegati",
         "features": [
-            "Statistiche di tutti i social supportati",
-            "Refresh manuale on-demand",
-            "Analitiche: top post e fasce orarie",
-            "Diagnostica automatica degli errori",
+            ("plan_feat_all_socials", "Statistiche di tutti i social supportati"),
+            ("plan_feat_manual_refresh", "Refresh manuale on-demand"),
+            ("plan_feat_analytics", "Analitiche: top post e fasce orarie"),
+            ("plan_feat_diagnostics", "Diagnostica automatica degli errori"),
+            ("plan_feat_insights", "Osservazioni automatiche sui tuoi contenuti"),
         ],
-        "missing": ["Analisi AI delle criticita'", "Storico e trend", "Report automatici"],
+        "missing": [
+            ("plan_feat_history", "Storico completo con grafici di trend"),
+            ("plan_feat_reports", "Report automatici"),
+        ],
     },
     {
         "id": "pro",
         "name": "Pro",
         "price_monthly": 12,
         "price_yearly": 120,
+        "tagline_code": "plan_pro_tagline",
         "tagline": "Per chi pubblica ogni giorno e vuole crescere.",
+        "accounts_code": "plan_pro_accounts",
         "accounts": "15 account collegati",
         "popular": True,
         "features": [
-            "Tutto quello che c'e' nel Free",
-            "Analisi AI delle criticita' on-demand",
-            "Storico completo con grafici di trend",
-            "Confronto tra periodi e alert sui cali",
-            "Suggerimenti sugli orari di pubblicazione",
-            "Esportazione dei dati in CSV",
+            ("plan_feat_all_free", "Tutto quello che c'e' nel Free"),
+            ("plan_feat_history", "Storico completo con grafici di trend"),
+            ("plan_feat_compare", "Confronto tra periodi e alert sui cali"),
+            ("plan_feat_hours", "Suggerimenti sugli orari di pubblicazione"),
+            ("plan_feat_csv", "Esportazione dei dati in CSV"),
         ],
         "missing": [],
     },
@@ -49,26 +64,36 @@ PLANS = [
         "name": "Studio",
         "price_monthly": 39,
         "price_yearly": 390,
+        "tagline_code": "plan_studio_tagline",
         "tagline": "Per agenzie e chi gestisce piu' brand.",
+        "accounts_code": "plan_studio_accounts",
         "accounts": "Account illimitati",
         "features": [
-            "Tutto quello che c'e' nel Pro",
-            "Spazi di lavoro separati per cliente",
-            "Report PDF white-label automatici",
-            "Analisi AI programmata ogni giorno",
-            "Accesso multi-utente al team",
-            "Supporto prioritario",
+            ("plan_feat_all_pro", "Tutto quello che c'e' nel Pro"),
+            ("plan_feat_workspaces", "Spazi di lavoro separati per cliente"),
+            ("plan_feat_whitelabel", "Report PDF white-label automatici"),
+            ("plan_feat_multiuser", "Accesso multi-utente al team"),
+            ("plan_feat_priority", "Supporto prioritario"),
         ],
         "missing": [],
     },
 ]
+
+
+def _public_plan(plan: dict) -> dict:
+    """Versione per il frontend: le liste diventano {code, text} cosi'
+    l'interfaccia traduce e, se una chiave manca, mostra comunque la frase."""
+    out = {k: v for k, v in plan.items() if k not in ("features", "missing")}
+    for key in ("features", "missing"):
+        out[key] = [{"code": c, "text": txt} for c, txt in plan.get(key, [])]
+    return out
 
 PLANS_BY_ID = {p["id"]: p for p in PLANS}
 
 
 def list_plans() -> dict:
     return {
-        "plans": PLANS,
+        "plans": [_public_plan(p) for p in PLANS],
         "checkout_ready": bool(os.environ.get("STRIPE_SECRET_KEY")),
         "currency": "EUR",
     }

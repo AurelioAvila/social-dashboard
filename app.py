@@ -70,10 +70,15 @@ _units_lock = threading.Lock()
 def get_snapshot():
     """Dati piu' recenti gia' salvati - nessuna chiamata esterna, per un
     caricamento istantaneo e a costo zero ogni volta che si apre l'app."""
+    import insights
+
     out = {}
     for platform in PLATFORM_NAMES:
         out[platform] = cache.latest_snapshot(platform)
-    out["insights"] = {p: cache.latest_insight(p) for p in PLATFORM_NAMES}
+    # Le osservazioni sono aritmetica sui dati gia' in memoria: costano
+    # nulla, quindi arrivano insieme allo snapshot invece di dietro a un
+    # pulsante che l'utente deve sapere di dover premere.
+    out["insights"] = {p: insights.generate_insights(out, platform=p) for p in PLATFORM_NAMES}
     out["diagnostics"] = diagnostics.run_diagnostics(out)
     out["analytics"] = analytics.compute_analytics(out)
     out["trends"] = trends.compute_trends()
@@ -152,24 +157,15 @@ def refresh_status():
 
 @app.post("/api/insights/{platform}")
 def get_platform_insights(platform: str):
-    """Analisi criticita' via Claude Haiku, mirata a UNA piattaforma - solo
-    su richiesta esplicita dal pulsante 'Analizza' della sezione. Cachata
-    per piattaforma: se richiamata senza un refresh nel mezzo, ritorna
-    l'ultima analisi salvata invece di rifare la chiamata a pagamento."""
+    """Analisi della piattaforma calcolata dal codice: istantanea e gratuita,
+    quindi non serve piu' ne' cache ne' un pulsante che la chieda - viene
+    gia' inclusa in /api/snapshot. L'endpoint resta per compatibilita'."""
     if platform not in PLATFORM_NAMES:
         raise HTTPException(404, f"Piattaforma sconosciuta: {platform}")
 
+    import insights
     snap = cache.latest_snapshot(platform)
-    fetch_at = snap.get("fetched_at", 0) if snap else 0
-
-    cached = cache.latest_insight(platform)
-    if cached and cached["based_on_fetch_at"] == fetch_at:
-        return {**cached, "from_cache": True}
-
-    import insights  # import pigro: carica l'SDK Anthropic solo se serve davvero
-    text = insights.generate_insights({platform: snap}, platform=platform)
-    cache.save_insight(text, fetch_at, scope=platform)
-    return {"generated_at": int(time.time()), "based_on_fetch_at": fetch_at, "text": text, "from_cache": False}
+    return {"generated_at": int(time.time()), "items": insights.generate_insights({platform: snap}, platform=platform)}
 
 
 # ---------------------------------------------------------------- config
@@ -215,6 +211,14 @@ def connect_platform(platform: str):
 def connect_status():
     import connections
     return connections.connect_status()
+
+
+@app.post("/api/connections/cancel")
+def connect_cancel():
+    """Sblocca un collegamento rimasto appeso (finestra chiusa, login mai
+    completato) senza dover aspettare la scadenza o riavviare l'app."""
+    import connections
+    return connections.cancel_connect()
 
 
 @app.get("/api/connections/authorize/{platform}")
@@ -284,7 +288,7 @@ def auth_me(authorization: str | None = Header(default=None)):
     import auth
     user = auth.user_for_token(_token_from_header(authorization))
     if not user:
-        raise HTTPException(401, "Sessione non valida o scaduta.")
+        raise HTTPException(401, "err_session_expired")
     return {"user": user}
 
 
@@ -313,7 +317,7 @@ def billing_checkout(payload: dict = Body(...), authorization: str | None = Head
 
     user = auth.user_for_token(_token_from_header(authorization))
     if not user:
-        raise HTTPException(401, "Devi accedere prima di acquistare un piano.")
+        raise HTTPException(401, "err_login_required_for_plan")
     try:
         return billing.create_checkout_session(
             payload.get("plan_id", ""), payload.get("billing_cycle", "monthly"), user["email"]

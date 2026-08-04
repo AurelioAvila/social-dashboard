@@ -440,8 +440,22 @@ button:disabled { opacity: 0.5; cursor: wait; transform: none; }
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 12%, transparent);
 }
 .insight-box.hidden { display: none; }
-.insight-box ul { margin: 0; padding-left: 18px; }
-.insight-box li { margin-bottom: 7px; font-size: 13px; line-height: 1.55; }
+.insight-box ul { margin: 0; padding-left: 0; list-style: none; }
+.insight-box li {
+  display: flex; gap: 9px; align-items: flex-start;
+  margin-bottom: 7px; font-size: 13px; line-height: 1.55;
+}
+.insight-box li:last-child { margin-bottom: 0; }
+/* Il colore fa il lavoro del semaforo: si capisce cosa va bene e cosa
+   guardare senza dover leggere ogni riga. */
+.insight-ico {
+  flex: 0 0 auto; width: 17px; height: 17px; margin-top: 1px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 50%; font-size: 10px; font-weight: 700; line-height: 1;
+}
+.insight-good .insight-ico { background: color-mix(in srgb, var(--green) 20%, transparent); color: var(--green); }
+.insight-warn .insight-ico { background: color-mix(in srgb, var(--yellow) 20%, transparent); color: var(--yellow); }
+.insight-info .insight-ico { background: color-mix(in srgb, var(--accent) 18%, transparent); color: var(--accent); }
 .insight-box .spinner-row { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 13.5px; }
 
 .spinner {
