@@ -46,6 +46,20 @@ const I18N = {
     connections_privacy: "Le autorizzazioni restano salvate solo sul tuo computer, in locale. Non passano da nessun server.",
     connect_now: "Collega {p}", connect_add_another: "Collega un altro account", connect_soon: "In arrivo",
     generic_error: "Si è verificato un errore.", connect_timeout: "Tempo scaduto: il collegamento non è stato completato.",
+    connect_already_running: "C'è già un collegamento in corso.",
+    connect_platform_unsupported: "Questa piattaforma non è ancora supportata.",
+    connect_guided_unavailable: "Il collegamento guidato non è disponibile per questa piattaforma.",
+    connect_window_closed: "Collegamento annullato: la finestra è stata chiusa prima di completare l'accesso.",
+    connect_denied: "Autorizzazione negata dalla piattaforma.",
+    connect_code_not_found: "Non sono riuscito a trovare il codice nell'URL incollato.",
+    connect_instagram_rejected: "Instagram ha rifiutato il codice di autorizzazione. Riprova a collegare l'account.",
+    connect_token_exchange_failed: "Scambio del token non riuscito. Riprova a collegare l'account.",
+    connect_tiktok_rejected: "TikTok ha rifiutato il codice di autorizzazione. Riprova a collegare l'account.",
+    connect_tiktok_unexpected: "Risposta inattesa da TikTok. Riprova più tardi.",
+    connect_proxy_http_error: "Il servizio di autorizzazione non ha risposto correttamente. Riprova tra poco.",
+    connect_proxy_rejected: "Il servizio di autorizzazione ha rifiutato la richiesta.",
+    connect_no_google_app: "Nessuna app OAuth Google configurata.",
+    proxy_not_configured: "Il servizio di autorizzazione non è configurato in questa build.",
     unavail_not_configured: "Collegamento non ancora disponibile in questa versione dell'app.",
     unavail_x_no_read_api: "X non espone le statistiche di lettura sul piano gratuito.",
     connect_not_linked: "Non collegato", connect_linked_n: "{n} collegato/i", connect_unlink: "Scollega",
@@ -219,6 +233,20 @@ const I18N = {
     connections_privacy: "Authorizations are stored only on your computer, locally. They never pass through any server.",
     connect_now: "Link {p}", connect_add_another: "Link another account", connect_soon: "Coming soon",
     generic_error: "Something went wrong.", connect_timeout: "Timed out: the link was not completed.",
+    connect_already_running: "A connection is already in progress.",
+    connect_platform_unsupported: "This platform isn't supported yet.",
+    connect_guided_unavailable: "Guided connection isn't available for this platform.",
+    connect_window_closed: "Connection cancelled: the window was closed before finishing sign-in.",
+    connect_denied: "Authorization was denied by the platform.",
+    connect_code_not_found: "Couldn't find the code in the pasted URL.",
+    connect_instagram_rejected: "Instagram rejected the authorization code. Try connecting the account again.",
+    connect_token_exchange_failed: "Token exchange failed. Try connecting the account again.",
+    connect_tiktok_rejected: "TikTok rejected the authorization code. Try connecting the account again.",
+    connect_tiktok_unexpected: "Unexpected response from TikTok. Try again later.",
+    connect_proxy_http_error: "The authorization service didn't respond correctly. Try again shortly.",
+    connect_proxy_rejected: "The authorization service rejected the request.",
+    connect_no_google_app: "No Google OAuth app configured.",
+    proxy_not_configured: "The authorization service isn't configured in this build.",
     unavail_not_configured: "Linking is not available yet in this version of the app.",
     unavail_x_no_read_api: "X does not expose read analytics on the free plan.",
     connect_not_linked: "Not linked", connect_linked_n: "{n} linked", connect_unlink: "Unlink",
@@ -392,6 +420,20 @@ const I18N = {
     connections_privacy: "Las autorizaciones se guardan solo en tu ordenador, en local. No pasan por ningun servidor.",
     connect_now: "Vincular {p}", connect_add_another: "Vincular otra cuenta", connect_soon: "Proximamente",
     generic_error: "Se ha producido un error.", connect_timeout: "Tiempo agotado: la vinculación no se completó.",
+    connect_already_running: "Ya hay una vinculación en curso.",
+    connect_platform_unsupported: "Esta plataforma aún no es compatible.",
+    connect_guided_unavailable: "La vinculación guiada no está disponible para esta plataforma.",
+    connect_window_closed: "Vinculación cancelada: la ventana se cerró antes de completar el acceso.",
+    connect_denied: "La plataforma denegó la autorización.",
+    connect_code_not_found: "No se encontró el código en la URL pegada.",
+    connect_instagram_rejected: "Instagram rechazó el código de autorización. Vuelve a intentar la vinculación.",
+    connect_token_exchange_failed: "Error al intercambiar el token. Vuelve a intentar la vinculación.",
+    connect_tiktok_rejected: "TikTok rechazó el código de autorización. Vuelve a intentar la vinculación.",
+    connect_tiktok_unexpected: "Respuesta inesperada de TikTok. Inténtalo más tarde.",
+    connect_proxy_http_error: "El servicio de autorización no respondió correctamente. Inténtalo en unos minutos.",
+    connect_proxy_rejected: "El servicio de autorización rechazó la solicitud.",
+    connect_no_google_app: "No hay ninguna app de OAuth de Google configurada.",
+    proxy_not_configured: "El servicio de autorización no está configurado en esta build.",
     unavail_not_configured: "La vinculación aún no está disponible en esta versión de la app.",
     unavail_x_no_read_api: "X no ofrece estadísticas de lectura en el plan gratuito.",
     connect_not_linked: "No vinculado", connect_linked_n: "{n} vinculada(s)", connect_unlink: "Desvincular",
@@ -565,6 +607,20 @@ const I18N = {
     connections_privacy: "Les autorisations sont enregistrees uniquement sur votre ordinateur, en local. Elles ne transitent par aucun serveur.",
     connect_now: "Lier {p}", connect_add_another: "Lier un autre compte", connect_soon: "Bientot",
     generic_error: "Une erreur est survenue.", connect_timeout: "Délai dépassé : la liaison n'a pas abouti.",
+    connect_already_running: "Une liaison est déjà en cours.",
+    connect_platform_unsupported: "Cette plateforme n'est pas encore prise en charge.",
+    connect_guided_unavailable: "La liaison guidée n'est pas disponible pour cette plateforme.",
+    connect_window_closed: "Liaison annulée : la fenêtre a été fermée avant la fin de la connexion.",
+    connect_denied: "Autorisation refusée par la plateforme.",
+    connect_code_not_found: "Impossible de trouver le code dans l'URL collée.",
+    connect_instagram_rejected: "Instagram a refusé le code d'autorisation. Réessayez de lier le compte.",
+    connect_token_exchange_failed: "Échec de l'échange du jeton. Réessayez de lier le compte.",
+    connect_tiktok_rejected: "TikTok a refusé le code d'autorisation. Réessayez de lier le compte.",
+    connect_tiktok_unexpected: "Réponse inattendue de TikTok. Réessayez plus tard.",
+    connect_proxy_http_error: "Le service d'autorisation n'a pas répondu correctement. Réessayez sous peu.",
+    connect_proxy_rejected: "Le service d'autorisation a refusé la demande.",
+    connect_no_google_app: "Aucune application OAuth Google configurée.",
+    proxy_not_configured: "Le service d'autorisation n'est pas configuré dans cette build.",
     unavail_not_configured: "La liaison n'est pas encore disponible dans cette version de l'app.",
     unavail_x_no_read_api: "X n'expose pas les statistiques de lecture sur l'offre gratuite.",
     connect_not_linked: "Non lie", connect_linked_n: "{n} lie(s)", connect_unlink: "Delier",
@@ -738,6 +794,20 @@ const I18N = {
     connections_privacy: "Die Autorisierungen werden nur lokal auf deinem Rechner gespeichert. Sie laufen \u00fcber keinen Server.",
     connect_now: "{p} verkn\u00fcpfen", connect_add_another: "Weiteres Konto verkn\u00fcpfen", connect_soon: "Demn\u00e4chst",
     generic_error: "Es ist ein Fehler aufgetreten.", connect_timeout: "Zeit\u00fcberschreitung: Die Verkn\u00fcpfung wurde nicht abgeschlossen.",
+    connect_already_running: "Es l\u00e4uft bereits eine Verkn\u00fcpfung.",
+    connect_platform_unsupported: "Diese Plattform wird noch nicht unterst\u00fctzt.",
+    connect_guided_unavailable: "Die gef\u00fchrte Verkn\u00fcpfung ist f\u00fcr diese Plattform nicht verf\u00fcgbar.",
+    connect_window_closed: "Verkn\u00fcpfung abgebrochen: Das Fenster wurde vor Abschluss der Anmeldung geschlossen.",
+    connect_denied: "Autorisierung von der Plattform verweigert.",
+    connect_code_not_found: "Der Code wurde in der eingef\u00fcgten URL nicht gefunden.",
+    connect_instagram_rejected: "Instagram hat den Autorisierungscode abgelehnt. Verkn\u00fcpfung erneut versuchen.",
+    connect_token_exchange_failed: "Token-Austausch fehlgeschlagen. Verkn\u00fcpfung erneut versuchen.",
+    connect_tiktok_rejected: "TikTok hat den Autorisierungscode abgelehnt. Verkn\u00fcpfung erneut versuchen.",
+    connect_tiktok_unexpected: "Unerwartete Antwort von TikTok. Sp\u00e4ter erneut versuchen.",
+    connect_proxy_http_error: "Der Autorisierungsdienst hat nicht korrekt geantwortet. In K\u00fcrze erneut versuchen.",
+    connect_proxy_rejected: "Der Autorisierungsdienst hat die Anfrage abgelehnt.",
+    connect_no_google_app: "Keine Google-OAuth-App konfiguriert.",
+    proxy_not_configured: "Der Autorisierungsdienst ist in dieser Build nicht konfiguriert.",
     unavail_not_configured: "Das Verkn\u00fcpfen ist in dieser App-Version noch nicht verf\u00fcgbar.",
     unavail_x_no_read_api: "X stellt im kostenlosen Tarif keine Lesestatistiken bereit.",
     connect_not_linked: "Nicht verkn\u00fcpft", connect_linked_n: "{n} verkn\u00fcpft", connect_unlink: "Trennen",
@@ -911,6 +981,20 @@ const I18N = {
     connections_privacy: "\u8a8d\u8a3c\u60c5\u5831\u306f\u304a\u4f7f\u3044\u306ePC\u5185\u306b\u306e\u307f\u4fdd\u5b58\u3055\u308c\u307e\u3059\u3002\u30b5\u30fc\u30d0\u30fc\u3092\u7d4c\u7531\u3059\u308b\u3053\u3068\u306f\u3042\u308a\u307e\u305b\u3093\u3002",
     connect_now: "{p}\u3092\u9023\u643a", connect_add_another: "\u5225\u306e\u30a2\u30ab\u30a6\u30f3\u30c8\u3092\u9023\u643a", connect_soon: "\u8fd1\u65e5\u5bfe\u5fdc",
     generic_error: "\u30a8\u30e9\u30fc\u304c\u767a\u751f\u3057\u307e\u3057\u305f\u3002", connect_timeout: "\u30bf\u30a4\u30e0\u30a2\u30a6\u30c8\uff1a\u9023\u643a\u304c\u5b8c\u4e86\u3057\u307e\u305b\u3093\u3067\u3057\u305f\u3002",
+    connect_already_running: "\u65e2\u306b\u9023\u643a\u51e6\u7406\u304c\u9032\u884c\u4e2d\u3067\u3059\u3002",
+    connect_platform_unsupported: "\u3053\u306e\u30d7\u30e9\u30c3\u30c8\u30d5\u30a9\u30fc\u30e0\u306f\u307e\u3060\u5bfe\u5fdc\u3057\u3066\u3044\u307e\u305b\u3093\u3002",
+    connect_guided_unavailable: "\u3053\u306e\u30d7\u30e9\u30c3\u30c8\u30d5\u30a9\u30fc\u30e0\u3067\u306f\u30ac\u30a4\u30c9\u4ed8\u304d\u9023\u643a\u3092\u5229\u7528\u3067\u304d\u307e\u305b\u3093\u3002",
+    connect_window_closed: "\u9023\u643a\u304c\u30ad\u30e3\u30f3\u30bb\u30eb\u3055\u308c\u307e\u3057\u305f\uff1a\u30ed\u30b0\u30a4\u30f3\u5b8c\u4e86\u524d\u306b\u30a6\u30a3\u30f3\u30c9\u30a6\u304c\u9589\u3058\u3089\u308c\u307e\u3057\u305f\u3002",
+    connect_denied: "\u30d7\u30e9\u30c3\u30c8\u30d5\u30a9\u30fc\u30e0\u306b\u3088\u3063\u3066\u8a8d\u53ef\u304c\u62d2\u5426\u3055\u308c\u307e\u3057\u305f\u3002",
+    connect_code_not_found: "\u8cbc\u308a\u4ed8\u3051\u305fURL\u306b\u30b3\u30fc\u30c9\u304c\u898b\u3064\u304b\u308a\u307e\u305b\u3093\u3067\u3057\u305f\u3002",
+    connect_instagram_rejected: "Instagram\u304c\u8a8d\u53ef\u30b3\u30fc\u30c9\u3092\u62d2\u5426\u3057\u307e\u3057\u305f\u3002\u3082\u3046\u4e00\u5ea6\u9023\u643a\u3092\u304a\u8a66\u3057\u304f\u3060\u3055\u3044\u3002",
+    connect_token_exchange_failed: "\u30c8\u30fc\u30af\u30f3\u306e\u4ea4\u63db\u306b\u5931\u6557\u3057\u307e\u3057\u305f\u3002\u3082\u3046\u4e00\u5ea6\u9023\u643a\u3092\u304a\u8a66\u3057\u304f\u3060\u3055\u3044\u3002",
+    connect_tiktok_rejected: "TikTok\u304c\u8a8d\u53ef\u30b3\u30fc\u30c9\u3092\u62d2\u5426\u3057\u307e\u3057\u305f\u3002\u3082\u3046\u4e00\u5ea6\u9023\u643a\u3092\u304a\u8a66\u3057\u304f\u3060\u3055\u3044\u3002",
+    connect_tiktok_unexpected: "TikTok\u304b\u3089\u4e88\u671f\u3057\u306a\u3044\u5fdc\u7b54\u304c\u3042\u308a\u307e\u3057\u305f\u3002\u3057\u3070\u3089\u304f\u3057\u3066\u304b\u3089\u518d\u8a66\u884c\u3057\u3066\u304f\u3060\u3055\u3044\u3002",
+    connect_proxy_http_error: "\u8a8d\u53ef\u30b5\u30fc\u30d3\u30b9\u304c\u6b63\u3057\u304f\u5fdc\u7b54\u3057\u307e\u305b\u3093\u3067\u3057\u305f\u3002\u3057\u3070\u3089\u304f\u3057\u3066\u304b\u3089\u518d\u8a66\u884c\u3057\u3066\u304f\u3060\u3055\u3044\u3002",
+    connect_proxy_rejected: "\u8a8d\u53ef\u30b5\u30fc\u30d3\u30b9\u304c\u30ea\u30af\u30a8\u30b9\u30c8\u3092\u62d2\u5426\u3057\u307e\u3057\u305f\u3002",
+    connect_no_google_app: "Google OAuth\u30a2\u30d7\u30ea\u304c\u8a2d\u5b9a\u3055\u308c\u3066\u3044\u307e\u305b\u3093\u3002",
+    proxy_not_configured: "\u3053\u306e\u30d3\u30eb\u30c9\u3067\u306f\u8a8d\u53ef\u30b5\u30fc\u30d3\u30b9\u304c\u8a2d\u5b9a\u3055\u308c\u3066\u3044\u307e\u305b\u3093\u3002",
     unavail_not_configured: "\u3053\u306e\u30d0\u30fc\u30b8\u30e7\u30f3\u306e\u30a2\u30d7\u30ea\u3067\u306f\u307e\u3060\u9023\u643a\u3067\u304d\u307e\u305b\u3093\u3002",
     unavail_x_no_read_api: "X \u306f\u7121\u6599\u30d7\u30e9\u30f3\u3067\u306f\u95b2\u89a7\u7d71\u8a08\u3092\u63d0\u4f9b\u3057\u3066\u3044\u307e\u305b\u3093\u3002",
     connect_not_linked: "\u672a\u9023\u643a", connect_linked_n: "{n}\u4ef6\u9023\u643a\u6e08\u307f", connect_unlink: "\u89e3\u9664",
@@ -1898,7 +1982,7 @@ document.getElementById("cm-open-btn").addEventListener("click", async e => {
   cmError("");
   try {
     const resp = await (await fetch(`/api/connections/authorize/${cmPlatform}`)).json();
-    if (!resp.ok) { cmError(resp.message); return; }
+    if (!resp.ok) { cmError(tServer(resp.message)); return; }
     window.open(resp.url, "_blank");
     toast(t("connect_browser_opened"));
   } catch (err) {
@@ -1920,7 +2004,7 @@ document.getElementById("cm-finish").addEventListener("click", async e => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ pasted }),
     })).json();
-    if (!resp.ok) { cmError(resp.message); return; }
+    if (!resp.ok) { cmError(tServer(resp.message)); return; }
     toast(t("connect_success", { n: resp.account || "" }), "ok");
     closeConnectModal();
     await loadConnections();
@@ -1944,7 +2028,7 @@ async function startGuided(platform, btn) {
   btn.disabled = true;
   try {
     const resp = await (await fetch(`/api/connections/authorize/${platform}`)).json();
-    if (!resp.ok) { toast(resp.message, "err"); return; }
+    if (!resp.ok) { toast(tServer(resp.message), "err"); return; }
     window.open(resp.url, "_blank");
     document.getElementById(`guided-${platform}`).classList.remove("hidden");
     toast(t("connect_browser_opened"));
@@ -1966,7 +2050,7 @@ async function finishGuided(platform, btn) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ pasted }),
     })).json();
-    if (!resp.ok) { toast(resp.message, "err"); return; }
+    if (!resp.ok) { toast(tServer(resp.message), "err"); return; }
     toast(t("connect_success", { n: resp.account || "" }), "ok");
     input.value = "";
     await loadConnections();
@@ -2005,7 +2089,7 @@ async function startConnect(platform, btn) {
       await sleep(500);
       const st = await (await fetch("/api/connections/status")).json();
       if (st.running) continue;
-      if (st.error) { cmError(st.error); toast(st.error, "err"); return; }
+      if (st.error) { const msg = tServer(st.error); cmError(msg); toast(msg, "err"); return; }
       if (st.done) {
         toast(t("connect_success", { n: st.account || "" }), "ok");
         closeConnectModal();
@@ -2282,7 +2366,7 @@ function renderPlans() {
     else cta = `<button class="plan-cta ${p.popular ? "" : "secondary"}" data-plan="${p.id}">${t("plan_cta", { p: p.name })}</button>`;
 
     return `<div class="plan-card ${p.popular ? "popular" : ""}">
-      ${p.popular ? `<span class="plan-ribbon">${t("plan_popular")}</span>` : ""}
+      ${p.popular ? `<span class="plan-ribbon">✨ ${t("plan_popular")}</span>` : ""}
       <div class="plan-name">${esc(p.name)}</div>
       <div class="plan-tagline">${esc(tOr(p.tagline_code, {}, p.tagline))}</div>
       <div class="plan-price">
@@ -2542,17 +2626,27 @@ applyStaticTranslations();
 renderLanguageGrid();
 renderAuthTexts();
 
+// Se c'e' gia' un token salvato, non si mostra "ospite" nemmeno per un
+// istante: si aspetta la risposta di loadUser() prima di scoprire la carta.
+// Senza questo, ad ogni riavvio si vedeva un lampo da disconnesso mentre
+// /api/auth/me era ancora in volo - a un'occhiata veloce sembrava un logout.
+if (authToken()) {
+  document.getElementById("account-logged-out").classList.add("hidden");
+}
+
+loadUser();
+
 (async () => {
   // La config decide quali piattaforme esistono: va letta prima di
   // disegnare qualsiasi cosa, altrimenti CertSprint comparirebbe per un
-  // istante anche nella build destinata ai clienti.
+  // istante anche nella build destinata ai clienti. Indipendente dalla
+  // sessione utente, quindi parte in parallelo e non la rallenta piu'.
   try {
     appConfig = await (await fetch("/api/config")).json();
   } catch (e) {
     appConfig = null;
   }
   applyConfig();
-  loadUser();
   loadConnections();
   loadSnapshot();
 })();

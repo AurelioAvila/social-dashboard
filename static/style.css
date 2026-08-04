@@ -894,7 +894,7 @@ button:disabled { opacity: 0.5; cursor: wait; transform: none; }
 }
 .cycle-btn.active .save-badge { background: rgba(255,255,255,0.22); color: inherit; }
 
-.plans-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(238px, 1fr)); gap: 16px; align-items: start; }
+.plans-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(238px, 1fr)); gap: 16px; align-items: start; padding-top: 14px; }
 .plan-card {
   position: relative;
   background: var(--card); border: 1px solid var(--card-border);
@@ -903,17 +903,27 @@ button:disabled { opacity: 0.5; cursor: wait; transform: none; }
   transition: transform 0.18s var(--ease), border-color 0.18s var(--ease), box-shadow 0.18s var(--ease);
 }
 .plan-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+/* Il piano in evidenza deve saltare all'occhio anche prima di leggere una
+   riga: scala leggermente sopra gli altri, sfondo con una sfumatura
+   dell'accento e bordo che brilla, cosi' non serve confrontare le
+   funzionalita' per capire qual e' la scelta consigliata. */
 .plan-card.popular {
-  border-color: color-mix(in srgb, var(--accent) 55%, var(--card-border));
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 22%, transparent), var(--shadow-lg);
+  transform: scale(1.045);
+  z-index: 1;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 9%, var(--card)), var(--card) 60%);
+  border-color: color-mix(in srgb, var(--accent) 70%, var(--card-border));
+  box-shadow: 0 0 0 1.5px color-mix(in srgb, var(--accent) 45%, transparent), 0 12px 32px -8px color-mix(in srgb, var(--accent) 45%, transparent), var(--shadow-lg);
 }
+.plan-card.popular:hover { transform: scale(1.045) translateY(-3px); }
+.plan-card.popular .plan-name { color: var(--accent); }
 .plan-ribbon {
-  position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+  position: absolute; top: -13px; left: 50%; transform: translateX(-50%);
   background: linear-gradient(135deg, var(--accent), var(--accent2));
-  color: var(--sidebar); font-size: 9.5px; font-weight: 900;
-  padding: 4px 12px; border-radius: 20px;
+  color: var(--sidebar); font-size: 10.5px; font-weight: 900;
+  padding: 6px 16px; border-radius: 20px;
   text-transform: uppercase; letter-spacing: 0.07em;
   white-space: nowrap;
+  box-shadow: 0 4px 14px -2px color-mix(in srgb, var(--accent) 60%, transparent);
 }
 .plan-name { font-size: 15px; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 4px; }
 .plan-tagline { font-size: 11.5px; color: var(--muted); line-height: 1.45; min-height: 32px; margin-bottom: 14px; }

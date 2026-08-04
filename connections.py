@@ -47,7 +47,7 @@ def _connect_is_active() -> bool:
         return False
     if time.time() - (_connect_state.get("started_at") or 0) > CONNECT_STALE_SECONDS:
         _connect_state["running"] = False
-        _connect_state["error"] = _connect_state["error"] or "Collegamento scaduto: riprova."
+        _connect_state["error"] = _connect_state["error"] or "connect_timeout"
         return False
     return True
 
@@ -159,10 +159,7 @@ def _connect_youtube() -> None:
 
     creds_pair = _google_client()
     if not creds_pair:
-        raise RuntimeError(
-            "Nessuna app OAuth Google configurata: imposta OAUTH_GOOGLE_CLIENT_ID e "
-            "OAUTH_GOOGLE_CLIENT_SECRET nel .env."
-        )
+        raise RuntimeError("connect_no_google_app")
     client_id, client_secret = creds_pair
 
     flow = InstalledAppFlow.from_client_config(
@@ -280,9 +277,9 @@ def _connect_in_window(auth_url: str, redirect_uri: str, title: str, timeout: in
             pass
 
     if "url" not in result:
-        raise RuntimeError("Collegamento annullato: la finestra e' stata chiusa prima di completare l'accesso.")
+        raise RuntimeError("connect_window_closed")
     if "error" in result["url"] and "code=" not in result["url"]:
-        raise RuntimeError("Autorizzazione negata dalla piattaforma.")
+        raise RuntimeError("connect_denied")
     return _clean_code(result["url"])
 
 
@@ -292,7 +289,7 @@ def _clean_code(raw: str) -> str:
     scambio del token fallisce."""
     raw = (raw or "").strip()
     if not raw:
-        raise RuntimeError("Incolla il codice o l'URL su cui sei atterrato dopo l'autorizzazione.")
+        raise RuntimeError("guided_paste_needed")
     if "code=" in raw:
         raw = raw.split("code=", 1)[1].split("&", 1)[0]
     raw = raw.split("#", 1)[0]
@@ -302,7 +299,7 @@ def _clean_code(raw: str) -> str:
     except Exception:
         pass
     if not raw:
-        raise RuntimeError("Non sono riuscito a trovare il codice nell'URL incollato.")
+        raise RuntimeError("connect_code_not_found")
     return raw
 
 
@@ -356,10 +353,14 @@ def proxy_call(action: str, payload: dict) -> dict:
         raise RuntimeError("proxy_not_configured")
     resp = requests.post(f"{base}/{action}", json=payload, timeout=30)
     if not resp.ok:
-        raise RuntimeError(f"Il servizio di autorizzazione ha risposto {resp.status_code}: {resp.text[:200]}")
+        # Il testo grezzo resta nei log per il debug; all'utente arriva solo
+        # un codice, cosi' il messaggio segue la lingua scelta nell'app.
+        print(f"[oauth-proxy] {resp.status_code}: {resp.text[:200]}")
+        raise RuntimeError("connect_proxy_http_error")
     data = resp.json()
     if data.get("error"):
-        raise RuntimeError(str(data["error"])[:200])
+        print(f"[oauth-proxy] rejected: {str(data['error'])[:200]}")
+        raise RuntimeError("connect_proxy_rejected")
     return data
 
 
@@ -448,7 +449,7 @@ def authorize_url(platform: str) -> dict:
     except RuntimeError as exc:
         return {"ok": False, "message": str(exc)}
 
-    return {"ok": False, "message": f"Collegamento guidato non disponibile per {platform}."}
+    return {"ok": False, "message": "connect_guided_unavailable"}
 
 
 def _finish_instagram(code: str) -> str:
@@ -475,7 +476,8 @@ def _finish_instagram(code: str) -> str:
             timeout=30,
         )
         if not token_resp.ok:
-            raise RuntimeError(f"Instagram ha rifiutato il codice: {token_resp.text[:200]}")
+            print(f"[instagram] token rejected: {token_resp.text[:200]}")
+            raise RuntimeError("connect_instagram_rejected")
         short = token_resp.json()
 
         # Il token breve dura un'ora: si scambia subito con quello a 60 giorni,
@@ -487,7 +489,8 @@ def _finish_instagram(code: str) -> str:
             timeout=30,
         )
         if not long_resp.ok:
-            raise RuntimeError(f"Scambio del token fallito: {long_resp.text[:200]}")
+            print(f"[instagram] long-token exchange failed: {long_resp.text[:200]}")
+            raise RuntimeError("connect_token_exchange_failed")
         long_token = long_resp.json()["access_token"]
 
     me = requests.get(
@@ -526,10 +529,12 @@ def _finish_tiktok(code: str) -> str:
             timeout=30,
         )
         if not resp.ok:
-            raise RuntimeError(f"TikTok ha rifiutato il codice: {resp.text[:200]}")
+            print(f"[tiktok] token rejected: {resp.text[:200]}")
+            raise RuntimeError("connect_tiktok_rejected")
         data = resp.json()
     if "access_token" not in data:
-        raise RuntimeError(f"Risposta inattesa da TikTok: {str(data)[:200]}")
+        print(f"[tiktok] unexpected response: {str(data)[:200]}")
+        raise RuntimeError("connect_tiktok_unexpected")
 
     # Se manca 'video.list' il login e' comunque riuscito: buttare via la
     # connessione lascerebbe l'utente senza account collegato e senza capire
@@ -577,7 +582,7 @@ def _connect_oneclick(platform: str) -> None:
     non accettano un redirect su 127.0.0.1."""
     info = authorize_url(platform)
     if not info.get("ok"):
-        raise RuntimeError(info.get("message", "Configurazione mancante."))
+        raise RuntimeError(info.get("message", "connect_guided_unavailable"))
 
     code = _connect_in_window(
         info["url"], REDIRECT_GETTERS[platform](), WINDOW_TITLES.get(platform, "Collega account")
@@ -588,7 +593,7 @@ def _connect_oneclick(platform: str) -> None:
 def finish_guided(platform: str, pasted: str) -> dict:
     finisher = GUIDED.get(platform)
     if not finisher:
-        return {"ok": False, "message": f"Collegamento guidato non disponibile per {platform}."}
+        return {"ok": False, "message": "connect_guided_unavailable"}
     try:
         account = finisher(_clean_code(pasted))
         return {"ok": True, "account": account}
@@ -639,11 +644,11 @@ def start_connect(platform: str) -> dict:
     elif platform in GUIDED and _oauth_window_available():
         runner = lambda: _connect_oneclick(platform)
     else:
-        return {"ok": False, "message": f"Piattaforma non supportata: {platform}"}
+        return {"ok": False, "message": "connect_platform_unsupported"}
 
     with _connect_lock:
         if _connect_is_active():
-            return {"ok": False, "message": "C'e' gia' un collegamento in corso."}
+            return {"ok": False, "message": "connect_already_running"}
         _connect_state.update({"running": True, "platform": platform, "error": None,
                                "done": False, "account": None, "started_at": time.time()})
 

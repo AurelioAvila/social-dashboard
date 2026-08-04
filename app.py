@@ -405,7 +405,22 @@ def export_csv(authorization: str | None = Header(default=None)):
     )
 
 
-app.mount("/", StaticFiles(directory=os.path.join(os.path.dirname(os.path.abspath(__file__)), "static"), html=True), name="static")
+class _NoCacheStaticFiles(StaticFiles):
+    """L'app gira sempre dallo stesso host:porta anche dopo un aggiornamento,
+    quindi il browser incorporato puo' continuare a servire una versione
+    vecchia di style.css/app.js dalla propria cache locale invece di
+    ricontrollarla - un rebuild non basterebbe a far vedere le modifiche.
+    No-cache forza una richiesta condizionale ad ogni avvio: costa
+    pochissimo (file piccoli, tutto in locale) e garantisce che l'interfaccia
+    mostrata sia sempre quella dell'ultima build installata."""
+
+    def file_response(self, *args, **kwargs):
+        response = super().file_response(*args, **kwargs)
+        response.headers["Cache-Control"] = "no-cache"
+        return response
+
+
+app.mount("/", _NoCacheStaticFiles(directory=os.path.join(os.path.dirname(os.path.abspath(__file__)), "static"), html=True), name="static")
 
 
 if __name__ == "__main__":
