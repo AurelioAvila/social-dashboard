@@ -25,6 +25,11 @@ credentials.json
 # Il template senza segreti e' brand.example.py.
 brand.py
 
+# Stato locale di Wrangler per il proxy OAuth (account autenticato, cache):
+# personale della macchina, non del progetto.
+oauth-proxy/.wrangler/
+oauth-proxy/node_modules/
+
 # ---------------------------------------------------------------------
 # Artefatti di build
 # ---------------------------------------------------------------------
