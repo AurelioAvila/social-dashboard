@@ -116,6 +116,10 @@ export async function createCheckout(env, body) {
     'line_items[0][price_data][unit_amount]': String(amount),
     'line_items[0][price_data][recurring][interval]': yearly ? 'year' : 'month',
     'line_items[0][price_data][product_data][name]': `Social Dashboard ${plan.name}`,
+    // Richiesto dall'account Stripe (tasse gestite automaticamente): senza
+    // un codice fiscale sul prodotto la sessione viene rifiutata.
+    // txcd_10103001 = software SaaS ad accesso remoto (nessun supporto fisico).
+    'line_items[0][price_data][product_data][tax_code]': 'txcd_10103001',
     'metadata[plan]': body.plan,
     // La chiave si riscuote da qui: la pagina la mostra grande e copiabile.
     success_url: `${self}/license/claim?session_id={CHECKOUT_SESSION_ID}`,
