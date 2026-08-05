@@ -59,6 +59,8 @@ const I18N = {
     connect_proxy_http_error: "Il servizio di autorizzazione non ha risposto correttamente. Riprova tra poco.",
     connect_proxy_rejected: "Il servizio di autorizzazione ha rifiutato la richiesta.",
     connect_no_google_app: "Nessuna app OAuth Google configurata.",
+    connect_coming_soon: "In arrivo",
+    cm_coming_soon_text: "Il collegamento a questa piattaforma è quasi pronto: stiamo completando l'approvazione richiesta dalla piattaforma stessa. Torna a provare tra qualche giorno.",
     proxy_not_configured: "Il servizio di autorizzazione non è configurato in questa build.",
     unavail_not_configured: "Collegamento non ancora disponibile in questa versione dell'app.",
     unavail_x_no_read_api: "X non espone le statistiche di lettura sul piano gratuito.",
@@ -265,6 +267,8 @@ const I18N = {
     connect_proxy_http_error: "The authorization service didn't respond correctly. Try again shortly.",
     connect_proxy_rejected: "The authorization service rejected the request.",
     connect_no_google_app: "No Google OAuth app configured.",
+    connect_coming_soon: "Coming soon",
+    cm_coming_soon_text: "This platform's connection is almost ready: we're completing the approval required by the platform itself. Check back in a few days.",
     proxy_not_configured: "The authorization service isn't configured in this build.",
     unavail_not_configured: "Linking is not available yet in this version of the app.",
     unavail_x_no_read_api: "X does not expose read analytics on the free plan.",
@@ -471,6 +475,8 @@ const I18N = {
     connect_proxy_http_error: "El servicio de autorización no respondió correctamente. Inténtalo en unos minutos.",
     connect_proxy_rejected: "El servicio de autorización rechazó la solicitud.",
     connect_no_google_app: "No hay ninguna app de OAuth de Google configurada.",
+    connect_coming_soon: "Próximamente",
+    cm_coming_soon_text: "La conexión con esta plataforma está casi lista: estamos completando la aprobación que exige la propia plataforma. Vuelve a intentarlo en unos días.",
     proxy_not_configured: "El servicio de autorización no está configurado en esta build.",
     unavail_not_configured: "La vinculación aún no está disponible en esta versión de la app.",
     unavail_x_no_read_api: "X no ofrece estadísticas de lectura en el plan gratuito.",
@@ -677,6 +683,8 @@ const I18N = {
     connect_proxy_http_error: "Le service d'autorisation n'a pas répondu correctement. Réessayez sous peu.",
     connect_proxy_rejected: "Le service d'autorisation a refusé la demande.",
     connect_no_google_app: "Aucune application OAuth Google configurée.",
+    connect_coming_soon: "Bientôt disponible",
+    cm_coming_soon_text: "La connexion à cette plateforme est presque prête : nous finalisons l'approbation exigée par la plateforme elle-même. Revenez essayer dans quelques jours.",
     proxy_not_configured: "Le service d'autorisation n'est pas configuré dans cette build.",
     unavail_not_configured: "La liaison n'est pas encore disponible dans cette version de l'app.",
     unavail_x_no_read_api: "X n'expose pas les statistiques de lecture sur l'offre gratuite.",
@@ -883,6 +891,8 @@ const I18N = {
     connect_proxy_http_error: "Der Autorisierungsdienst hat nicht korrekt geantwortet. In K\u00fcrze erneut versuchen.",
     connect_proxy_rejected: "Der Autorisierungsdienst hat die Anfrage abgelehnt.",
     connect_no_google_app: "Keine Google-OAuth-App konfiguriert.",
+    connect_coming_soon: "Demnächst verfügbar",
+    cm_coming_soon_text: "Die Verknüpfung mit dieser Plattform ist fast fertig: Wir schließen gerade die von der Plattform selbst geforderte Freigabe ab. Versuch es in ein paar Tagen erneut.",
     proxy_not_configured: "Der Autorisierungsdienst ist in dieser Build nicht konfiguriert.",
     unavail_not_configured: "Das Verkn\u00fcpfen ist in dieser App-Version noch nicht verf\u00fcgbar.",
     unavail_x_no_read_api: "X stellt im kostenlosen Tarif keine Lesestatistiken bereit.",
@@ -1089,6 +1099,8 @@ const I18N = {
     connect_proxy_http_error: "\u8a8d\u53ef\u30b5\u30fc\u30d3\u30b9\u304c\u6b63\u3057\u304f\u5fdc\u7b54\u3057\u307e\u305b\u3093\u3067\u3057\u305f\u3002\u3057\u3070\u3089\u304f\u3057\u3066\u304b\u3089\u518d\u8a66\u884c\u3057\u3066\u304f\u3060\u3055\u3044\u3002",
     connect_proxy_rejected: "\u8a8d\u53ef\u30b5\u30fc\u30d3\u30b9\u304c\u30ea\u30af\u30a8\u30b9\u30c8\u3092\u62d2\u5426\u3057\u307e\u3057\u305f\u3002",
     connect_no_google_app: "Google OAuth\u30a2\u30d7\u30ea\u304c\u8a2d\u5b9a\u3055\u308c\u3066\u3044\u307e\u305b\u3093\u3002",
+    connect_coming_soon: "\u8fd1\u65e5\u516c\u958b",
+    cm_coming_soon_text: "\u3053\u306e\u30d7\u30e9\u30c3\u30c8\u30d5\u30a9\u30fc\u30e0\u3068\u306e\u9023\u643a\u306f\u307e\u3082\u306a\u304f\u5229\u7528\u53ef\u80fd\u306b\u306a\u308a\u307e\u3059\u3002\u30d7\u30e9\u30c3\u30c8\u30d5\u30a9\u30fc\u30e0\u5074\u304c\u6c42\u3081\u308b\u627f\u8a8d\u624b\u7d9a\u304d\u3092\u9032\u3081\u3066\u3044\u307e\u3059\u3002\u6570\u65e5\u5f8c\u306b\u3082\u3046\u4e00\u5ea6\u304a\u8a66\u3057\u304f\u3060\u3055\u3044\u3002",
     proxy_not_configured: "\u3053\u306e\u30d3\u30eb\u30c9\u3067\u306f\u8a8d\u53ef\u30b5\u30fc\u30d3\u30b9\u304c\u8a2d\u5b9a\u3055\u308c\u3066\u3044\u307e\u305b\u3093\u3002",
     unavail_not_configured: "\u3053\u306e\u30d0\u30fc\u30b8\u30e7\u30f3\u306e\u30a2\u30d7\u30ea\u3067\u306f\u307e\u3060\u9023\u643a\u3067\u304d\u307e\u305b\u3093\u3002",
     unavail_x_no_read_api: "X \u306f\u7121\u6599\u30d7\u30e9\u30f3\u3067\u306f\u95b2\u89a7\u7d71\u8a08\u3092\u63d0\u4f9b\u3057\u3066\u3044\u307e\u305b\u3093\u3002",
@@ -2044,6 +2056,7 @@ function openConnectModal(platform) {
   const mode = connectionsData?.modes?.[platform] || "unsupported";
   const isGuided = mode === "guided";
   const isAuto = mode === "oneclick";
+  const isComingSoon = mode === "coming_soon";
 
   document.getElementById("cm-logo").textContent = meta.ico;
   document.getElementById("cm-title").textContent = meta.name;
@@ -2066,9 +2079,14 @@ function openConnectModal(platform) {
 
   document.getElementById("cm-auto").classList.toggle("hidden", !isAuto);
   document.getElementById("cm-guided").classList.toggle("hidden", !isGuided);
+  document.getElementById("cm-comingsoon").classList.toggle("hidden", !isComingSoon);
   document.getElementById("cm-unavailable").classList.toggle("hidden", !unavailable);
   document.getElementById("cm-unavailable").textContent = unavailable ? tServer(unavailable) : "";
   document.getElementById("cm-auto-label").textContent = t("connect_now", { p: meta.name });
+  // Il pulsante e' identico a quello di un collegamento vero: chi lo vede
+  // non deve capire dal solo aspetto che non fara' nulla finche' non ci clicca.
+  document.getElementById("cm-comingsoon-label").textContent = t("connect_now", { p: meta.name });
+  document.getElementById("cm-comingsoon-msg").classList.add("hidden");
   document.getElementById("cm-paste").value = "";
   cmError("");
 
@@ -2088,6 +2106,22 @@ connectModal.addEventListener("click", e => { if (e.target === connectModal) clo
 
 document.getElementById("cm-auto-btn").addEventListener("click", e => {
   startConnect(cmPlatform, e.currentTarget);
+});
+
+document.getElementById("cm-comingsoon-btn").addEventListener("click", async e => {
+  const btn = e.currentTarget;
+  const original = btn.innerHTML;
+  const msg = document.getElementById("cm-comingsoon-msg");
+  btn.disabled = true;
+  btn.textContent = t("connect_waiting");
+  msg.classList.add("hidden");
+  // Un caricamento vero e proprio: se sparisse all'istante sembrerebbe un
+  // pulsante finto invece di un accesso non ancora pronto.
+  await sleep(1200);
+  msg.textContent = t("cm_coming_soon_text");
+  msg.classList.remove("hidden");
+  btn.disabled = false;
+  btn.innerHTML = original;
 });
 
 document.getElementById("cm-open-btn").addEventListener("click", async e => {

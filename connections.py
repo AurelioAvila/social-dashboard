@@ -428,6 +428,9 @@ def authorize_url(platform: str) -> dict:
     """URL da aprire nel browser per autorizzare l'account."""
     from urllib.parse import urlencode
 
+    if platform in COMING_SOON:
+        return {"ok": False, "message": "connect_coming_soon"}
+
     try:
         # force_reauth / disable_auto_auth: la finestra dell'app conserva i
         # cookie della piattaforma, quindi senza questi parametri il secondo
@@ -602,6 +605,8 @@ def _connect_oneclick(platform: str) -> None:
 
 
 def finish_guided(platform: str, pasted: str) -> dict:
+    if platform in COMING_SOON:
+        return {"ok": False, "message": "connect_coming_soon"}
     finisher = GUIDED.get(platform)
     if not finisher:
         return {"ok": False, "message": "connect_guided_unavailable"}
@@ -619,6 +624,8 @@ def connect_mode(platform: str) -> str:
     Se le credenziali dell'app non ci sono, si dichiara "unavailable" fin
     da subito: meglio dirlo prima che far premere un pulsante destinato a
     fallire."""
+    if platform in COMING_SOON:
+        return "coming_soon"
     if platform in UNAVAILABLE:
         return "unavailable"
     if not credentials_ready(platform):
@@ -645,8 +652,19 @@ UNAVAILABLE = {
     "x": "unavail_x_no_read_api",
 }
 
+# Instagram e TikTok hanno le credenziali pronte ma non sono ancora
+# collegabili per un cliente qualsiasi: Instagram richiede la verifica
+# aziendale di Meta (bloccata, manca la documentazione), TikTok e' in
+# revisione dal 2026-08-04. Anziche' far provare un accesso che per
+# Instagram si inceppa in silenzio (account non tester) o per TikTok si
+# collega senza dati (manca video.list), si dichiara subito "in arrivo".
+# Togliere una piattaforma da qui appena la sua revisione viene approvata.
+COMING_SOON = {"instagram", "tiktok"}
+
 
 def start_connect(platform: str) -> dict:
+    if platform in COMING_SOON:
+        return {"ok": False, "message": "connect_coming_soon"}
     if platform in UNAVAILABLE:
         return {"ok": False, "message": UNAVAILABLE[platform]}
 
