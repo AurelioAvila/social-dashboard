@@ -141,11 +141,22 @@ def _google_client() -> tuple[str, str] | None:
     if client_id and client_secret:
         return client_id, client_secret
 
-    for key, value in os.environ.items():
-        if key.endswith("_YOUTUBE_CLIENT_ID") and value:
-            secret = os.environ.get(key.replace("_CLIENT_ID", "_CLIENT_SECRET"))
-            if secret:
-                return value, secret
+    # Ultima spiaggia, solo in sviluppo: riusa una qualsiasi coppia
+    # *_YOUTUBE_CLIENT_ID/_SECRET gia' presente nel .env.
+    #
+    # Fuori dalla build personale questo fallback NON deve esistere. Ha gia'
+    # fatto danni: durante lo sviluppo mascherava il fatto che GOOGLE_CLIENT_ID
+    # in brand.py fosse vuoto (le credenziali arrivavano da un altro progetto
+    # nel .env), quindi YouTube sembrava collegabile mentre nella build
+    # distribuita non lo era. E su un computer altrui userebbe le credenziali
+    # di quella persona senza dirglielo.
+    import config
+    if config.is_personal():
+        for key, value in os.environ.items():
+            if key.endswith("_YOUTUBE_CLIENT_ID") and value:
+                secret = os.environ.get(key.replace("_CLIENT_ID", "_CLIENT_SECRET"))
+                if secret:
+                    return value, secret
     return None
 
 
