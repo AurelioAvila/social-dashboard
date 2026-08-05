@@ -272,13 +272,23 @@ def _token_from_header(authorization: str | None) -> str:
 
 
 def _current_plan(authorization: str | None) -> str:
-    """Piano dell'utente della richiesta. Chi non ha una sessione valida vale
-    come Free: il piano non si deduce mai da quello che dice il client."""
+    """Piano valido per questa richiesta.
+
+    La fonte e' la licenza verificata online: il piano non puo' dipendere da
+    un database che sta sul computer di chi deve pagare. Il campo `plan`
+    dell'utente resta come scorciatoia amministrativa (account interni), e
+    fra i due vince il piu' generoso - cosi' una licenza attiva funziona
+    anche senza aver effettuato l'accesso."""
     import auth
+    import licensing
     import plans
 
     user = auth.user_for_token(_token_from_header(authorization))
-    return plans.normalize(user.get("plan") if user else None)
+    account_plan = plans.normalize(user.get("plan") if user else None)
+    license_plan = licensing.current_plan()
+
+    rank = {plans.FREE: 0, plans.PRO: 1, plans.STUDIO: 2}
+    return account_plan if rank.get(account_plan, 0) >= rank.get(license_plan, 0) else license_plan
 
 
 @app.post("/api/auth/register")
@@ -340,20 +350,52 @@ def billing_plans():
 
 @app.post("/api/billing/checkout")
 def billing_checkout(payload: dict = Body(...), authorization: str | None = Header(default=None)):
-    """Prepara il pagamento su Stripe. I dati della carta non passano mai da
-    qui: si restituisce l'URL della pagina di checkout ospitata da Stripe."""
+    """Apre il pagamento. Ne' i dati della carta ne' la chiave segreta di
+    Stripe passano da qui: la sessione la crea il servizio, che e' anche
+    l'unico a poter stabilire chi ha pagato."""
     import auth
     import billing
 
     user = auth.user_for_token(_token_from_header(authorization))
-    if not user:
-        raise HTTPException(401, "err_login_required_for_plan")
-    try:
-        return billing.create_checkout_session(
-            payload.get("plan_id", ""), payload.get("billing_cycle", "monthly"), user["email"]
-        )
-    except ValueError as exc:
-        raise HTTPException(400, str(exc))
+    return billing.start_checkout(
+        payload.get("plan_id", ""),
+        payload.get("billing_cycle", "monthly"),
+        user["email"] if user else "",
+    )
+
+
+# ---------------------------------------------------------------- licenze
+
+@app.on_event("startup")
+def _license_recheck_on_start():
+    """Ricontrolla la licenza in sottofondo a ogni avvio, cosi' una revoca
+    (rimborso, abbonamento disdetto) ha effetto entro un giorno. In un thread
+    separato: se il servizio e' lento, la finestra si apre lo stesso."""
+    import licensing
+
+    threading.Thread(target=licensing.refresh_if_due, daemon=True).start()
+
+
+@app.get("/api/license")
+def license_status():
+    import licensing
+    return licensing.status()
+
+
+@app.post("/api/license/activate")
+def license_activate(payload: dict = Body(...)):
+    """Attiva la chiave ricevuta dopo il pagamento."""
+    import licensing
+    return licensing.activate(payload.get("key", ""))
+
+
+@app.post("/api/license/remove")
+def license_remove():
+    """Stacca la licenza da questa installazione, per spostarla su un altro
+    computer senza doverne chiedere una nuova."""
+    import licensing
+    licensing.clear()
+    return {"ok": True}
 
 
 # ---------------------------------------------------------------- export

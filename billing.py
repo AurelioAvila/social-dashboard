@@ -1,13 +1,13 @@
 """
 Piani e avvio del pagamento.
 
-I dati della carta non passano MAI da questa app: si crea una Checkout
-Session su Stripe e si manda l'utente sulla pagina ospitata da Stripe.
-Se STRIPE_SECRET_KEY non e' configurata l'endpoint lo dice apertamente
-invece di simulare un acquisto riuscito.
+I dati della carta non passano MAI da questa app. Nemmeno la chiave segreta
+di Stripe: sarebbe compilata dentro l'eseguibile e chiunque potrebbe
+rileggerla decomprimendo il binario. La sessione di pagamento la crea il
+servizio, che e' anche l'unico a poter stabilire chi ha pagato davvero -
+un database dei piani che vive sul computer del cliente non e' una prova
+di pagamento.
 """
-import os
-
 import requests
 
 # I testi viaggiano come codice + frase italiana di riserva: la pagina dei
@@ -94,57 +94,58 @@ PLANS_BY_ID = {p["id"]: p for p in PLANS}
 def list_plans() -> dict:
     return {
         "plans": [_public_plan(p) for p in PLANS],
-        "checkout_ready": bool(os.environ.get("STRIPE_SECRET_KEY")),
+        "checkout_ready": checkout_ready(),
         "currency": "EUR",
     }
 
 
-def create_checkout_session(plan_id: str, billing_cycle: str, user_email: str) -> dict:
-    """Crea una Stripe Checkout Session e restituisce l'URL ospitato da Stripe.
-    L'utente inserisce i dati di pagamento solo su quella pagina, mai qui."""
+def _service_url() -> str:
+    import brand
+
+    return (brand.get("OAUTH_PROXY_URL") or "").rstrip("/")
+
+
+def checkout_ready() -> bool:
+    """Il pagamento e' disponibile se il servizio e' raggiungibile. Non
+    dipende piu' da una configurazione locale: nella build del cliente non
+    ci sarebbe mai stata, e il pulsante sarebbe stato spento per tutti."""
+    return bool(_service_url())
+
+
+def start_checkout(plan_id: str, billing_cycle: str, user_email: str = "") -> dict:
+    """Chiede al servizio la pagina di pagamento per questo piano.
+
+    L'importo lo decide il servizio, non l'app: se lo scegliesse il client,
+    chi modifica l'eseguibile potrebbe farsi generare un abbonamento da zero
+    euro."""
     plan = PLANS_BY_ID.get(plan_id)
-    if not plan:
-        raise ValueError(f"Piano sconosciuto: {plan_id}")
-    if plan_id == "free":
-        raise ValueError("Il piano Free non richiede pagamento.")
+    if not plan or plan_id == "free":
+        return {"ok": False, "message": "plan_unknown"}
 
-    secret_key = os.environ.get("STRIPE_SECRET_KEY")
-    if not secret_key:
-        return {
-            "ok": False,
-            "reason": "not_configured",
-            "message": (
-                "Pagamenti non ancora attivi: manca STRIPE_SECRET_KEY nel .env. "
-                "Aggiungi la chiave del tuo account Stripe per abilitare il checkout."
-            ),
-        }
+    base = _service_url()
+    if not base:
+        return {"ok": False, "message": "checkout_unavailable"}
 
-    yearly = billing_cycle == "yearly"
-    amount = plan["price_yearly"] if yearly else plan["price_monthly"]
-    interval = "year" if yearly else "month"
-    base_url = os.environ.get("APP_PUBLIC_URL", "http://127.0.0.1:8787")
+    try:
+        resp = requests.post(
+            f"{base}/checkout",
+            json={
+                "plan": plan_id,
+                "cycle": "yearly" if billing_cycle == "yearly" else "monthly",
+                "email": user_email,
+            },
+            timeout=30,
+        )
+    except Exception:
+        return {"ok": False, "message": "checkout_unavailable"}
 
-    # Si usa l'API HTTP direttamente invece dell'SDK stripe: una dipendenza in
-    # meno da bundlare nell'eseguibile, e serve una sola chiamata.
-    resp = requests.post(
-        "https://api.stripe.com/v1/checkout/sessions",
-        auth=(secret_key, ""),
-        data={
-            "mode": "subscription",
-            "success_url": f"{base_url}/?checkout=success",
-            "cancel_url": f"{base_url}/?checkout=cancelled",
-            "customer_email": user_email,
-            "line_items[0][quantity]": 1,
-            "line_items[0][price_data][currency]": "eur",
-            "line_items[0][price_data][unit_amount]": amount * 100,
-            "line_items[0][price_data][recurring][interval]": interval,
-            "line_items[0][price_data][product_data][name]": f"Social Dashboard {plan['name']}",
-            "metadata[plan_id]": plan_id,
-        },
-        timeout=30,
-    )
-    if resp.status_code >= 400:
-        detail = resp.json().get("error", {}).get("message", resp.text[:200])
-        return {"ok": False, "reason": "stripe_error", "message": detail}
+    if not resp.ok:
+        # Il dettaglio resta nei log per il debug; all'utente arriva un
+        # codice, che l'interfaccia mostra nella sua lingua.
+        print(f"[billing] checkout failed {resp.status_code}: {resp.text[:200]}")
+        return {"ok": False, "message": "checkout_unavailable"}
 
-    return {"ok": True, "checkout_url": resp.json()["url"]}
+    url = resp.json().get("url")
+    if not url:
+        return {"ok": False, "message": "checkout_unavailable"}
+    return {"ok": True, "checkout_url": url}

@@ -9,7 +9,14 @@ scarica l'app si trova una sezione che non lo riguarda e non puo' usare.
 import os
 
 # Piattaforme social, sempre disponibili a tutti.
-CORE_PLATFORMS = ["youtube", "instagram", "tiktok", "x"]
+CORE_PLATFORMS = ["youtube", "instagram", "tiktok"]
+
+# X non espone le metriche di lettura sul piano gratuito delle sue API:
+# collegarlo non produrrebbe alcun dato. Mostrarlo con un pulsante "Collega"
+# destinato a fallire promette una funzione che non possiamo mantenere, quindi
+# resta fuori dalla build distribuita. Torna visibile in modalita' personale
+# (per lo sviluppo) o forzando SHOW_X=1.
+UNAVAILABLE_PLATFORMS = ["x"]
 
 # Moduli personali: visibili solo nella build personale e solo se configurati.
 PERSONAL_PLATFORMS = ["certsprint"]
@@ -29,6 +36,8 @@ def is_personal() -> bool:
 
 def enabled_platforms() -> list[str]:
     platforms = list(CORE_PLATFORMS)
+    if is_personal() or os.environ.get("SHOW_X"):
+        platforms += UNAVAILABLE_PLATFORMS
     if is_personal():
         for name in PERSONAL_PLATFORMS:
             if name == "certsprint" and not os.environ.get("CERTSPRINT_PUBLIC_URL"):

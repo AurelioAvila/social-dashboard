@@ -15,7 +15,16 @@
  * Endpoint:
  *   POST /exchange {platform, code, redirect_uri}  -> {access_token, ...}
  *   POST /refresh  {platform, refresh_token}       -> {access_token, scope}
+ *
+ * Qui vive anche il rilascio delle licenze (licensing.js), per lo stesso
+ * motivo: la chiave segreta di Stripe non puo' stare in un eseguibile
+ * distribuito, e un'app locale non puo' decidere da sola chi ha pagato.
+ *   POST /checkout        -> URL di pagamento
+ *   POST /stripe/webhook  -> emissione della licenza
+ *   GET  /license/claim   -> la pagina dove il cliente legge la sua chiave
+ *   POST /license/verify  -> l'app sblocca il piano
  */
+import { createCheckout, handleWebhook, verifyLicense, claimPage } from './licensing.js';
 
 const JSON_HEADERS = { 'content-type': 'application/json' };
 
@@ -80,23 +89,53 @@ async function tiktokToken(env, params) {
 
 export default {
   async fetch(request, env) {
-    if (request.method !== 'POST') return fail('Metodo non consentito.', 405);
+    const url = new URL(request.url);
+    const action = url.pathname.replace(/^\/+|\/+$/g, '');
 
-    const action = new URL(request.url).pathname.replace(/^\/+|\/+$/g, '');
+    // --- Licenze -------------------------------------------------------
+    // Prima dello scambio token: sono gli unici endpoint che accettano GET
+    // (la pagina di riscossione) e che leggono il corpo grezzo (la firma di
+    // Stripe si calcola sui byte esatti, non sul JSON re-serializzato).
+    if (action === 'license/claim') {
+      if (request.method !== 'GET') return fail('method_not_allowed', 405);
+      return claimPage(env, url);
+    }
+
+    if (action === 'license/cancelled') {
+      return new Response(
+        '<!doctype html><meta charset="utf-8"><title>Payment cancelled</title>' +
+          '<style>body{margin:0;min-height:100vh;display:flex;align-items:center;' +
+          'justify-content:center;background:#0f1115;color:#e8eaf0;font:16px system-ui}</style>' +
+          '<div>Payment cancelled — you can close this tab.</div>',
+        { headers: { 'content-type': 'text/html; charset=utf-8' } }
+      );
+    }
+
+    if (action === 'stripe/webhook') {
+      if (request.method !== 'POST') return fail('method_not_allowed', 405);
+      return handleWebhook(env, request);
+    }
+
+    if (request.method !== 'POST') return fail('method_not_allowed', 405);
+
     let body;
     try {
       body = await request.json();
     } catch {
-      return fail('Corpo della richiesta non valido.', 400);
+      return fail('bad_request', 400);
     }
 
+    if (action === 'checkout') return createCheckout(env, body);
+    if (action === 'license/verify') return verifyLicense(env, body);
+
+    // --- Scambio token OAuth -------------------------------------------
     const platform = body.platform;
     if (platform !== 'instagram' && platform !== 'tiktok') {
-      return fail('Piattaforma non supportata.', 400);
+      return fail('platform_unsupported', 400);
     }
 
     if (action === 'exchange') {
-      if (!body.code || !body.redirect_uri) return fail('Parametri mancanti.', 400);
+      if (!body.code || !body.redirect_uri) return fail('missing_params', 400);
       if (platform === 'instagram') {
         return instagramExchange(env, body.code, body.redirect_uri);
       }
@@ -108,10 +147,10 @@ export default {
     }
 
     if (action === 'refresh') {
-      if (!body.refresh_token) return fail('Parametri mancanti.', 400);
+      if (!body.refresh_token) return fail('missing_params', 400);
       // Instagram rinnova il token a lunga durata senza secret, quindi lo fa
       // l'app da sola: qui serve solo TikTok.
-      if (platform !== 'tiktok') return fail('Rinnovo non necessario per questa piattaforma.', 400);
+      if (platform !== 'tiktok') return fail('refresh_not_needed', 400);
       return tiktokToken(env, {
         grant_type: 'refresh_token',
         refresh_token: body.refresh_token,

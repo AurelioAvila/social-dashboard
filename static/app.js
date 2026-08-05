@@ -82,8 +82,8 @@ const I18N = {
     diagnostics_subtitle: "Calcolata istantaneamente dal codice, zero costo — segnala errori ed è aggiornata a ogni Refresh.",
     themes_subtitle: "Scegli l'aspetto della dashboard — resta salvato anche alla prossima apertura.",
     language_subtitle: "Scegli la lingua dell'interfaccia — resta salvata anche alla prossima apertura.",
-    empty_no_data: "Nessun dato — premi Refresh.", empty_configure_yt: "Configura YT_CHANNELS nel .env.",
-    empty_configure_ig: "Configura IG_ACCOUNTS nel .env.", empty_configure_tt: "Configura TT_ACCOUNTS nel .env.",
+    empty_no_data: "Nessun dato — premi Refresh.", empty_configure_yt: "Collega un canale YouTube per vedere qui le tue statistiche.",
+    empty_configure_ig: "Collega un account Instagram per vedere qui le tue statistiche.", empty_configure_tt: "Collega un account TikTok per vedere qui le tue statistiche.",
     empty_not_configured: "Non configurato.",
     label_subscribers_total: "Iscritti totali", label_channels: "Canali", label_followers_total: "Follower totali",
     label_accounts: "Account", label_accounts_configured: "Account configurati", label_credentials: "Credenziali",
@@ -203,7 +203,26 @@ const I18N = {
     plan_current: "Piano attuale", plan_period_month: "/mese", plan_period_year: "/anno",
     plan_billed_yearly: "{a}€ fatturati una volta l'anno", plan_billed_free: "Per sempre, senza scadenza",
     pricing_note_ready: "Pagamento sicuro tramite Stripe. Puoi disdire quando vuoi.",
-    pricing_note_setup: "Checkout non ancora attivo: aggiungi STRIPE_SECRET_KEY nel .env per abilitare i pagamenti.",
+    pricing_note_setup: "I pagamenti non sono al momento disponibili. Riprova più tardi.",
+    checkout_unavailable: "Il servizio di pagamento non è raggiungibile. Riprova tra poco.",
+    plan_unknown: "Piano non valido.",
+    checkout_opened: "Ho aperto la pagina di pagamento nel browser.",
+    licence_title: "Licenza",
+    licence_hint: "Hai acquistato Pro o Studio? Incolla qui la chiave che hai ricevuto dopo il pagamento.",
+    licence_placeholder: "SD-PRO-XXXX-XXXX-XXXX-XXXX",
+    licence_activate: "Attiva", licence_remove: "Rimuovi",
+    licence_state_free: "Piano Free", licence_state_active: "{p} attivo",
+    licence_state_expired: "Licenza da verificare",
+    licence_state_revoked: "Licenza non attiva",
+    licence_revoked_note: "Questo abbonamento non risulta più attivo. Se pensi sia un errore, contatta l'assistenza.",
+    licence_active_on: "Licenza attiva ({k})",
+    licence_recheck_failed: "Non riusciamo a verificare la licenza. Controlla la connessione: il piano resta attivo ancora per qualche giorno.",
+    licence_enter_key: "Inserisci la chiave di licenza.",
+    licence_activated: "{p} attivato!", licence_removed: "Licenza rimossa da questo computer.",
+    license_missing: "Inserisci la chiave di licenza.",
+    license_not_found: "Chiave non valida. Controlla di averla copiata per intero.",
+    license_inactive: "Questa licenza non è più attiva. Se l'abbonamento è in corso, contatta l'assistenza.",
+    license_service_unavailable: "Non riusciamo a raggiungere il servizio di verifica. Controlla la connessione e riprova.",
     palette_placeholder: "Vai a…", palette_empty: "Nessun risultato.",
     strength_labels: "debole,debole,media,buona,ottima",
   },
@@ -269,8 +288,8 @@ const I18N = {
     diagnostics_subtitle: "Computed instantly from code, zero cost — flags errors and updates on every Refresh.",
     themes_subtitle: "Choose the dashboard's look — saved for next time too.",
     language_subtitle: "Choose the interface language — saved for next time too.",
-    empty_no_data: "No data — press Refresh.", empty_configure_yt: "Configure YT_CHANNELS in .env.",
-    empty_configure_ig: "Configure IG_ACCOUNTS in .env.", empty_configure_tt: "Configure TT_ACCOUNTS in .env.",
+    empty_no_data: "No data — press Refresh.", empty_configure_yt: "Connect a YouTube channel to see your stats here.",
+    empty_configure_ig: "Connect an Instagram account to see your stats here.", empty_configure_tt: "Connect a TikTok account to see your stats here.",
     empty_not_configured: "Not configured.",
     label_subscribers_total: "Total subscribers", label_channels: "Channels", label_followers_total: "Total followers",
     label_accounts: "Accounts", label_accounts_configured: "Configured accounts", label_credentials: "Credentials",
@@ -390,7 +409,26 @@ const I18N = {
     plan_current: "Current plan", plan_period_month: "/mo", plan_period_year: "/yr",
     plan_billed_yearly: "€{a} billed once a year", plan_billed_free: "Free forever, no expiry",
     pricing_note_ready: "Secure payment via Stripe. Cancel anytime.",
-    pricing_note_setup: "Checkout not active yet: add STRIPE_SECRET_KEY to .env to enable payments.",
+    pricing_note_setup: "Payments are currently unavailable. Please try again later.",
+    checkout_unavailable: "The payment service can't be reached. Try again shortly.",
+    plan_unknown: "Invalid plan.",
+    checkout_opened: "I've opened the payment page in your browser.",
+    licence_title: "Licence",
+    licence_hint: "Bought Pro or Studio? Paste the key you received after payment.",
+    licence_placeholder: "SD-PRO-XXXX-XXXX-XXXX-XXXX",
+    licence_activate: "Activate", licence_remove: "Remove",
+    licence_state_free: "Free plan", licence_state_active: "{p} active",
+    licence_state_expired: "Licence needs checking",
+    licence_state_revoked: "Licence inactive",
+    licence_revoked_note: "This subscription is no longer active. If you think this is a mistake, contact support.",
+    licence_active_on: "Licence active ({k})",
+    licence_recheck_failed: "We can't verify your licence right now. Check your connection — your plan stays active for a few more days.",
+    licence_enter_key: "Enter your licence key.",
+    licence_activated: "{p} activated!", licence_removed: "Licence removed from this computer.",
+    license_missing: "Enter your licence key.",
+    license_not_found: "Invalid key. Check that you copied all of it.",
+    license_inactive: "This licence is no longer active. If your subscription is current, contact support.",
+    license_service_unavailable: "We can't reach the verification service. Check your connection and try again.",
     palette_placeholder: "Go to…", palette_empty: "No results.",
     strength_labels: "weak,weak,fair,good,strong",
   },
@@ -456,8 +494,8 @@ const I18N = {
     diagnostics_subtitle: "Calculado al instante por el código, sin coste — señala errores y se actualiza en cada Refresh.",
     themes_subtitle: "Elige el aspecto del panel — se guarda para la próxima vez.",
     language_subtitle: "Elige el idioma de la interfaz — se guarda para la próxima vez.",
-    empty_no_data: "Sin datos — pulsa Refresh.", empty_configure_yt: "Configura YT_CHANNELS en el .env.",
-    empty_configure_ig: "Configura IG_ACCOUNTS en el .env.", empty_configure_tt: "Configura TT_ACCOUNTS en el .env.",
+    empty_no_data: "Sin datos — pulsa Refresh.", empty_configure_yt: "Vincula un canal de YouTube para ver aquí tus estadísticas.",
+    empty_configure_ig: "Vincula una cuenta de Instagram para ver aquí tus estadísticas.", empty_configure_tt: "Vincula una cuenta de TikTok para ver aquí tus estadísticas.",
     empty_not_configured: "No configurado.",
     label_subscribers_total: "Suscriptores totales", label_channels: "Canales", label_followers_total: "Seguidores totales",
     label_accounts: "Cuentas", label_accounts_configured: "Cuentas configuradas", label_credentials: "Credenciales",
@@ -577,7 +615,26 @@ const I18N = {
     plan_current: "Plan actual", plan_period_month: "/mes", plan_period_year: "/año",
     plan_billed_yearly: "{a}€ facturados una vez al año", plan_billed_free: "Gratis para siempre",
     pricing_note_ready: "Pago seguro con Stripe. Cancela cuando quieras.",
-    pricing_note_setup: "Checkout aún no activo: añade STRIPE_SECRET_KEY al .env para habilitar los pagos.",
+    pricing_note_setup: "Los pagos no están disponibles en este momento. Inténtalo más tarde.",
+    checkout_unavailable: "No se puede contactar con el servicio de pago. Inténtalo en unos minutos.",
+    plan_unknown: "Plan no válido.",
+    checkout_opened: "He abierto la página de pago en el navegador.",
+    licence_title: "Licencia",
+    licence_hint: "¿Has comprado Pro o Studio? Pega aquí la clave que recibiste tras el pago.",
+    licence_placeholder: "SD-PRO-XXXX-XXXX-XXXX-XXXX",
+    licence_activate: "Activar", licence_remove: "Quitar",
+    licence_state_free: "Plan Free", licence_state_active: "{p} activo",
+    licence_state_expired: "Licencia por verificar",
+    licence_state_revoked: "Licencia inactiva",
+    licence_revoked_note: "Esta suscripción ya no está activa. Si crees que es un error, contacta con soporte.",
+    licence_active_on: "Licencia activa ({k})",
+    licence_recheck_failed: "No podemos verificar tu licencia ahora. Revisa la conexión: tu plan sigue activo unos días más.",
+    licence_enter_key: "Introduce tu clave de licencia.",
+    licence_activated: "¡{p} activado!", licence_removed: "Licencia quitada de este equipo.",
+    license_missing: "Introduce tu clave de licencia.",
+    license_not_found: "Clave no válida. Comprueba que la copiaste entera.",
+    license_inactive: "Esta licencia ya no está activa. Si tu suscripción está vigente, contacta con soporte.",
+    license_service_unavailable: "No podemos contactar con el servicio de verificación. Revisa la conexión e inténtalo de nuevo.",
     palette_placeholder: "Ir a…", palette_empty: "Sin resultados.",
     strength_labels: "débil,débil,media,buena,excelente",
   },
@@ -643,8 +700,8 @@ const I18N = {
     diagnostics_subtitle: "Calculé instantanément par le code, sans coût — signale les erreurs et se met à jour à chaque Refresh.",
     themes_subtitle: "Choisissez l'apparence du tableau de bord — sauvegardé pour la prochaine fois.",
     language_subtitle: "Choisissez la langue de l'interface — sauvegardé pour la prochaine fois.",
-    empty_no_data: "Aucune donnée — appuyez sur Refresh.", empty_configure_yt: "Configurez YT_CHANNELS dans .env.",
-    empty_configure_ig: "Configurez IG_ACCOUNTS dans .env.", empty_configure_tt: "Configurez TT_ACCOUNTS dans .env.",
+    empty_no_data: "Aucune donnée — appuyez sur Refresh.", empty_configure_yt: "Liez une chaîne YouTube pour voir vos statistiques ici.",
+    empty_configure_ig: "Liez un compte Instagram pour voir vos statistiques ici.", empty_configure_tt: "Liez un compte TikTok pour voir vos statistiques ici.",
     empty_not_configured: "Non configuré.",
     label_subscribers_total: "Abonnés totaux", label_channels: "Chaînes", label_followers_total: "Followers totaux",
     label_accounts: "Comptes", label_accounts_configured: "Comptes configurés", label_credentials: "Identifiants",
@@ -764,7 +821,26 @@ const I18N = {
     plan_current: "Offre actuelle", plan_period_month: "/mois", plan_period_year: "/an",
     plan_billed_yearly: "{a}€ facturés une fois par an", plan_billed_free: "Gratuit pour toujours",
     pricing_note_ready: "Paiement sécurisé via Stripe. Annulable à tout moment.",
-    pricing_note_setup: "Checkout pas encore actif : ajoutez STRIPE_SECRET_KEY dans .env pour activer les paiements.",
+    pricing_note_setup: "Les paiements sont indisponibles pour le moment. Réessayez plus tard.",
+    checkout_unavailable: "Le service de paiement est injoignable. Réessayez sous peu.",
+    plan_unknown: "Offre non valide.",
+    checkout_opened: "J'ai ouvert la page de paiement dans le navigateur.",
+    licence_title: "Licence",
+    licence_hint: "Vous avez acheté Pro ou Studio ? Collez ici la clé reçue après le paiement.",
+    licence_placeholder: "SD-PRO-XXXX-XXXX-XXXX-XXXX",
+    licence_activate: "Activer", licence_remove: "Retirer",
+    licence_state_free: "Offre Free", licence_state_active: "{p} actif",
+    licence_state_expired: "Licence à vérifier",
+    licence_state_revoked: "Licence inactive",
+    licence_revoked_note: "Cet abonnement n'est plus actif. Si vous pensez qu'il s'agit d'une erreur, contactez le support.",
+    licence_active_on: "Licence active ({k})",
+    licence_recheck_failed: "Impossible de vérifier votre licence pour l'instant. Vérifiez la connexion : votre offre reste active encore quelques jours.",
+    licence_enter_key: "Saisissez votre clé de licence.",
+    licence_activated: "{p} activé !", licence_removed: "Licence retirée de cet ordinateur.",
+    license_missing: "Saisissez votre clé de licence.",
+    license_not_found: "Clé non valide. Vérifiez que vous l'avez copiée en entier.",
+    license_inactive: "Cette licence n'est plus active. Si votre abonnement est en cours, contactez le support.",
+    license_service_unavailable: "Impossible de joindre le service de vérification. Vérifiez la connexion et réessayez.",
     palette_placeholder: "Aller à…", palette_empty: "Aucun résultat.",
     strength_labels: "faible,faible,moyen,bon,excellent",
   },
@@ -830,8 +906,8 @@ const I18N = {
     diagnostics_subtitle: "Sofort und kostenlos vom Code berechnet — zeigt Fehler an und aktualisiert sich bei jedem Refresh.",
     themes_subtitle: "Wähle das Erscheinungsbild des Dashboards — bleibt auch beim nächsten Öffnen gespeichert.",
     language_subtitle: "Wähle die Sprache der Oberfläche — bleibt auch beim nächsten Öffnen gespeichert.",
-    empty_no_data: "Keine Daten — Refresh drücken.", empty_configure_yt: "YT_CHANNELS in .env konfigurieren.",
-    empty_configure_ig: "IG_ACCOUNTS in .env konfigurieren.", empty_configure_tt: "TT_ACCOUNTS in .env konfigurieren.",
+    empty_no_data: "Keine Daten — Refresh drücken.", empty_configure_yt: "Verknüpfe einen YouTube-Kanal, um hier deine Statistiken zu sehen.",
+    empty_configure_ig: "Verknüpfe ein Instagram-Konto, um hier deine Statistiken zu sehen.", empty_configure_tt: "Verknüpfe ein TikTok-Konto, um hier deine Statistiken zu sehen.",
     empty_not_configured: "Nicht konfiguriert.",
     label_subscribers_total: "Abonnenten gesamt", label_channels: "Kanäle", label_followers_total: "Follower gesamt",
     label_accounts: "Konten", label_accounts_configured: "Konfigurierte Konten", label_credentials: "Zugangsdaten",
@@ -951,7 +1027,26 @@ const I18N = {
     plan_current: "Aktueller Tarif", plan_period_month: "/Mon.", plan_period_year: "/Jahr",
     plan_billed_yearly: "{a}€ einmal jährlich abgerechnet", plan_billed_free: "Für immer kostenlos",
     pricing_note_ready: "Sichere Zahlung über Stripe. Jederzeit kündbar.",
-    pricing_note_setup: "Checkout noch nicht aktiv: STRIPE_SECRET_KEY in .env eintragen, um Zahlungen zu aktivieren.",
+    pricing_note_setup: "Zahlungen sind derzeit nicht verfügbar. Bitte später erneut versuchen.",
+    checkout_unavailable: "Der Zahlungsdienst ist nicht erreichbar. Bitte in Kürze erneut versuchen.",
+    plan_unknown: "Ungültiger Tarif.",
+    checkout_opened: "Die Zahlungsseite wurde im Browser geöffnet.",
+    licence_title: "Lizenz",
+    licence_hint: "Pro oder Studio gekauft? Füge hier den Schlüssel ein, den du nach der Zahlung erhalten hast.",
+    licence_placeholder: "SD-PRO-XXXX-XXXX-XXXX-XXXX",
+    licence_activate: "Aktivieren", licence_remove: "Entfernen",
+    licence_state_free: "Free-Tarif", licence_state_active: "{p} aktiv",
+    licence_state_expired: "Lizenz zu prüfen",
+    licence_state_revoked: "Lizenz inaktiv",
+    licence_revoked_note: "Dieses Abo ist nicht mehr aktiv. Falls das ein Fehler ist, wende dich an den Support.",
+    licence_active_on: "Lizenz aktiv ({k})",
+    licence_recheck_failed: "Die Lizenz kann gerade nicht geprüft werden. Prüfe die Verbindung – dein Tarif bleibt noch einige Tage aktiv.",
+    licence_enter_key: "Gib deinen Lizenzschlüssel ein.",
+    licence_activated: "{p} aktiviert!", licence_removed: "Lizenz von diesem Computer entfernt.",
+    license_missing: "Gib deinen Lizenzschlüssel ein.",
+    license_not_found: "Ungültiger Schlüssel. Prüfe, ob du ihn vollständig kopiert hast.",
+    license_inactive: "Diese Lizenz ist nicht mehr aktiv. Falls dein Abo läuft, wende dich an den Support.",
+    license_service_unavailable: "Der Prüfdienst ist nicht erreichbar. Prüfe die Verbindung und versuche es erneut.",
     palette_placeholder: "Gehe zu…", palette_empty: "Keine Ergebnisse.",
     strength_labels: "schwach,schwach,mittel,gut,stark",
   },
@@ -1017,8 +1112,8 @@ const I18N = {
     diagnostics_subtitle: "コードによって即座に無料で計算 — エラーを検出し、Refreshのたびに更新されます。",
     themes_subtitle: "ダッシュボードの外観を選択 — 次回起動時も保存されます。",
     language_subtitle: "インターフェースの言語を選択 — 次回起動時も保存されます。",
-    empty_no_data: "データがありません — Refreshを押してください。", empty_configure_yt: ".envでYT_CHANNELSを設定してください。",
-    empty_configure_ig: ".envでIG_ACCOUNTSを設定してください。", empty_configure_tt: ".envでTT_ACCOUNTSを設定してください。",
+    empty_no_data: "データがありません — Refreshを押してください。", empty_configure_yt: "YouTubeチャンネルを連携すると、ここに統計が表示されます。",
+    empty_configure_ig: "Instagramアカウントを連携すると、ここに統計が表示されます。", empty_configure_tt: "TikTokアカウントを連携すると、ここに統計が表示されます。",
     empty_not_configured: "未設定。",
     label_subscribers_total: "総登録者数", label_channels: "チャンネル数", label_followers_total: "総フォロワー数",
     label_accounts: "アカウント", label_accounts_configured: "設定済みアカウント", label_credentials: "認証情報",
@@ -1138,7 +1233,26 @@ const I18N = {
     plan_current: "現在のプラン", plan_period_month: "/月", plan_period_year: "/年",
     plan_billed_yearly: "年1回 {a}€ のお支払い", plan_billed_free: "ずっと無料",
     pricing_note_ready: "Stripeによる安全な決済。いつでも解約できます。",
-    pricing_note_setup: "決済は未設定です: .env に STRIPE_SECRET_KEY を追加すると有効になります。",
+    pricing_note_setup: "現在お支払いはご利用いただけません。しばらくしてから再度お試しください。",
+    checkout_unavailable: "決済サービスに接続できません。しばらくしてから再度お試しください。",
+    plan_unknown: "無効なプランです。",
+    checkout_opened: "ブラウザで決済ページを開きました。",
+    licence_title: "ライセンス",
+    licence_hint: "ProまたはStudioをご購入済みですか？お支払い後に届いたキーをここに貼り付けてください。",
+    licence_placeholder: "SD-PRO-XXXX-XXXX-XXXX-XXXX",
+    licence_activate: "有効化", licence_remove: "削除",
+    licence_state_free: "Freeプラン", licence_state_active: "{p} 有効",
+    licence_state_expired: "ライセンスの確認が必要",
+    licence_state_revoked: "ライセンス無効",
+    licence_revoked_note: "このサブスクリプションは有効ではありません。誤りだと思われる場合はサポートにご連絡ください。",
+    licence_active_on: "ライセンス有効（{k}）",
+    licence_recheck_failed: "現在ライセンスを確認できません。接続をご確認ください。プランはあと数日間有効です。",
+    licence_enter_key: "ライセンスキーを入力してください。",
+    licence_activated: "{p} を有効化しました！", licence_removed: "このコンピューターからライセンスを削除しました。",
+    license_missing: "ライセンスキーを入力してください。",
+    license_not_found: "無効なキーです。すべてコピーされているかご確認ください。",
+    license_inactive: "このライセンスは有効ではありません。サブスクリプションが有効な場合はサポートにご連絡ください。",
+    license_service_unavailable: "確認サービスに接続できません。接続をご確認のうえ再度お試しください。",
     palette_placeholder: "移動先…", palette_empty: "結果がありません。",
     strength_labels: "弱い,弱い,普通,良い,強い",
   },
@@ -2331,6 +2445,102 @@ async function loadUser() {
   renderUser();
 }
 
+// ---------- Licenza ----------
+// Vale per l'installazione, non per l'account: chi ha appena pagato deve
+// poter attivare subito, anche senza essersi registrato.
+let licenceInfo = null;
+
+function renderLicence() {
+  const state = document.getElementById("licence-state");
+  const active = document.getElementById("licence-active");
+  const row = document.querySelector(".licence-row");
+  const hint = document.querySelector(".licence-box .muted");
+  if (!state) return;
+
+  const lic = licenceInfo || { active: false, plan: "free" };
+  state.classList.remove("on", "warn");
+
+  if (lic.active) {
+    state.textContent = t("licence_state_active", { p: planLabel(lic.plan) });
+    state.classList.add("on");
+    active.classList.remove("hidden");
+    row.classList.add("hidden");
+    hint.classList.add("hidden");
+    document.getElementById("licence-active-text").textContent =
+      lic.stale ? t("licence_recheck_failed") : t("licence_active_on", { k: lic.key });
+    if (lic.stale) state.classList.add("warn");
+  } else {
+    // Revocata e "da verificare" non sono la stessa cosa: la prima e' una
+    // decisione (rimborso, disdetta), la seconda un problema tecnico.
+    state.textContent = lic.revoked
+      ? t("licence_state_revoked")
+      : (lic.expired ? t("licence_state_expired") : t("licence_state_free"));
+    if (lic.expired) state.classList.add("warn");
+    active.classList.add("hidden");
+    row.classList.remove("hidden");
+    hint.classList.remove("hidden");
+    if (lic.revoked) licenceMsg(t("licence_revoked_note"), "err");
+  }
+}
+
+function planLabel(id) {
+  return id ? id.charAt(0).toUpperCase() + id.slice(1) : "Free";
+}
+
+async function loadLicence() {
+  try {
+    licenceInfo = await (await fetch("/api/license")).json();
+  } catch (e) { licenceInfo = null; }
+  renderLicence();
+}
+
+function licenceMsg(text, kind) {
+  const box = document.getElementById("licence-msg");
+  if (!box) return;
+  box.textContent = text || "";
+  box.className = "licence-msg" + (text ? ` ${kind || ""}` : " hidden");
+}
+
+document.getElementById("licence-activate")?.addEventListener("click", async e => {
+  const btn = e.currentTarget;
+  const input = document.getElementById("licence-key");
+  const key = input.value.trim();
+  if (!key) { licenceMsg(t("licence_enter_key"), "err"); return; }
+
+  btn.disabled = true;
+  licenceMsg("");
+  try {
+    const resp = await (await fetch("/api/license/activate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ key }),
+    })).json();
+
+    if (!resp.ok) { licenceMsg(tServer(resp.code) || t("generic_error"), "err"); return; }
+
+    input.value = "";
+    licenceMsg(t("licence_activated", { p: planLabel(resp.plan) }), "ok");
+    toast(t("licence_activated", { p: planLabel(resp.plan) }), "ok");
+    await loadLicence();
+    // I limiti cambiano subito: si ridisegna quello che li mostra.
+    await loadSnapshot();
+    if (plansData) renderPlans();
+  } catch (err) {
+    licenceMsg(t("generic_error"), "err");
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+document.getElementById("licence-remove")?.addEventListener("click", async () => {
+  await fetch("/api/license/remove", { method: "POST" }).catch(() => {});
+  licenceMsg("");
+  toast(t("licence_removed"));
+  await loadLicence();
+  await loadSnapshot();
+  if (plansData) renderPlans();
+});
+
 // ---------- Piani ----------
 async function loadPlans() {
   try {
@@ -2390,11 +2600,9 @@ function renderPlans() {
 
 async function startCheckout(planId) {
   if (planId === "free") { goTo("account"); return; }
-  if (!currentUser) {
-    goTo("account");
-    toast(t("toast_login_required"));
-    return;
-  }
+  // Non serve un account per acquistare: la licenza vale per questa
+  // installazione e si attiva incollando la chiave. Un passaggio in meno
+  // fra il cliente e il pagamento.
   try {
     const resp = await fetch("/api/billing/checkout", {
       method: "POST",
@@ -2403,8 +2611,14 @@ async function startCheckout(planId) {
     });
     const data = await resp.json();
     if (!resp.ok) { toast(tServer(data.detail) || t("generic_error"), "err"); return; }
-    if (data.ok && data.checkout_url) window.location.href = data.checkout_url;
-    else toast(data.message || "Checkout non disponibile.", "err");
+    if (data.ok && data.checkout_url) {
+      // Il pagamento si apre nel browser di sistema, non nella finestra
+      // dell'app: la chiave va letta, copiata e spesso conservata.
+      window.open(data.checkout_url, "_blank");
+      toast(t("checkout_opened"));
+    } else {
+      toast(tServer(data.message) || t("generic_error"), "err");
+    }
   } catch (e) {
     toast(String(e), "err");
   }
@@ -2649,4 +2863,5 @@ loadUser();
   applyConfig();
   loadConnections();
   loadSnapshot();
+  loadLicence();
 })();

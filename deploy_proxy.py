@@ -1,5 +1,5 @@
 """
-Deploy del proxy OAuth in un colpo solo.
+Deploy del servizio (proxy OAuth + licenze) in un colpo solo.
 
 Fa tutto quello che serve dopo `wrangler login`: pubblica il Worker, ci
 carica i segreti leggendoli da brand.py, scrive l'URL in brand.py e svuota
@@ -12,6 +12,11 @@ Al termine `python check_release.py` deve dire che la build e' pulita.
 
 I segreti passano allo stdin di wrangler, non sulla riga di comando: cosi'
 non finiscono nella cronologia della shell ne' nell'elenco dei processi.
+
+Le chiavi di Stripe non stanno in brand.py (non devono nemmeno sfiorare il
+repository o la build): si caricano a parte, una volta sola, con
+
+    python deploy_proxy.py --stripe
 """
 import re
 import subprocess
@@ -92,7 +97,51 @@ def update_brand(url: str) -> None:
     print(f"brand.py aggiornato: proxy attivo, {', '.join(TO_CLEAR)} svuotati.")
 
 
+def push_stripe_keys() -> int:
+    """Carica le chiavi di Stripe sul Worker. Si chiedono qui e non si
+    scrivono da nessuna parte: restano solo nel Worker, che e' l'unico posto
+    dove possono stare senza finire in un eseguibile distribuito."""
+    import getpass
+
+    print("Chiavi di Stripe (dashboard.stripe.com).")
+    print("Non verranno salvate su questo computer: vanno direttamente al Worker.\n")
+
+    entries = [
+        ("STRIPE_SECRET_KEY",
+         "Secret key (Developers > API keys, inizia con sk_live_ o sk_test_): "),
+        ("STRIPE_WEBHOOK_SECRET",
+         "Webhook signing secret (Developers > Webhooks > il tuo endpoint, inizia con whsec_): "),
+    ]
+
+    for name, prompt in entries:
+        value = getpass.getpass(prompt).strip()
+        if not value:
+            print(f"  {name}: saltato (vuoto)")
+            continue
+        res = subprocess.run(
+            ["npx", "wrangler", "secret", "put", name],
+            cwd=PROXY_DIR, input=value, text=True, capture_output=True, shell=True,
+            encoding="utf-8", errors="replace",
+        )
+        print(f"  {name}: {'caricato' if res.returncode == 0 else 'ERRORE'}")
+        if res.returncode != 0:
+            print((res.stderr or "")[-300:])
+            return 1
+
+    print("\nFatto. Ricorda che il webhook su Stripe deve puntare a:")
+    print("  <URL del Worker>/stripe/webhook")
+    print("con gli eventi: checkout.session.completed,")
+    print("               customer.subscription.deleted, invoice.payment_failed")
+    return 0
+
+
 def main() -> int:
+    if "--stripe" in sys.argv:
+        if not check_login():
+            print("Non sei autenticato su Cloudflare. Esegui prima: wrangler login")
+            return 1
+        return push_stripe_keys()
+
     if not check_login():
         print("Non sei autenticato su Cloudflare.\n"
               "Esegui prima:  wrangler login\n"

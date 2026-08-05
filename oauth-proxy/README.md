@@ -1,6 +1,54 @@
-# Proxy di scambio token
+# Servizio: scambio token OAuth + licenze
 
-## Perché serve
+Il Worker fa due cose, per lo stesso motivo di fondo: sono le due cose che
+un'app installata sul computer del cliente **non può fare da sola**.
+
+| | Perché non può stare nell'app |
+|---|---|
+| Scambio token OAuth | Il client secret sarebbe leggibile decomprimendo l'eseguibile |
+| Licenze | Il database dei piani sarebbe sul PC di chi deve pagare |
+
+## Licenze
+
+Flusso completo:
+
+1. l'app chiede `POST /checkout` → riceve l'URL di pagamento Stripe
+2. il cliente paga sulla pagina di Stripe
+3. Stripe chiama `POST /stripe/webhook` → qui nasce la chiave di licenza
+4. il cliente atterra su `GET /license/claim` → legge e copia la sua chiave
+5. la incolla nell'app → `POST /license/verify` → il piano si sblocca
+
+**Gli importi stanno nel Worker**, non nell'app: se li decidesse il client,
+chi modifica l'eseguibile potrebbe farsi generare un abbonamento da zero euro.
+La firma del webhook viene verificata (HMAC, confronto a tempo costante,
+finestra di 5 minuti): senza quel controllo chiunque potrebbe farsi emettere
+licenze gratis.
+
+### Configurare Stripe
+
+```bash
+python deploy_proxy.py --stripe
+```
+
+Chiede le due chiavi e le carica sul Worker senza salvarle su disco. Poi, su
+[dashboard.stripe.com](https://dashboard.stripe.com) → Developers → Webhooks,
+aggiungi un endpoint che punta a:
+
+```
+https://<il-tuo-worker>.workers.dev/stripe/webhook
+```
+
+con gli eventi `checkout.session.completed`, `customer.subscription.deleted`
+e `invoice.payment_failed`.
+
+### Revoca
+
+Un rimborso o una disdetta arrivano via webhook e la licenza passa a
+`inactive`. L'app se ne accorge al controllo successivo (entro 24 ore) e
+**toglie il piano subito**: il periodo di tolleranza di 7 giorni copre solo i
+problemi di rete, non un abbonamento che non è più pagato.
+
+## Perché serve il proxy OAuth
 
 Instagram e TikTok richiedono il **client secret** per trasformare il `code`
 OAuth in un token d'accesso.

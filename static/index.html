@@ -298,6 +298,27 @@
         </div>
         <div id="acc-since" class="muted"></div>
       </div>
+
+      <!-- La licenza vale per questa installazione, quindi resta visibile
+           anche senza aver effettuato l'accesso: chi ha appena pagato deve
+           poter incollare la chiave subito. -->
+      <div class="licence-box">
+        <div class="licence-head">
+          <h2 data-i18n="licence_title">Licenza</h2>
+          <span class="licence-state" id="licence-state" data-i18n="licence_state_free">Piano Free</span>
+        </div>
+        <p class="muted" data-i18n="licence_hint">Hai acquistato Pro o Studio? Incolla qui la chiave che hai ricevuto dopo il pagamento.</p>
+        <div class="licence-row">
+          <input type="text" id="licence-key" autocomplete="off" spellcheck="false"
+                 data-i18n-placeholder="licence_placeholder" placeholder="SD-PRO-XXXX-XXXX-XXXX-XXXX">
+          <button class="btn-analyze" id="licence-activate" data-i18n="licence_activate">Attiva</button>
+        </div>
+        <div class="licence-msg hidden" id="licence-msg"></div>
+        <div class="licence-active hidden" id="licence-active">
+          <span id="licence-active-text"></span>
+          <button class="btn-ghost" id="licence-remove" data-i18n="licence_remove">Rimuovi</button>
+        </div>
+      </div>
     </section>
 
     <!-- ---------------- Piani ---------------- -->
