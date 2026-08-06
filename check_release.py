@@ -92,10 +92,32 @@ def check_binary() -> list[str]:
     ]
 
 
+def _version_reminder() -> None:
+    """Il controllo aggiornamenti (version.py) confronta APP_VERSION con
+    l'ultimo tag pubblicato su GitHub: se questa build ha lo stesso numero
+    della release gia' pubblicata, ogni cliente gia' aggiornato vedrebbe
+    "aggiornamento disponibile" all'infinito. Non blocca (un tag locale non
+    ancora pushato e' normale), ma lo ricorda ad ogni controllo."""
+    try:
+        import subprocess
+        import version
+        tag = subprocess.run(["git", "describe", "--tags", "--abbrev=0"],
+                              capture_output=True, text=True, timeout=5).stdout.strip()
+        current_tag = tag.lstrip("vV")
+        if current_tag and current_tag == version.APP_VERSION:
+            print(f"Promemoria: APP_VERSION ({version.APP_VERSION}) e' uguale "
+                  f"all'ultimo tag git ({tag}). Se questa e' una nuova release, "
+                  "alza APP_VERSION in version.py prima di pubblicarla.")
+    except Exception:
+        pass  # git assente o nessun tag: nessun promemoria, non e' un errore
+
+
 def main() -> int:
     problems = check_config()
     if "--dist" in sys.argv:
         problems += check_binary()
+
+    _version_reminder()
 
     if problems:
         print("Controllo NON superato:\n")

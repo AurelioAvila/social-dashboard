@@ -1172,3 +1172,21 @@ button:disabled { opacity: 0.5; cursor: wait; transform: none; }
 }
 .sw-nav .sw-next { flex: 1; }
 .sw-nav .btn-analyze:disabled { opacity: .4; cursor: default; }
+
+/* ---------- Avviso di aggiornamento disponibile ---------- */
+.update-banner {
+  background: color-mix(in srgb, var(--green) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--green) 34%, transparent);
+  color: var(--text); font-size: 11px; font-weight: 650;
+  padding: 8px 10px; border-radius: var(--r-sm); margin-top: 8px;
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  width: 100%;
+}
+.update-banner:hover {
+  background: color-mix(in srgb, var(--green) 20%, transparent);
+  transform: none; filter: none;
+}
+.update-dot {
+  width: 7px; height: 7px; border-radius: 999px; background: var(--green);
+  flex: none; box-shadow: 0 0 0 3px color-mix(in srgb, var(--green) 20%, transparent);
+}

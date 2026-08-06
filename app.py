@@ -187,6 +187,15 @@ def get_config():
     return config.public_config()
 
 
+@app.get("/api/version")
+def get_version():
+    """Non scarica ne' installa nulla: dice solo se su GitHub c'e' una
+    release piu' recente di questa, cosi' il frontend puo' mostrare un
+    avviso con il link alla pagina di download."""
+    import version
+    return version.status()
+
+
 # ------------------------------------------------------------ connessioni
 
 @app.get("/api/connections")

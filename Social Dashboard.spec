@@ -9,7 +9,7 @@ a = Analysis(
     # Moduli importati solo dentro le funzioni: l'analisi statica puo' non
     # accorgersene e finirebbero fuori dalla build.
     hiddenimports=['brand', 'connections', 'auth', 'billing', 'config', 'trends',
-                   'licensing', 'own_app'],
+                   'licensing', 'own_app', 'version'],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],

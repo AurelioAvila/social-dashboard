@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>Social Dashboard</title>
-<link rel="stylesheet" href="style.css?v=1.2.5">
+<link rel="stylesheet" href="style.css?v=1.2.6">
 </head>
 <body>
 <div class="app">
@@ -66,6 +66,13 @@
         <span id="refresh-progress-label" class="progress-label">0%</span>
       </div>
       <button class="kbd-hint" id="palette-trigger"><span data-i18n="palette_hint">Search</span> <kbd>Ctrl</kbd><kbd>K</kbd></button>
+      <!-- Non scarica ne' installa nulla: dice solo che esiste una versione
+           piu' nuova e apre la pagina di download nel browser di sistema.
+           Nascosto finche' il controllo non trova davvero un aggiornamento. -->
+      <button class="update-banner hidden" id="update-banner">
+        <span class="update-dot"></span>
+        <span data-i18n="update_available">Update available</span>
+      </button>
     </div>
   </nav>
 
@@ -461,6 +468,6 @@
 
 <div class="toasts" id="toasts"></div>
 
-<script src="app.js?v=1.2.5"></script>
+<script src="app.js?v=1.2.6"></script>
 </body>
 </html>

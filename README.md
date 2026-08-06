@@ -38,6 +38,10 @@ Download the latest release, extract the ZIP and launch
 On first launch Windows may show a SmartScreen warning because the
 executable isn't digitally signed: "More info" → "Run anyway".
 
+The app checks once a day whether a newer release exists and shows a small
+banner if so; it never downloads or installs anything on its own, the
+banner just opens the release page for you to grab manually.
+
 ## Connecting accounts
 
 Open **Connect account**, press the platform button, sign in. The app only

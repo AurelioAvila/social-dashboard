@@ -22,6 +22,11 @@ const LANGS = [
 const I18N = {
   it: {
 
+    // --- Controllo aggiornamenti ---
+    update_available: "Aggiornamento disponibile",
+    update_available_v: "Versione {v} disponibile",
+    update_hint: "Apre la pagina di download della versione {v}.",
+
     // --- "Usa la tua app": procedura guidata ---
     sw_title: "Collega {p} con la tua app",
     sw_step_of: "Passo {n} di {tot}",
@@ -284,6 +289,11 @@ const I18N = {
     strength_labels: "debole,debole,media,buona,ottima",
   },
   en: {
+
+    // --- Controllo aggiornamenti ---
+    update_available: "Update available",
+    update_available_v: "Version {v} available",
+    update_hint: "Opens the download page for version {v}.",
 
     // --- "Usa la tua app": procedura guidata ---
     sw_title: "Connect {p} with your own app",
@@ -548,6 +558,11 @@ const I18N = {
   },
   es: {
 
+    // --- Controllo aggiornamenti ---
+    update_available: "Actualización disponible",
+    update_available_v: "Versión {v} disponible",
+    update_hint: "Abre la página de descarga de la versión {v}.",
+
     // --- "Usa la tua app": procedura guidata ---
     sw_title: "Conecta {p} con tu propia app",
     sw_step_of: "Paso {n} de {tot}",
@@ -810,6 +825,11 @@ const I18N = {
     strength_labels: "débil,débil,media,buena,excelente",
   },
   fr: {
+
+    // --- Controllo aggiornamenti ---
+    update_available: "Mise à jour disponible",
+    update_available_v: "Version {v} disponible",
+    update_hint: "Ouvre la page de téléchargement de la version {v}.",
 
     // --- "Usa la tua app": procedura guidata ---
     sw_title: "Connecter {p} avec votre propre app",
@@ -1074,6 +1094,11 @@ const I18N = {
   },
   de: {
 
+    // --- Controllo aggiornamenti ---
+    update_available: "Update verfügbar",
+    update_available_v: "Version {v} verfügbar",
+    update_hint: "Öffnet die Download-Seite für Version {v}.",
+
     // --- "Usa la tua app": procedura guidata ---
     sw_title: "{p} mit deiner eigenen App verbinden",
     sw_step_of: "Schritt {n} von {tot}",
@@ -1336,6 +1361,11 @@ const I18N = {
     strength_labels: "schwach,schwach,mittel,gut,stark",
   },
   ja: {
+
+    // --- Controllo aggiornamenti ---
+    update_available: "アップデートあり",
+    update_available_v: "バージョン {v} が利用可能",
+    update_hint: "バージョン{v}のダウンロードページを開きます。",
 
     // --- "Usa la tua app": procedura guidata ---
     sw_title: "自分のアプリで{p}を連携",
@@ -3472,4 +3502,30 @@ loadUser();
   loadConnections();
   loadSnapshot();
   loadLicence();
+  loadUpdateCheck();
 })();
+
+// ---------- Controllo aggiornamenti ----------
+// Non scarica ne' installa nulla: il backend chiede a GitHub se esiste una
+// release piu' recente (al massimo una volta al giorno, vedi version.py) e
+// qui si mostra solo un avviso discreto con il link alla pagina di download.
+async function loadUpdateCheck() {
+  try {
+    const resp = await (await fetch("/api/version")).json();
+    if (!resp.update_available) return;
+    const banner = document.getElementById("update-banner");
+    banner.querySelector("span:last-child").textContent =
+      t("update_available_v", { v: resp.latest });
+    banner.title = t("update_hint", { v: resp.latest });
+    banner.classList.remove("hidden");
+    banner.dataset.url = resp.url;
+  } catch (e) {
+    // Offline o GitHub irraggiungibile: nessun avviso, si riprova al
+    // prossimo avvio. Non deve mai interrompere l'uso dell'app.
+  }
+}
+
+document.getElementById("update-banner").addEventListener("click", e => {
+  const url = e.currentTarget.dataset.url;
+  if (url) window.open(url, "_blank");
+});
