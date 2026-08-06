@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>Social Dashboard</title>
-<link rel="stylesheet" href="style.css?v=1.2.2">
+<link rel="stylesheet" href="style.css?v=1.2.4">
 </head>
 <body>
 <div class="app">
@@ -387,10 +387,67 @@
       <p class="modal-text" data-i18n="cm_auto_text">Si aprirà il browser: accedi e autorizza l'accesso in sola lettura. Tutto il resto lo fa la dashboard.</p>
       <button class="btn-primary-lg" id="cm-comingsoon-btn"><span id="cm-comingsoon-label">Accedi</span></button>
       <div id="cm-comingsoon-msg" class="hidden modal-unavailable" style="margin-top:12px"></div>
+      <!-- Via d'uscita per chi non vuole aspettare la nostra approvazione:
+           con un'app propria il collegamento e' disponibile subito. Compare
+           solo dopo il messaggio "in arrivo", cosi' non distrae chi si
+           accontenta di aspettare. -->
+      <div id="cm-ownapp-offer" class="hidden ownapp-offer">
+        <div class="ownapp-offer-text" data-i18n="sw_offer">Non vuoi aspettare? Puoi collegarlo subito usando una tua app: ti guidiamo passo passo, servono circa 10 minuti.</div>
+        <button class="btn-analyze" id="cm-ownapp-start" data-i18n="sw_offer_btn">Collegalo adesso →</button>
+      </div>
+    </div>
+
+    <div id="cm-ownapp-active" class="hidden ownapp-active">
+      <span id="cm-ownapp-active-text"></span>
+      <button class="btn-unlink" id="cm-ownapp-remove" data-i18n="sw_own_remove">Rimuovi</button>
     </div>
 
     <div id="cm-unavailable" class="hidden modal-unavailable"></div>
     <div id="cm-error" class="form-error hidden"></div>
+  </div>
+</div>
+
+<!-- Procedura guidata "usa la tua app" (Instagram / TikTok) -->
+<div class="modal-overlay hidden" id="setup-modal">
+  <div class="modal setup-modal">
+    <button class="modal-close" id="setup-close" aria-label="Chiudi">✕</button>
+    <div class="modal-head">
+      <span class="connect-logo" id="sw-logo">◎</span>
+      <div>
+        <div class="modal-title" id="sw-title">Collega</div>
+        <div class="modal-sub muted" id="sw-counter"></div>
+      </div>
+    </div>
+
+    <div class="sw-progress"><div class="sw-progress-bar" id="sw-progress-bar"></div></div>
+
+    <div class="sw-step">
+      <div class="sw-step-title" id="sw-step-title"></div>
+      <p class="sw-step-text" id="sw-step-text"></p>
+
+      <!-- Ogni passo mostra solo cio' che gli serve: un pulsante che apre la
+           pagina giusta, un valore da copiare, oppure i campi finali. -->
+      <button class="btn-analyze sw-open" id="sw-open" data-i18n="sw_open">Apri la pagina</button>
+
+      <div id="sw-copy-row" class="hidden sw-copy-row">
+        <code class="sw-copy-value" id="sw-copy-value"></code>
+        <button class="btn-analyze" id="sw-copy-btn" data-i18n="sw_copy">Copia</button>
+      </div>
+
+      <div id="sw-fields" class="hidden">
+        <label class="sw-label" id="sw-id-label"></label>
+        <input type="text" class="guided-input" id="sw-id" autocomplete="off" spellcheck="false">
+        <label class="sw-label" id="sw-secret-label"></label>
+        <input type="password" class="guided-input" id="sw-secret" autocomplete="off" spellcheck="false">
+      </div>
+
+      <div id="sw-error" class="form-error hidden"></div>
+    </div>
+
+    <div class="sw-nav">
+      <button class="btn-analyze" id="sw-back" data-i18n="sw_back">Indietro</button>
+      <button class="btn-primary-lg sw-next" id="sw-next" data-i18n="sw_next">Avanti</button>
+    </div>
   </div>
 </div>
 
@@ -404,6 +461,6 @@
 
 <div class="toasts" id="toasts"></div>
 
-<script src="app.js?v=1.2.2"></script>
+<script src="app.js?v=1.2.4"></script>
 </body>
 </html>

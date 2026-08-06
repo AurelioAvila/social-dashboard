@@ -6,7 +6,10 @@ a = Analysis(
     pathex=[],
     binaries=[],
     datas=[('static', 'static')],
-    hiddenimports=['brand', 'connections', 'auth', 'billing', 'config', 'trends'],
+    # Moduli importati solo dentro le funzioni: l'analisi statica puo' non
+    # accorgersene e finirebbero fuori dalla build.
+    hiddenimports=['brand', 'connections', 'auth', 'billing', 'config', 'trends',
+                   'licensing', 'own_app'],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],

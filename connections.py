@@ -352,7 +352,15 @@ def proxy_url() -> str:
     return (brand.get("OAUTH_PROXY_URL") or "").rstrip("/")
 
 
-def using_proxy() -> bool:
+def using_proxy(platform: str | None = None) -> bool:
+    """Il proxy custodisce i *nostri* segreti. Se il cliente ha registrato
+    un'app propria il segreto e' suo e sta solo su questo computer: lo
+    scambio del token deve avvenire in locale, altrimenti il proxy tenterebbe
+    di firmarlo con credenziali che non c'entrano nulla."""
+    if platform:
+        import own_app
+        if own_app.configured(platform):
+            return False
     return bool(proxy_url())
 
 
@@ -379,9 +387,18 @@ def _instagram_app() -> tuple[str, str, str]:
     """(app_id, secret, redirect). Con il proxy attivo il secret non e' nella
     build e resta vuoto: serve solo all'endpoint che fa lo scambio."""
     import brand
+    import own_app
+    redirect = brand.get("INSTAGRAM_REDIRECT_URI")
+
+    # L'app registrata dal cliente ha la precedenza: e' quella che gli
+    # permette di collegare il proprio account senza attendere la nostra
+    # revisione, quindi se c'e' e' perche' vuole usare quella.
+    mine = own_app.get("instagram")
+    if mine:
+        return mine["client_id"], mine["client_secret"], redirect
+
     app_id = brand.get("INSTAGRAM_APP_ID")
     secret = brand.get("INSTAGRAM_APP_SECRET")
-    redirect = brand.get("INSTAGRAM_REDIRECT_URI")
     if not (app_id and secret):
         found = _env_pair("_IG_APP_ID", "_IG_APP_SECRET")
         if found:
@@ -395,9 +412,15 @@ def _instagram_app() -> tuple[str, str, str]:
 def _tiktok_app() -> tuple[str, str, str]:
     """(client_key, secret, redirect). Vedi _instagram_app per il secret."""
     import brand
+    import own_app
+    redirect = brand.get("TIKTOK_REDIRECT_URI")
+
+    mine = own_app.get("tiktok")  # vedi _instagram_app
+    if mine:
+        return mine["client_id"], mine["client_secret"], redirect
+
     key = brand.get("TIKTOK_CLIENT_KEY")
     secret = brand.get("TIKTOK_CLIENT_SECRET")
-    redirect = brand.get("TIKTOK_REDIRECT_URI")
     if not (key and secret):
         found = _env_pair("_TIKTOK_CLIENT_KEY", "_TIKTOK_CLIENT_SECRET")
         if found:
@@ -428,7 +451,7 @@ def authorize_url(platform: str) -> dict:
     """URL da aprire nel browser per autorizzare l'account."""
     from urllib.parse import urlencode
 
-    if platform in COMING_SOON:
+    if coming_soon(platform):
         return {"ok": False, "message": "connect_coming_soon"}
 
     try:
@@ -471,7 +494,7 @@ def _finish_instagram(code: str) -> str:
 
     app_id, app_secret, redirect = _instagram_app()
 
-    if using_proxy():
+    if using_proxy("instagram"):
         # Il secret non e' in questa build: code -> token a lunga durata
         # avviene sull'endpoint che lo custodisce.
         long_token = proxy_call("exchange", {
@@ -528,7 +551,7 @@ def _finish_tiktok(code: str) -> str:
 
     key, secret, redirect = _tiktok_app()
 
-    if using_proxy():
+    if using_proxy("tiktok"):
         data = proxy_call("exchange", {
             "platform": "tiktok", "code": code, "redirect_uri": redirect,
         })
@@ -573,7 +596,7 @@ def _finish_tiktok(code: str) -> str:
     # Col proxy il secret non viene salvato nemmeno in locale: il rinnovo del
     # token passera' anch'esso dall'endpoint che lo custodisce.
     stored = {"refresh_token": data["refresh_token"], "client_key": key, "granted_scope": granted}
-    if using_proxy():
+    if using_proxy("tiktok"):
         stored["via_proxy"] = True
     else:
         stored["client_secret"] = secret
@@ -605,7 +628,7 @@ def _connect_oneclick(platform: str) -> None:
 
 
 def finish_guided(platform: str, pasted: str) -> dict:
-    if platform in COMING_SOON:
+    if coming_soon(platform):
         return {"ok": False, "message": "connect_coming_soon"}
     finisher = GUIDED.get(platform)
     if not finisher:
@@ -624,7 +647,7 @@ def connect_mode(platform: str) -> str:
     Se le credenziali dell'app non ci sono, si dichiara "unavailable" fin
     da subito: meglio dirlo prima che far premere un pulsante destinato a
     fallire."""
-    if platform in COMING_SOON:
+    if coming_soon(platform):
         return "coming_soon"
     if platform in UNAVAILABLE:
         return "unavailable"
@@ -662,8 +685,18 @@ UNAVAILABLE = {
 COMING_SOON = {"instagram", "tiktok"}
 
 
+def coming_soon(platform: str) -> bool:
+    """"In arrivo" riguarda la *nostra* app in attesa di approvazione. Chi ha
+    registrato la propria non sta aspettando nessuno: per lui il collegamento
+    e' disponibile subito, ed e' proprio il motivo per cui l'ha registrata."""
+    if platform not in COMING_SOON:
+        return False
+    import own_app
+    return not own_app.configured(platform)
+
+
 def start_connect(platform: str) -> dict:
-    if platform in COMING_SOON:
+    if coming_soon(platform):
         return {"ok": False, "message": "connect_coming_soon"}
     if platform in UNAVAILABLE:
         return {"ok": False, "message": UNAVAILABLE[platform]}

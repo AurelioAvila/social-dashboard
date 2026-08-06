@@ -48,9 +48,26 @@ Availability by platform:
 | Platform | Status |
 |---|---|
 | YouTube | Direct connection |
-| Instagram | Direct connection |
-| TikTok | Requires approval of the statistics read permission |
+| Instagram | Coming soon, or connect now with your own app |
+| TikTok | Coming soon, or connect now with your own app |
 | X | Read metrics don't exist on the free API tier |
+
+### Connect Instagram or TikTok right now
+
+Both platforms require their own review before an app may connect *other*
+people's accounts, and Instagram additionally requires Meta business
+verification. Neither review is needed to connect the account of whoever
+registered the app: Instagram allows it in Development mode, TikTok through a
+Sandbox.
+
+So there is a way to skip the wait entirely. Press **Connect**, and when the
+"coming soon" notice appears choose **Connect it now**: a step-by-step guide
+walks you through registering your own app — about ten minutes, once. The
+credentials never leave your computer, and the redirect address is already
+published, so there is no website for you to set up.
+
+When the platform review is approved this becomes unnecessary, and existing
+connections keep working either way.
 
 ## Development
 
@@ -118,6 +135,7 @@ without the variable set never exposes the personal modules.
 ```
 app.py            FastAPI API and refresh orchestration
 connections.py    Account linking via OAuth
+own_app.py        Credentials of an app registered by the user
 platforms/        One adapter per platform
 diagnostics.py    Automated checks (no AI calls)
 analytics.py      Locally computed statistics

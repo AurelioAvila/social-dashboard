@@ -192,6 +192,7 @@ def get_config():
 @app.get("/api/connections")
 def get_connections():
     import connections
+    import own_app
     platforms = list(connections.CONNECTORS) + list(connections.GUIDED) + list(connections.UNAVAILABLE)
     platforms = list(dict.fromkeys(platforms))
     reasons = {p: connections.unavailable_reason(p) for p in platforms}
@@ -205,6 +206,10 @@ def get_connections():
         # Come si collega ciascuna: "oneclick" (basta il bottone),
         # "guided" (serve un incolla), "unavailable".
         "modes": {p: connections.connect_mode(p) for p in platforms},
+        # Piattaforme per cui il cliente puo' registrare un'app propria e
+        # collegarsi senza attendere la nostra revisione, con lo stato di
+        # quelle gia' configurate.
+        "own_app": {p: own_app.status(p) for p in own_app.SUPPORTED},
     }
 
 
@@ -260,6 +265,31 @@ def remove_connection(connection_id: int):
     import connections
     connections.delete_connection(connection_id)
     return {"ok": True}
+
+
+# --------------------------------------------------- "usa la tua app"
+# Instagram e TikTok aprono l'accesso senza revisione a chi collega il
+# proprio account tramite un'app registrata da se'. Vedi own_app.py.
+
+@app.get("/api/own-app/{platform}")
+def own_app_status(platform: str):
+    import own_app
+    return own_app.status(platform)
+
+
+@app.post("/api/own-app/{platform}")
+def own_app_save(platform: str, payload: dict = Body(...)):
+    import own_app
+    return own_app.save(platform, payload.get("client_id", ""), payload.get("client_secret", ""))
+
+
+@app.delete("/api/own-app/{platform}")
+def own_app_clear(platform: str):
+    """Torna alla nostra app. Le connessioni gia' create restano: sono state
+    autorizzate con le credenziali del cliente e continuano a funzionare
+    finche' non le scollega lui."""
+    import own_app
+    return own_app.clear(platform)
 
 
 # ---------------------------------------------------------------- account

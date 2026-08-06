@@ -21,6 +21,61 @@ const LANGS = [
 
 const I18N = {
   it: {
+
+    // --- "Usa la tua app": procedura guidata ---
+    sw_title: "Collega {p} con la tua app",
+    sw_step_of: "Passo {n} di {tot}",
+    sw_back: "Indietro",
+    sw_next: "Avanti",
+    sw_finish: "Salva e collega",
+    sw_saving: "Verifica in corso…",
+    sw_open: "Apri la pagina",
+    sw_copy: "Copia",
+    sw_copied: "Copiato ✓",
+    sw_copy_failed: "Non riesco a copiare: seleziona l'indirizzo e copialo a mano.",
+    sw_saved: "Fatto: ora accedi al tuo account.",
+    sw_removed: "La tua app è stata rimossa.",
+    sw_offer: "Non vuoi aspettare? Puoi collegarlo subito registrando una tua app: ti guidiamo passo passo, servono circa 10 minuti.",
+    sw_offer_btn: "Collegalo adesso →",
+    sw_own_active: "Stai usando la tua app ({id}).",
+    sw_own_remove: "Rimuovi",
+    sw_id_label_ig: "ID app Instagram",
+    sw_secret_label_ig: "Chiave segreta app Instagram",
+    sw_id_ph_ig: "1234567890123456",
+    sw_secret_ph_ig: "32 caratteri",
+    sw_id_label_tt: "Client key",
+    sw_secret_label_tt: "Client secret",
+    sw_id_ph_tt: "sbaw…",
+    sw_secret_ph_tt: "incolla il segreto",
+    sw_ig1_t: "Cosa serve",
+    sw_ig1_d: "Registrerai una tua app Instagram: circa 10 minuti, una volta sola.\nServono un account Instagram Professionale (Business o Creator) e un account Facebook per entrare nel pannello sviluppatori.\nLe credenziali restano su questo computer.",
+    sw_ig2_t: "Crea l'app",
+    sw_ig2_d: "Apri il pannello sviluppatori di Meta e premi «Crea app».\nQuando chiede il caso d'uso scegli «Altro», poi come tipo scegli «Business».\nIl nome è libero.",
+    sw_ig3_t: "Aggiungi Instagram",
+    sw_ig3_d: "Nella tua nuova app apri «Aggiungi prodotti», trova «Instagram» e premi «Configura».\nPoi scegli «Configura l'API con il login di Instagram business».",
+    sw_ig4_t: "Incolla l'indirizzo di ritorno",
+    sw_ig4_d: "Nella stessa pagina apri «Impostazioni di login business».\nCopia l'indirizzo qui sotto e incollalo nel campo «URI di reindirizzamento OAuth», poi salva.\nÈ una pagina che esiste già: non devi pubblicare nessun sito.",
+    sw_ig5_t: "Copia le due credenziali",
+    sw_ig5_d: "Sempre in quella pagina, nella sezione delle impostazioni dell'app, trovi «ID app Instagram» e «Chiave segreta app Instagram».\nCopiali qui sotto: è l'ultimo passaggio.",
+    sw_tt1_t: "Cosa serve",
+    sw_tt1_d: "Registrerai una tua app TikTok: circa 10 minuti, una volta sola.\nServe solo il tuo account TikTok.\nLe credenziali restano su questo computer.",
+    sw_tt2_t: "Crea l'app",
+    sw_tt2_d: "Apri il portale sviluppatori di TikTok, accedi con il tuo account e registra una nuova app.\nDalle un nome e conferma.",
+    sw_tt3_t: "Attiva login e permessi",
+    sw_tt3_d: "Nella tua app apri «Add products» e aggiungi «Login Kit».\nTra gli ambiti attiva user.info.basic, user.info.stats e video.list.\nSono di sola lettura: servono a leggere follower e statistiche dei video.",
+    sw_tt4_t: "Crea la sandbox",
+    sw_tt4_d: "Apri «Sandbox» e creane una.\nDentro la sandbox aggiungi il tuo account TikTok come «target user»: è questo che ti permette di leggere i tuoi dati senza attendere la revisione di TikTok.",
+    sw_tt5_t: "Incolla l'indirizzo di ritorno",
+    sw_tt5_d: "Nelle impostazioni del Login Kit copia l'indirizzo qui sotto e incollalo tra i «Redirect URI», poi salva.\nÈ una pagina che esiste già: non devi pubblicare nessun sito.",
+    sw_tt6_t: "Copia le due credenziali",
+    sw_tt6_d: "Nei dettagli dell'app trovi «Client key» e «Client secret» della sandbox.\nCopiali qui sotto: è l'ultimo passaggio.",
+    ownapp_missing: "Compila entrambi i campi.",
+    ownapp_unsupported: "Piattaforma non supportata.",
+    ownapp_bad_ig_id: "L'ID app Instagram è fatto solo di cifre. Controlla di non aver invertito i due campi.",
+    ownapp_bad_ig_secret: "La chiave segreta non sembra completa: copiala per intero, senza spazi.",
+    ownapp_bad_tt_key: "La Client key di TikTok inizia con «aw» o «sbaw». Controlla di non aver invertito i due campi.",
+    ownapp_bad_tt_secret: "Il Client secret non sembra completo: copialo per intero, senza spazi.",
+    ownapp_tt_refused: "TikTok non riconosce queste credenziali. Verifica di aver copiato Client key e Client secret della stessa app.",
     overview_by_platform: "Per piattaforma",
     tile_followers: "Pubblico totale", tile_recent_views: "Views recenti", tile_recent_views_foot: "sugli ultimi contenuti",
     tile_engagement: "Interazioni", tile_engagement_foot: "like + commenti recenti",
@@ -229,6 +284,61 @@ const I18N = {
     strength_labels: "debole,debole,media,buona,ottima",
   },
   en: {
+
+    // --- "Usa la tua app": procedura guidata ---
+    sw_title: "Connect {p} with your own app",
+    sw_step_of: "Step {n} of {tot}",
+    sw_back: "Back",
+    sw_next: "Next",
+    sw_finish: "Save and connect",
+    sw_saving: "Checking…",
+    sw_open: "Open the page",
+    sw_copy: "Copy",
+    sw_copied: "Copied ✓",
+    sw_copy_failed: "Couldn't copy: select the address and copy it manually.",
+    sw_saved: "Done — now sign in to your account.",
+    sw_removed: "Your own app has been removed.",
+    sw_offer: "Don't want to wait? You can connect it right away by registering your own app — we'll guide you step by step, it takes about 10 minutes.",
+    sw_offer_btn: "Connect it now →",
+    sw_own_active: "You're using your own app ({id}).",
+    sw_own_remove: "Remove",
+    sw_id_label_ig: "Instagram app ID",
+    sw_secret_label_ig: "Instagram app secret",
+    sw_id_ph_ig: "1234567890123456",
+    sw_secret_ph_ig: "32 characters",
+    sw_id_label_tt: "Client key",
+    sw_secret_label_tt: "Client secret",
+    sw_id_ph_tt: "sbaw…",
+    sw_secret_ph_tt: "paste the secret",
+    sw_ig1_t: "What you'll need",
+    sw_ig1_d: "You'll register your own Instagram app: about 10 minutes, once only.\nYou need an Instagram Professional account (Business or Creator) and a Facebook account to access the developer dashboard.\nThe credentials stay on this computer.",
+    sw_ig2_t: "Create the app",
+    sw_ig2_d: "Open the Meta developer dashboard and click «Create app».\nWhen asked for the use case pick «Other», then choose «Business» as the type.\nThe name is up to you.",
+    sw_ig3_t: "Add Instagram",
+    sw_ig3_d: "In your new app open «Add products», find «Instagram» and click «Set up».\nThen choose «API setup with Instagram business login».",
+    sw_ig4_t: "Paste the redirect address",
+    sw_ig4_d: "On the same page open «Business login settings».\nCopy the address below and paste it into the «OAuth redirect URI» field, then save.\nThat page already exists — you don't have to publish any website.",
+    sw_ig5_t: "Copy the two credentials",
+    sw_ig5_d: "Still on that page, in the app settings section, you'll find «Instagram app ID» and «Instagram app secret».\nCopy them below — this is the last step.",
+    sw_tt1_t: "What you'll need",
+    sw_tt1_d: "You'll register your own TikTok app: about 10 minutes, once only.\nAll you need is your TikTok account.\nThe credentials stay on this computer.",
+    sw_tt2_t: "Create the app",
+    sw_tt2_d: "Open the TikTok developer portal, sign in with your account and register a new app.\nGive it a name and confirm.",
+    sw_tt3_t: "Enable login and permissions",
+    sw_tt3_d: "In your app open «Add products» and add «Login Kit».\nAmong the scopes enable user.info.basic, user.info.stats and video.list.\nThey are read-only: they let the dashboard read followers and video stats.",
+    sw_tt4_t: "Create the sandbox",
+    sw_tt4_d: "Open «Sandbox» and create one.\nInside it, add your TikTok account as a «target user» — this is what lets you read your own data without waiting for TikTok's review.",
+    sw_tt5_t: "Paste the redirect address",
+    sw_tt5_d: "In the Login Kit settings, copy the address below and paste it among the «Redirect URI» entries, then save.\nThat page already exists — you don't have to publish any website.",
+    sw_tt6_t: "Copy the two credentials",
+    sw_tt6_d: "In the app details you'll find the sandbox «Client key» and «Client secret».\nCopy them below — this is the last step.",
+    ownapp_missing: "Fill in both fields.",
+    ownapp_unsupported: "Platform not supported.",
+    ownapp_bad_ig_id: "The Instagram app ID is digits only. Check you haven't swapped the two fields.",
+    ownapp_bad_ig_secret: "The app secret doesn't look complete: copy all of it, without spaces.",
+    ownapp_bad_tt_key: "The TikTok client key starts with «aw» or «sbaw». Check you haven't swapped the two fields.",
+    ownapp_bad_tt_secret: "The client secret doesn't look complete: copy all of it, without spaces.",
+    ownapp_tt_refused: "TikTok doesn't recognise these credentials. Check that the client key and client secret come from the same app.",
     overview_by_platform: "By platform",
     tile_followers: "Total audience", tile_recent_views: "Recent views", tile_recent_views_foot: "on latest content",
     tile_engagement: "Interactions", tile_engagement_foot: "recent likes + comments",
@@ -437,6 +547,61 @@ const I18N = {
     strength_labels: "weak,weak,fair,good,strong",
   },
   es: {
+
+    // --- "Usa la tua app": procedura guidata ---
+    sw_title: "Conecta {p} con tu propia app",
+    sw_step_of: "Paso {n} de {tot}",
+    sw_back: "Atrás",
+    sw_next: "Siguiente",
+    sw_finish: "Guardar y conectar",
+    sw_saving: "Comprobando…",
+    sw_open: "Abrir la página",
+    sw_copy: "Copiar",
+    sw_copied: "Copiado ✓",
+    sw_copy_failed: "No se pudo copiar: selecciona la dirección y cópiala a mano.",
+    sw_saved: "Listo: ahora inicia sesión en tu cuenta.",
+    sw_removed: "Se ha quitado tu propia app.",
+    sw_offer: "¿No quieres esperar? Puedes conectarlo ya registrando tu propia app: te guiamos paso a paso, son unos 10 minutos.",
+    sw_offer_btn: "Conectarlo ahora →",
+    sw_own_active: "Estás usando tu propia app ({id}).",
+    sw_own_remove: "Quitar",
+    sw_id_label_ig: "ID de la app de Instagram",
+    sw_secret_label_ig: "Clave secreta de la app de Instagram",
+    sw_id_ph_ig: "1234567890123456",
+    sw_secret_ph_ig: "32 caracteres",
+    sw_id_label_tt: "Client key",
+    sw_secret_label_tt: "Client secret",
+    sw_id_ph_tt: "sbaw…",
+    sw_secret_ph_tt: "pega el secreto",
+    sw_ig1_t: "Qué necesitas",
+    sw_ig1_d: "Registrarás tu propia app de Instagram: unos 10 minutos, una sola vez.\nNecesitas una cuenta profesional de Instagram (Business o Creator) y una cuenta de Facebook para entrar en el panel de desarrolladores.\nLas credenciales se quedan en este ordenador.",
+    sw_ig2_t: "Crea la app",
+    sw_ig2_d: "Abre el panel de desarrolladores de Meta y pulsa «Crear app».\nCuando pregunte el caso de uso elige «Otro» y luego «Negocios» como tipo.\nEl nombre es libre.",
+    sw_ig3_t: "Añade Instagram",
+    sw_ig3_d: "En tu nueva app abre «Añadir productos», busca «Instagram» y pulsa «Configurar».\nLuego elige «Configurar la API con el inicio de sesión de Instagram business».",
+    sw_ig4_t: "Pega la dirección de retorno",
+    sw_ig4_d: "En la misma página abre «Configuración de inicio de sesión de negocios».\nCopia la dirección de abajo y pégala en el campo «URI de redireccionamiento de OAuth», luego guarda.\nEsa página ya existe: no tienes que publicar ningún sitio.",
+    sw_ig5_t: "Copia las dos credenciales",
+    sw_ig5_d: "En esa misma página, en la sección de ajustes de la app, encontrarás «ID de la app de Instagram» y «Clave secreta de la app de Instagram».\nCópialos abajo: es el último paso.",
+    sw_tt1_t: "Qué necesitas",
+    sw_tt1_d: "Registrarás tu propia app de TikTok: unos 10 minutos, una sola vez.\nSolo necesitas tu cuenta de TikTok.\nLas credenciales se quedan en este ordenador.",
+    sw_tt2_t: "Crea la app",
+    sw_tt2_d: "Abre el portal de desarrolladores de TikTok, inicia sesión con tu cuenta y registra una nueva app.\nPonle un nombre y confirma.",
+    sw_tt3_t: "Activa el login y los permisos",
+    sw_tt3_d: "En tu app abre «Add products» y añade «Login Kit».\nEntre los ámbitos activa user.info.basic, user.info.stats y video.list.\nSon de solo lectura: sirven para leer seguidores y estadísticas de los vídeos.",
+    sw_tt4_t: "Crea la sandbox",
+    sw_tt4_d: "Abre «Sandbox» y crea una.\nDentro añade tu cuenta de TikTok como «target user»: esto es lo que te permite leer tus datos sin esperar la revisión de TikTok.",
+    sw_tt5_t: "Pega la dirección de retorno",
+    sw_tt5_d: "En los ajustes del Login Kit copia la dirección de abajo y pégala entre los «Redirect URI», luego guarda.\nEsa página ya existe: no tienes que publicar ningún sitio.",
+    sw_tt6_t: "Copia las dos credenciales",
+    sw_tt6_d: "En los detalles de la app encontrarás «Client key» y «Client secret» de la sandbox.\nCópialos abajo: es el último paso.",
+    ownapp_missing: "Rellena ambos campos.",
+    ownapp_unsupported: "Plataforma no compatible.",
+    ownapp_bad_ig_id: "El ID de la app de Instagram son solo dígitos. Comprueba que no hayas invertido los dos campos.",
+    ownapp_bad_ig_secret: "La clave secreta no parece completa: cópiala entera, sin espacios.",
+    ownapp_bad_tt_key: "La client key de TikTok empieza por «aw» o «sbaw». Comprueba que no hayas invertido los dos campos.",
+    ownapp_bad_tt_secret: "El client secret no parece completo: cópialo entero, sin espacios.",
+    ownapp_tt_refused: "TikTok no reconoce estas credenciales. Comprueba que la client key y el client secret sean de la misma app.",
     overview_by_platform: "Por plataforma",
     tile_followers: "Audiencia total", tile_recent_views: "Vistas recientes", tile_recent_views_foot: "en el contenido reciente",
     tile_engagement: "Interacciones", tile_engagement_foot: "me gusta + comentarios recientes",
@@ -645,6 +810,61 @@ const I18N = {
     strength_labels: "débil,débil,media,buena,excelente",
   },
   fr: {
+
+    // --- "Usa la tua app": procedura guidata ---
+    sw_title: "Connecter {p} avec votre propre app",
+    sw_step_of: "Étape {n} sur {tot}",
+    sw_back: "Retour",
+    sw_next: "Suivant",
+    sw_finish: "Enregistrer et connecter",
+    sw_saving: "Vérification…",
+    sw_open: "Ouvrir la page",
+    sw_copy: "Copier",
+    sw_copied: "Copié ✓",
+    sw_copy_failed: "Copie impossible : sélectionnez l'adresse et copiez-la manuellement.",
+    sw_saved: "Terminé : connectez-vous maintenant à votre compte.",
+    sw_removed: "Votre app a été retirée.",
+    sw_offer: "Vous ne voulez pas attendre ? Vous pouvez le connecter tout de suite en enregistrant votre propre app : nous vous guidons pas à pas, environ 10 minutes.",
+    sw_offer_btn: "Le connecter maintenant →",
+    sw_own_active: "Vous utilisez votre propre app ({id}).",
+    sw_own_remove: "Retirer",
+    sw_id_label_ig: "ID de l'app Instagram",
+    sw_secret_label_ig: "Clé secrète de l'app Instagram",
+    sw_id_ph_ig: "1234567890123456",
+    sw_secret_ph_ig: "32 caractères",
+    sw_id_label_tt: "Client key",
+    sw_secret_label_tt: "Client secret",
+    sw_id_ph_tt: "sbaw…",
+    sw_secret_ph_tt: "collez le secret",
+    sw_ig1_t: "Ce qu'il vous faut",
+    sw_ig1_d: "Vous allez enregistrer votre propre app Instagram : environ 10 minutes, une seule fois.\nIl vous faut un compte Instagram professionnel (Business ou Créateur) et un compte Facebook pour accéder au tableau de bord développeur.\nLes identifiants restent sur cet ordinateur.",
+    sw_ig2_t: "Créez l'app",
+    sw_ig2_d: "Ouvrez le tableau de bord développeur Meta et cliquez sur «Créer une app».\nPour le cas d'usage choisissez «Autre», puis «Entreprise» comme type.\nLe nom est libre.",
+    sw_ig3_t: "Ajoutez Instagram",
+    sw_ig3_d: "Dans votre nouvelle app, ouvrez «Ajouter des produits», trouvez «Instagram» et cliquez sur «Configurer».\nChoisissez ensuite «Configuration de l'API avec la connexion Instagram business».",
+    sw_ig4_t: "Collez l'adresse de retour",
+    sw_ig4_d: "Sur la même page, ouvrez «Paramètres de connexion business».\nCopiez l'adresse ci-dessous et collez-la dans le champ «URI de redirection OAuth», puis enregistrez.\nCette page existe déjà : vous n'avez aucun site à publier.",
+    sw_ig5_t: "Copiez les deux identifiants",
+    sw_ig5_d: "Toujours sur cette page, dans la section des paramètres de l'app, vous trouverez «ID de l'app Instagram» et «Clé secrète de l'app Instagram».\nCopiez-les ci-dessous : c'est la dernière étape.",
+    sw_tt1_t: "Ce qu'il vous faut",
+    sw_tt1_d: "Vous allez enregistrer votre propre app TikTok : environ 10 minutes, une seule fois.\nIl vous suffit de votre compte TikTok.\nLes identifiants restent sur cet ordinateur.",
+    sw_tt2_t: "Créez l'app",
+    sw_tt2_d: "Ouvrez le portail développeur TikTok, connectez-vous avec votre compte et enregistrez une nouvelle app.\nDonnez-lui un nom et confirmez.",
+    sw_tt3_t: "Activez la connexion et les permissions",
+    sw_tt3_d: "Dans votre app, ouvrez «Add products» et ajoutez «Login Kit».\nParmi les portées, activez user.info.basic, user.info.stats et video.list.\nElles sont en lecture seule : elles servent à lire les abonnés et les statistiques des vidéos.",
+    sw_tt4_t: "Créez la sandbox",
+    sw_tt4_d: "Ouvrez «Sandbox» et créez-en une.\nÀ l'intérieur, ajoutez votre compte TikTok comme «target user» : c'est ce qui vous permet de lire vos données sans attendre la revue de TikTok.",
+    sw_tt5_t: "Collez l'adresse de retour",
+    sw_tt5_d: "Dans les paramètres du Login Kit, copiez l'adresse ci-dessous et collez-la parmi les «Redirect URI», puis enregistrez.\nCette page existe déjà : vous n'avez aucun site à publier.",
+    sw_tt6_t: "Copiez les deux identifiants",
+    sw_tt6_d: "Dans les détails de l'app, vous trouverez «Client key» et «Client secret» de la sandbox.\nCopiez-les ci-dessous : c'est la dernière étape.",
+    ownapp_missing: "Remplissez les deux champs.",
+    ownapp_unsupported: "Plateforme non prise en charge.",
+    ownapp_bad_ig_id: "L'ID de l'app Instagram ne contient que des chiffres. Vérifiez que vous n'avez pas inversé les deux champs.",
+    ownapp_bad_ig_secret: "La clé secrète semble incomplète : copiez-la en entier, sans espaces.",
+    ownapp_bad_tt_key: "La client key TikTok commence par «aw» ou «sbaw». Vérifiez que vous n'avez pas inversé les deux champs.",
+    ownapp_bad_tt_secret: "Le client secret semble incomplet : copiez-le en entier, sans espaces.",
+    ownapp_tt_refused: "TikTok ne reconnaît pas ces identifiants. Vérifiez que la client key et le client secret proviennent de la même app.",
     overview_by_platform: "Par plateforme",
     tile_followers: "Audience totale", tile_recent_views: "Vues recentes", tile_recent_views_foot: "sur le contenu recent",
     tile_engagement: "Interactions", tile_engagement_foot: "j'aime + commentaires recents",
@@ -853,6 +1073,61 @@ const I18N = {
     strength_labels: "faible,faible,moyen,bon,excellent",
   },
   de: {
+
+    // --- "Usa la tua app": procedura guidata ---
+    sw_title: "{p} mit deiner eigenen App verbinden",
+    sw_step_of: "Schritt {n} von {tot}",
+    sw_back: "Zurück",
+    sw_next: "Weiter",
+    sw_finish: "Speichern und verbinden",
+    sw_saving: "Wird geprüft…",
+    sw_open: "Seite öffnen",
+    sw_copy: "Kopieren",
+    sw_copied: "Kopiert ✓",
+    sw_copy_failed: "Kopieren nicht möglich: Markiere die Adresse und kopiere sie von Hand.",
+    sw_saved: "Fertig — melde dich jetzt bei deinem Konto an.",
+    sw_removed: "Deine eigene App wurde entfernt.",
+    sw_offer: "Du willst nicht warten? Du kannst es sofort verbinden, indem du eine eigene App registrierst — wir führen dich Schritt für Schritt, etwa 10 Minuten.",
+    sw_offer_btn: "Jetzt verbinden →",
+    sw_own_active: "Du verwendest deine eigene App ({id}).",
+    sw_own_remove: "Entfernen",
+    sw_id_label_ig: "Instagram-App-ID",
+    sw_secret_label_ig: "Instagram-App-Geheimnis",
+    sw_id_ph_ig: "1234567890123456",
+    sw_secret_ph_ig: "32 Zeichen",
+    sw_id_label_tt: "Client Key",
+    sw_secret_label_tt: "Client Secret",
+    sw_id_ph_tt: "sbaw…",
+    sw_secret_ph_tt: "Geheimnis einfügen",
+    sw_ig1_t: "Was du brauchst",
+    sw_ig1_d: "Du registrierst deine eigene Instagram-App: etwa 10 Minuten, nur einmal.\nDu brauchst ein professionelles Instagram-Konto (Business oder Creator) und ein Facebook-Konto für das Entwickler-Dashboard.\nDie Zugangsdaten bleiben auf diesem Computer.",
+    sw_ig2_t: "App erstellen",
+    sw_ig2_d: "Öffne das Meta-Entwickler-Dashboard und klicke auf «App erstellen».\nWähle beim Anwendungsfall «Sonstiges» und als Typ «Business».\nDer Name ist frei wählbar.",
+    sw_ig3_t: "Instagram hinzufügen",
+    sw_ig3_d: "Öffne in deiner neuen App «Produkte hinzufügen», suche «Instagram» und klicke auf «Einrichten».\nWähle dann «API-Einrichtung mit Instagram-Business-Login».",
+    sw_ig4_t: "Weiterleitungsadresse einfügen",
+    sw_ig4_d: "Öffne auf derselben Seite «Business-Login-Einstellungen».\nKopiere die Adresse unten und füge sie in das Feld «OAuth-Weiterleitungs-URI» ein, dann speichern.\nDiese Seite existiert bereits — du musst keine Website veröffentlichen.",
+    sw_ig5_t: "Die beiden Zugangsdaten kopieren",
+    sw_ig5_d: "Auf derselben Seite findest du im Bereich der App-Einstellungen «Instagram-App-ID» und «Instagram-App-Geheimnis».\nKopiere sie unten — das ist der letzte Schritt.",
+    sw_tt1_t: "Was du brauchst",
+    sw_tt1_d: "Du registrierst deine eigene TikTok-App: etwa 10 Minuten, nur einmal.\nDu brauchst nur dein TikTok-Konto.\nDie Zugangsdaten bleiben auf diesem Computer.",
+    sw_tt2_t: "App erstellen",
+    sw_tt2_d: "Öffne das TikTok-Entwicklerportal, melde dich mit deinem Konto an und registriere eine neue App.\nGib ihr einen Namen und bestätige.",
+    sw_tt3_t: "Login und Berechtigungen aktivieren",
+    sw_tt3_d: "Öffne in deiner App «Add products» und füge «Login Kit» hinzu.\nAktiviere bei den Scopes user.info.basic, user.info.stats und video.list.\nSie sind nur lesend: Sie dienen dazu, Follower und Videostatistiken zu lesen.",
+    sw_tt4_t: "Sandbox erstellen",
+    sw_tt4_d: "Öffne «Sandbox» und erstelle eine.\nFüge darin dein TikTok-Konto als «target user» hinzu — das erlaubt dir, deine eigenen Daten ohne TikToks Prüfung zu lesen.",
+    sw_tt5_t: "Weiterleitungsadresse einfügen",
+    sw_tt5_d: "Kopiere in den Login-Kit-Einstellungen die Adresse unten und füge sie bei «Redirect URI» ein, dann speichern.\nDiese Seite existiert bereits — du musst keine Website veröffentlichen.",
+    sw_tt6_t: "Die beiden Zugangsdaten kopieren",
+    sw_tt6_d: "In den App-Details findest du «Client key» und «Client secret» der Sandbox.\nKopiere sie unten — das ist der letzte Schritt.",
+    ownapp_missing: "Fülle beide Felder aus.",
+    ownapp_unsupported: "Plattform nicht unterstützt.",
+    ownapp_bad_ig_id: "Die Instagram-App-ID besteht nur aus Ziffern. Prüfe, ob du die beiden Felder vertauscht hast.",
+    ownapp_bad_ig_secret: "Das App-Geheimnis wirkt unvollständig: Kopiere es vollständig, ohne Leerzeichen.",
+    ownapp_bad_tt_key: "Der TikTok-Client-Key beginnt mit «aw» oder «sbaw». Prüfe, ob du die beiden Felder vertauscht hast.",
+    ownapp_bad_tt_secret: "Das Client Secret wirkt unvollständig: Kopiere es vollständig, ohne Leerzeichen.",
+    ownapp_tt_refused: "TikTok erkennt diese Zugangsdaten nicht. Prüfe, ob Client Key und Client Secret aus derselben App stammen.",
     overview_by_platform: "Nach Plattform",
     tile_followers: "Gesamtreichweite", tile_recent_views: "Aktuelle Views", tile_recent_views_foot: "auf den letzten Inhalten",
     tile_engagement: "Interaktionen", tile_engagement_foot: "Likes + Kommentare",
@@ -1061,6 +1336,61 @@ const I18N = {
     strength_labels: "schwach,schwach,mittel,gut,stark",
   },
   ja: {
+
+    // --- "Usa la tua app": procedura guidata ---
+    sw_title: "自分のアプリで{p}を連携",
+    sw_step_of: "ステップ {n}/{tot}",
+    sw_back: "戻る",
+    sw_next: "次へ",
+    sw_finish: "保存して連携",
+    sw_saving: "確認中…",
+    sw_open: "ページを開く",
+    sw_copy: "コピー",
+    sw_copied: "コピーしました ✓",
+    sw_copy_failed: "コピーできません。アドレスを選択して手動でコピーしてください。",
+    sw_saved: "完了しました。アカウントにログインしてください。",
+    sw_removed: "自分のアプリを解除しました。",
+    sw_offer: "待ちたくない場合は、自分のアプリを登録すればすぐに連携できます。手順は画面で案内します（約10分）。",
+    sw_offer_btn: "今すぐ連携 →",
+    sw_own_active: "自分のアプリを使用中です（{id}）。",
+    sw_own_remove: "解除",
+    sw_id_label_ig: "Instagram アプリ ID",
+    sw_secret_label_ig: "Instagram アプリシークレット",
+    sw_id_ph_ig: "1234567890123456",
+    sw_secret_ph_ig: "32文字",
+    sw_id_label_tt: "Client key",
+    sw_secret_label_tt: "Client secret",
+    sw_id_ph_tt: "sbaw…",
+    sw_secret_ph_tt: "シークレットを貼り付け",
+    sw_ig1_t: "必要なもの",
+    sw_ig1_d: "自分の Instagram アプリを登録します（約10分、初回のみ）。\nInstagram のプロアカウント（ビジネスまたはクリエイター）と、開発者ダッシュボードに入るための Facebook アカウントが必要です。\n認証情報はこのパソコンに保存されます。",
+    sw_ig2_t: "アプリを作成",
+    sw_ig2_d: "Meta の開発者ダッシュボードを開き、「アプリを作成」を押します。\nユースケースは「その他」、タイプは「ビジネス」を選んでください。\n名前は自由です。",
+    sw_ig3_t: "Instagram を追加",
+    sw_ig3_d: "新しいアプリで「プロダクトを追加」を開き、「Instagram」を選んで「設定」を押します。\n次に「Instagram ビジネスログインで API を設定」を選びます。",
+    sw_ig4_t: "リダイレクト先を貼り付け",
+    sw_ig4_d: "同じページで「ビジネスログイン設定」を開きます。\n下のアドレスをコピーして「OAuth リダイレクト URI」欄に貼り付け、保存してください。\nこのページは既に存在します。サイトを公開する必要はありません。",
+    sw_ig5_t: "2つの認証情報をコピー",
+    sw_ig5_d: "同じページのアプリ設定欄に「Instagram アプリ ID」と「Instagram アプリシークレット」があります。\n下に貼り付けてください。これが最後の手順です。",
+    sw_tt1_t: "必要なもの",
+    sw_tt1_d: "自分の TikTok アプリを登録します（約10分、初回のみ）。\n必要なのは TikTok アカウントだけです。\n認証情報はこのパソコンに保存されます。",
+    sw_tt2_t: "アプリを作成",
+    sw_tt2_d: "TikTok の開発者ポータルを開き、アカウントでログインして新しいアプリを登録します。\n名前を付けて確定してください。",
+    sw_tt3_t: "ログインと権限を有効化",
+    sw_tt3_d: "アプリで「Add products」を開き、「Login Kit」を追加します。\nスコープで user.info.basic、user.info.stats、video.list を有効にします。\nいずれも読み取り専用で、フォロワー数と動画の統計を読むために使います。",
+    sw_tt4_t: "サンドボックスを作成",
+    sw_tt4_d: "「Sandbox」を開いて1つ作成します。\nその中に自分の TikTok アカウントを「target user」として追加します。これにより、TikTok の審査を待たずに自分のデータを読めます。",
+    sw_tt5_t: "リダイレクト先を貼り付け",
+    sw_tt5_d: "Login Kit の設定で、下のアドレスをコピーして「Redirect URI」に貼り付け、保存してください。\nこのページは既に存在します。サイトを公開する必要はありません。",
+    sw_tt6_t: "2つの認証情報をコピー",
+    sw_tt6_d: "アプリ詳細にサンドボックスの「Client key」と「Client secret」があります。\n下に貼り付けてください。これが最後の手順です。",
+    ownapp_missing: "両方の項目を入力してください。",
+    ownapp_unsupported: "対応していないプラットフォームです。",
+    ownapp_bad_ig_id: "Instagram アプリ ID は数字のみです。2つの項目を入れ替えていないか確認してください。",
+    ownapp_bad_ig_secret: "シークレットが不完全のようです。空白を含めず全体をコピーしてください。",
+    ownapp_bad_tt_key: "TikTok の Client key は「aw」または「sbaw」で始まります。2つの項目を入れ替えていないか確認してください。",
+    ownapp_bad_tt_secret: "Client secret が不完全のようです。空白を含めず全体をコピーしてください。",
+    ownapp_tt_refused: "TikTok がこの認証情報を認識できません。Client key と Client secret が同じアプリのものか確認してください。",
     overview_by_platform: "\u30d7\u30e9\u30c3\u30c8\u30d5\u30a9\u30fc\u30e0\u5225",
     tile_followers: "\u7dcf\u30d5\u30a9\u30ed\u30ef\u30fc", tile_recent_views: "\u6700\u8fd1\u306e\u518d\u751f\u6570", tile_recent_views_foot: "\u76f4\u8fd1\u306e\u30b3\u30f3\u30c6\u30f3\u30c4",
     tile_engagement: "\u30a8\u30f3\u30b2\u30fc\u30b8\u30e1\u30f3\u30c8", tile_engagement_foot: "\u76f4\u8fd1\u306e\u3044\u3044\u306d\u3068\u30b3\u30e1\u30f3\u30c8",
@@ -2087,6 +2417,21 @@ function openConnectModal(platform) {
   // non deve capire dal solo aspetto che non fara' nulla finche' non ci clicca.
   document.getElementById("cm-comingsoon-label").textContent = t("connect_now", { p: meta.name });
   document.getElementById("cm-comingsoon-msg").classList.add("hidden");
+  // L'alternativa "usa la tua app" resta nascosta finche' non si scopre che
+  // la piattaforma non e' ancora pronta: proporla prima vorrebbe dire
+  // chiedere dieci minuti di configurazione a chi puo' evitarli.
+  document.getElementById("cm-ownapp-offer").classList.add("hidden");
+
+  // Chi ha gia' registrato la propria app deve poterlo vedere e disfare.
+  const own = connectionsData?.own_app?.[platform];
+  const ownActive = !!own?.configured;
+  document.getElementById("cm-ownapp-active").classList.toggle("hidden", !ownActive);
+  if (ownActive) {
+    document.getElementById("cm-ownapp-active-text").textContent =
+      t("sw_own_active", { id: own.client_id_hint });
+    document.getElementById("cm-ownapp-remove").textContent = t("sw_own_remove");
+  }
+
   document.getElementById("cm-paste").value = "";
   cmError("");
 
@@ -2120,6 +2465,9 @@ document.getElementById("cm-comingsoon-btn").addEventListener("click", async e =
   await sleep(1200);
   msg.textContent = t("cm_coming_soon_text");
   msg.classList.remove("hidden");
+  // Solo ora si offre la scorciatoia: il cliente ha appena scoperto che
+  // deve aspettare, ed e' il momento in cui gli serve saperlo.
+  document.getElementById("cm-ownapp-offer").classList.remove("hidden");
   btn.disabled = false;
   btn.innerHTML = original;
 });
@@ -2170,6 +2518,205 @@ document.querySelectorAll("[data-link-platform]").forEach(btn => {
 
 document.addEventListener("keydown", e => {
   if (e.key === "Escape" && !connectModal.classList.contains("hidden")) closeConnectModal();
+});
+
+
+// ---------- "Usa la tua app": procedura guidata ----------
+//
+// Instagram e TikTok non chiedono nessuna revisione a chi collega l'account
+// con cui ha registrato l'app. Registrarne una richiede pero' di muoversi in
+// due pannelli per sviluppatori pieni di opzioni che non c'entrano: qui il
+// percorso e' ridotto a un passo alla volta, con il pulsante che apre la
+// pagina giusta e il valore da incollare gia' pronto negli appunti.
+//
+// `open` apre una pagina, `copy` mostra un valore da copiare, `fields` e'
+// l'ultimo passo con le due credenziali. Il testo di ogni passo vive nelle
+// traduzioni come sw_<chiave>_t (titolo) e sw_<chiave>_d (descrizione).
+const SETUP_STEPS = {
+  instagram: [
+    { k: "ig1" },
+    { k: "ig2", open: "https://developers.facebook.com/apps/" },
+    { k: "ig3" },
+    { k: "ig4", copy: true },
+    { k: "ig5", fields: true },
+  ],
+  tiktok: [
+    { k: "tt1" },
+    { k: "tt2", open: "https://developers.tiktok.com/apps" },
+    { k: "tt3" },
+    { k: "tt4" },
+    { k: "tt5", copy: true },
+    { k: "tt6", fields: true },
+  ],
+};
+
+const setupModal = document.getElementById("setup-modal");
+let swPlatform = null;
+let swIndex = 0;
+
+function swSteps() { return SETUP_STEPS[swPlatform] || []; }
+
+function openSetup(platform) {
+  if (!SETUP_STEPS[platform]) return;
+  swPlatform = platform;
+  swIndex = 0;
+  document.getElementById("sw-id").value = "";
+  document.getElementById("sw-secret").value = "";
+  closeConnectModal();
+  setupModal.classList.remove("hidden");
+  renderSetup();
+}
+
+function closeSetup() { setupModal.classList.add("hidden"); }
+
+function swError(message) {
+  const box = document.getElementById("sw-error");
+  box.textContent = message || "";
+  box.classList.toggle("hidden", !message);
+}
+
+function renderSetup() {
+  const steps = swSteps();
+  const step = steps[swIndex];
+  if (!step) return;
+  const meta = CONNECT_META[swPlatform] || { name: swPlatform, ico: "◎" };
+  const isLast = swIndex === steps.length - 1;
+
+  document.getElementById("sw-logo").textContent = meta.ico;
+  document.getElementById("sw-title").textContent = t("sw_title", { p: meta.name });
+  document.getElementById("sw-counter").textContent =
+    t("sw_step_of", { n: swIndex + 1, tot: steps.length });
+  document.getElementById("sw-progress-bar").style.width =
+    `${((swIndex + 1) / steps.length) * 100}%`;
+
+  document.getElementById("sw-step-title").textContent = t(`sw_${step.k}_t`);
+  document.getElementById("sw-step-text").textContent = t(`sw_${step.k}_d`);
+
+  const openBtn = document.getElementById("sw-open");
+  openBtn.classList.toggle("hidden", !step.open);
+
+  document.getElementById("sw-copy-row").classList.toggle("hidden", !step.copy);
+  if (step.copy) {
+    document.getElementById("sw-copy-value").textContent = swRedirectUri();
+    document.getElementById("sw-copy-btn").textContent = t("sw_copy");
+  }
+
+  document.getElementById("sw-fields").classList.toggle("hidden", !step.fields);
+  if (step.fields) {
+    const suffix = swPlatform === "instagram" ? "ig" : "tt";
+    document.getElementById("sw-id-label").textContent = t(`sw_id_label_${suffix}`);
+    document.getElementById("sw-secret-label").textContent = t(`sw_secret_label_${suffix}`);
+    document.getElementById("sw-id").placeholder = t(`sw_id_ph_${suffix}`);
+    document.getElementById("sw-secret").placeholder = t(`sw_secret_ph_${suffix}`);
+  }
+
+  const back = document.getElementById("sw-back");
+  back.textContent = t("sw_back");
+  back.disabled = swIndex === 0;
+  document.getElementById("sw-next").textContent = isLast ? t("sw_finish") : t("sw_next");
+  swError("");
+}
+
+function swRedirectUri() {
+  return connectionsData?.own_app?.[swPlatform]?.redirect_uri || "";
+}
+
+// Gli appunti passano da navigator.clipboard quando c'e', ma questo valore
+// e' il punto in cui la procedura si spezzerebbe se non funzionasse: senza
+// il ripiego, chi non puo' copiare dovrebbe trascrivere a mano un URL lungo.
+async function swCopy(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch (e) { /* si prova sotto */ }
+  try {
+    const area = document.createElement("textarea");
+    area.value = text;
+    area.style.position = "fixed";
+    area.style.opacity = "0";
+    document.body.appendChild(area);
+    area.select();
+    const ok = document.execCommand("copy");
+    document.body.removeChild(area);
+    return ok;
+  } catch (e) {
+    return false;
+  }
+}
+
+document.getElementById("setup-close").addEventListener("click", closeSetup);
+setupModal.addEventListener("click", e => { if (e.target === setupModal) closeSetup(); });
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape" && !setupModal.classList.contains("hidden")) closeSetup();
+});
+
+document.getElementById("sw-open").addEventListener("click", () => {
+  const step = swSteps()[swIndex];
+  if (step?.open) { window.open(step.open, "_blank"); toast(t("connect_browser_opened")); }
+});
+
+document.getElementById("sw-copy-btn").addEventListener("click", async e => {
+  const btn = e.currentTarget;
+  const ok = await swCopy(swRedirectUri());
+  if (!ok) { swError(t("sw_copy_failed")); return; }
+  btn.textContent = t("sw_copied");
+  setTimeout(() => { btn.textContent = t("sw_copy"); }, 1600);
+});
+
+document.getElementById("sw-back").addEventListener("click", () => {
+  if (swIndex > 0) { swIndex--; renderSetup(); }
+});
+
+document.getElementById("sw-next").addEventListener("click", async e => {
+  const steps = swSteps();
+  if (swIndex < steps.length - 1) { swIndex++; renderSetup(); return; }
+
+  // Ultimo passo: si salva, e se le credenziali reggono si prosegue dritti
+  // al collegamento vero senza far ricominciare da capo.
+  const btn = e.currentTarget;
+  const platform = swPlatform;
+  const clientId = document.getElementById("sw-id").value.trim();
+  const clientSecret = document.getElementById("sw-secret").value.trim();
+  if (!clientId || !clientSecret) { swError(t("ownapp_missing")); return; }
+
+  btn.disabled = true;
+  btn.textContent = t("sw_saving");
+  swError("");
+  try {
+    const resp = await (await fetch(`/api/own-app/${platform}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ client_id: clientId, client_secret: clientSecret }),
+    })).json();
+    if (!resp.ok) { swError(tServer(resp.message)); return; }
+
+    toast(t("sw_saved"), "ok");
+    closeSetup();
+    await loadConnections();
+    openConnectModal(platform);
+    // La piattaforma ora e' collegabile davvero: si avvia subito il login,
+    // che e' quello per cui il cliente ha fatto tutti questi passaggi.
+    const auto = document.getElementById("cm-auto-btn");
+    if (!document.getElementById("cm-auto").classList.contains("hidden")) auto.click();
+  } catch (err) {
+    swError(String(err));
+  } finally {
+    // Solo il pulsante torna com'era. Ridisegnare il passo cancellerebbe il
+    // messaggio d'errore appena scritto, e il cliente si ritroverebbe con le
+    // credenziali rifiutate senza sapere quale dei due campi rivedere.
+    btn.disabled = false;
+    btn.textContent = t("sw_finish");
+  }
+});
+
+document.getElementById("cm-ownapp-start").addEventListener("click", () => openSetup(cmPlatform));
+
+document.getElementById("cm-ownapp-remove").addEventListener("click", async () => {
+  const platform = cmPlatform;
+  await fetch(`/api/own-app/${platform}`, { method: "DELETE" });
+  toast(t("sw_removed"));
+  await loadConnections();
+  openConnectModal(platform);
 });
 
 async function startGuided(platform, btn) {
