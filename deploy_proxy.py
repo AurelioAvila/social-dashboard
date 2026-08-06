@@ -17,6 +17,11 @@ Le chiavi di Stripe non stanno in brand.py (non devono nemmeno sfiorare il
 repository o la build): si caricano a parte, una volta sola, con
 
     python deploy_proxy.py --stripe
+
+Stessa cosa per la chiave di Resend (manda l'email con la chiave di
+licenza):
+
+    python deploy_proxy.py --resend
 """
 import re
 import subprocess
@@ -135,12 +140,47 @@ def push_stripe_keys() -> int:
     return 0
 
 
+def push_resend_key() -> int:
+    """Carica la chiave API di Resend: senza questa, la chiave di licenza
+    resta visibile solo sulla pagina di atterraggio dopo il pagamento, con
+    nessuna copia di riserva se il cliente chiude la scheda troppo presto."""
+    import getpass
+
+    print("Chiave API di Resend (resend.com/api-keys).")
+    print("Non verra' salvata su questo computer: va direttamente al Worker.\n")
+
+    value = getpass.getpass("Resend API key (inizia con re_): ").strip()
+    if not value:
+        print("  RESEND_API_KEY: saltato (vuoto)")
+        return 0
+
+    res = subprocess.run(
+        ["npx", "wrangler", "secret", "put", "RESEND_API_KEY"],
+        cwd=PROXY_DIR, input=value, text=True, capture_output=True, shell=True,
+        encoding="utf-8", errors="replace",
+    )
+    print(f"  RESEND_API_KEY: {'caricata' if res.returncode == 0 else 'ERRORE'}")
+    if res.returncode != 0:
+        print((res.stderr or "")[-300:])
+        return 1
+
+    print("\nFatto. Il dominio mittente (licenses@mail.getcertsprint.com) deve")
+    print("essere verificato su resend.com/domains prima che le email partano.")
+    return 0
+
+
 def main() -> int:
     if "--stripe" in sys.argv:
         if not check_login():
             print("Non sei autenticato su Cloudflare. Esegui prima: wrangler login")
             return 1
         return push_stripe_keys()
+
+    if "--resend" in sys.argv:
+        if not check_login():
+            print("Non sei autenticato su Cloudflare. Esegui prima: wrangler login")
+            return 1
+        return push_resend_key()
 
     if not check_login():
         print("Non sei autenticato su Cloudflare.\n"

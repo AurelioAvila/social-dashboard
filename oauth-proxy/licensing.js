@@ -9,12 +9,22 @@
  * Flusso:
  *   1. l'app chiede POST /checkout        -> URL di pagamento Stripe
  *   2. il cliente paga sulla pagina Stripe
- *   3. Stripe chiama POST /stripe/webhook -> qui si emette la chiave
+ *   3. Stripe chiama POST /stripe/webhook -> qui si emette la chiave e si
+ *      manda l'email con Resend
  *   4. il cliente atterra su GET /license/claim -> vede la sua chiave
  *   5. l'app chiama POST /license/verify  -> sblocca il piano
  *
  * Le chiavi vivono in KV (namespace LICENSES), indicizzate sia per chiave
  * sia per session_id di Stripe (serve al passo 4).
+ *
+ * L'email non è un extra: la pagina del passo 4 è raggiunta solo se il
+ * browser del cliente resta aperto fino al redirect di Stripe. Chiudere la
+ * scheda un attimo troppo presto, o un problema di rete in quel momento,
+ * e la chiave sarebbe persa senza un secondo modo per recuperarla. Un
+ * fallimento dell'invio non deve pero' bloccare l'emissione della chiave
+ * ne' far ripetere il webhook a Stripe: si prova, si annota se e' andata,
+ * e la pagina di atterraggio lo dice onestamente invece di promettere una
+ * ricevuta Stripe che non conterra' mai la chiave.
  */
 
 const JSON_HEADERS = { 'content-type': 'application/json' };
@@ -143,6 +153,52 @@ export async function createCheckout(env, body) {
   return json({ url: data.url });
 }
 
+// Da qui parte l'email della chiave. Un sottodominio dedicato invece del
+// dominio principale di getcertsprint.com: se la reputazione di invio
+// peggiorasse (bounce, spam) non si porterebbe dietro l'altro prodotto.
+const LICENSE_FROM = 'Social Dashboard <licenses@mail.getcertsprint.com>';
+
+function licenseEmailHtml(plan, key) {
+  const planName = PLANS[plan]?.name || plan;
+  return `<!doctype html><html><body style="margin:0;background:#0f1115;color:#e8eaf0;font:15px/1.55 system-ui,-apple-system,Segoe UI,sans-serif;padding:32px 16px">
+<div style="max-width:480px;margin:0 auto;background:#171a21;border:1px solid #262b36;border-radius:16px;padding:28px">
+<h1 style="font-size:18px;margin:0 0 6px">Payment complete</h1>
+<p style="color:#9aa3b2;font-size:13.5px;margin:0 0 18px">Your ${planName} license for Social Dashboard is ready.</p>
+<div style="font:700 19px/1.4 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.04em;background:#0f1115;border:1px solid #3a4152;border-radius:12px;padding:14px;word-break:break-all;margin-bottom:16px">${key}</div>
+<p style="color:#6f7787;font-size:12.5px;margin:0">Paste this key into Social Dashboard under <strong>Your account</strong> to activate ${planName}. Keep this email — it's the only copy sent to you.</p>
+</div></body></html>`;
+}
+
+/** Manda la chiave via Resend. Non solleva mai: un fallimento qui non deve
+ *  far fallire il webhook (Stripe lo ripeterebbe) ne' impedire che la
+ *  chiave esista comunque, raggiungibile dalla pagina di atterraggio. */
+async function sendLicenseEmail(env, to, plan, key) {
+  if (!env.RESEND_API_KEY || !to) return false;
+  try {
+    const resp = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        authorization: `Bearer ${env.RESEND_API_KEY}`,
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: LICENSE_FROM,
+        to,
+        subject: 'Your Social Dashboard license key',
+        html: licenseEmailHtml(plan, key),
+      }),
+    });
+    if (!resp.ok) {
+      console.log('resend send failed', resp.status, (await resp.text()).slice(0, 300));
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.log('resend send threw', String(err).slice(0, 300));
+    return false;
+  }
+}
+
 /** Stripe conferma il pagamento: qui nasce la licenza. */
 export async function handleWebhook(env, request) {
   const raw = await request.text();
@@ -161,15 +217,20 @@ export async function handleWebhook(env, request) {
     if (!PLANS[plan]) return json({ received: true });
 
     const key = newLicenseKey(plan);
+    const email = obj.customer_email || obj.customer_details?.email || '';
     const record = {
       key,
       plan,
-      email: obj.customer_email || obj.customer_details?.email || '',
+      email,
       customer: obj.customer || '',
       subscription: obj.subscription || '',
       status: 'active',
       issued_at: Date.now(),
+      email_sent: false,
     };
+    if (email) {
+      record.email_sent = await sendLicenseEmail(env, email, plan, key);
+    }
     await env.LICENSES.put(`key:${key}`, JSON.stringify(record));
     // Indice per session_id: serve alla pagina che mostra la chiave al
     // cliente subito dopo il pagamento.
@@ -251,18 +312,26 @@ export async function claimPage(env, url) {
       `<!doctype html><meta charset="utf-8"><meta http-equiv="refresh" content="2">
 <title>Activating…</title><style>body{margin:0;min-height:100vh;display:flex;align-items:center;
 justify-content:center;background:#0f1115;color:#e8eaf0;font:16px system-ui}</style>
-<div>Activating your licence…</div>`,
+<div>Activating your license…</div>`,
       { headers: { 'content-type': 'text/html; charset=utf-8' } }
     );
   }
 
+  // Lo stato dell'invio e' quello vero, registrato dal webhook: non si
+  // promette una copia via email se non e' partita davvero (niente email
+  // fornita a Stripe, Resend non configurato, o l'invio e' fallito).
+  const rec = await env.LICENSES.get(`key:${key}`, 'json');
+  const hint = rec?.email_sent
+    ? `A copy was also emailed to ${rec.email}.`
+    : 'This is the only copy of your key — no email is sent, so keep it somewhere safe before leaving this page.';
+
   return page(
-    'Your licence key',
+    'Your license key',
     `<h1>Payment complete</h1>
 <p>Copy this key and paste it into Social Dashboard under <strong>Your account</strong>.</p>
 <div class="key" id="k">${key}</div>
 <button onclick="navigator.clipboard.writeText(document.getElementById('k').textContent.trim());this.textContent='Copied'">Copy key</button>
-<div class="hint">Keep this key: it is also in your Stripe receipt email.</div>`
+<div class="hint">${hint}</div>`
   );
 }
 

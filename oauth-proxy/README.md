@@ -41,6 +41,28 @@ https://<il-tuo-worker>.workers.dev/stripe/webhook
 con gli eventi `checkout.session.completed`, `customer.subscription.deleted`
 e `invoice.payment_failed`.
 
+### Configurare l'email della chiave
+
+La pagina `/license/claim` è raggiunta solo se il browser del cliente resta
+aperto fino al redirect di Stripe: senza una copia via email, chiudere la
+scheda un attimo troppo presto significa perdere la chiave per sempre. Con
+[Resend](https://resend.com) (gratis fino a 3.000 email/mese):
+
+1. crea un account su resend.com
+2. in **Domains**, aggiungi il sottodominio mittente (qui:
+   `mail.getcertsprint.com`) e aggiungi su quel dominio i record DNS che
+   Resend mostra (SPF, DKIM, DMARC) — senza quelli le email finiscono in spam
+3. in **API Keys**, crea una chiave
+4. caricala sul Worker:
+
+```bash
+python deploy_proxy.py --resend
+```
+
+Senza questa chiave l'app funziona lo stesso: la chiave resta comunque
+raggiungibile dalla pagina di atterraggio, semplicemente senza una copia di
+riserva via email.
+
 ### Revoca
 
 Un rimborso o una disdetta arrivano via webhook e la licenza passa a

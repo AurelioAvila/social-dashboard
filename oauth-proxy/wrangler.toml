@@ -10,6 +10,7 @@ compatibility_date = "2026-08-04"
 #   TIKTOK_CLIENT_SECRET
 #   STRIPE_SECRET_KEY       (crea le sessioni di pagamento)
 #   STRIPE_WEBHOOK_SECRET   (verifica che il pagamento arrivi davvero da Stripe)
+#   RESEND_API_KEY          (manda la chiave di licenza via email)
 
 # URL pubblico del Worker: serve a costruire i link di ritorno dopo il
 # pagamento. Non e' un segreto, quindi puo' stare qui.
