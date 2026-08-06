@@ -134,6 +134,11 @@ export async function createCheckout(env, body) {
     // La chiave si riscuote da qui: la pagina la mostra grande e copiabile.
     success_url: `${self}/license/claim?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${self}/license/cancelled`,
+    // Mostra il campo "codice promozionale" nella pagina di pagamento di
+    // Stripe. Senza questo, un promotion code creato sul dashboard non ha
+    // nessun posto dove essere digitato: la sessione lo rifiuterebbe anche
+    // se il codice esiste ed e' valido.
+    allow_promotion_codes: 'true',
   });
   if (body.email) form.set('customer_email', body.email);
 
