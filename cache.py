@@ -105,6 +105,31 @@ def latest_snapshot(platform: str) -> dict | None:
     return {"fetched_at": row[0], **json.loads(row[1])}
 
 
+def clear_snapshot(platform: str) -> None:
+    """Cancella tutto lo storico salvato di una piattaforma - non solo
+    l'ultimo snapshot. Serve quando non resta piu' nessun account collegato:
+    senza questo, Overview continuerebbe a mostrare i numeri dell'ultimo
+    account scollegato finche' l'utente non preme Refresh a mano, il che
+    sembra un dato reale invece che una cache mai svuotata."""
+    conn = _conn()
+    conn.execute("DELETE FROM snapshots WHERE platform = ?", (platform,))
+    conn.commit()
+    conn.close()
+
+
+def clear_all() -> None:
+    """Svuota tutto cio' che e' ricalcolabile con un refresh: snapshot,
+    osservazioni, cache generica. Non tocca connessioni, licenza o le app
+    proprie del cliente - quelle sono configurazione, non cache, e cancellarle
+    per sbaglio da un pulsante "pulisci cache" sarebbe una sorpresa brutta."""
+    conn = _conn()
+    conn.execute("DELETE FROM snapshots")
+    conn.execute("DELETE FROM insights")
+    conn.execute("DELETE FROM kv_cache")
+    conn.commit()
+    conn.close()
+
+
 def history(platform: str, limit: int = 30) -> list[dict]:
     conn = _conn()
     rows = conn.execute(

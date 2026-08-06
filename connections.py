@@ -120,9 +120,17 @@ def save_connection(platform: str, account_name: str, account_id: str, data: dic
 
 def delete_connection(connection_id: int) -> None:
     conn = _conn()
+    row = conn.execute("SELECT platform FROM connections WHERE id = ?", (connection_id,)).fetchone()
     conn.execute("DELETE FROM connections WHERE id = ?", (connection_id,))
     conn.commit()
     conn.close()
+
+    # Se non resta piu' nessun account di questa piattaforma, i numeri
+    # visti l'ultima volta non sono piu' di nessuno: senza questo restavano
+    # in cache e la dashboard continuava a mostrarli come se fossero
+    # ancora veri, finche' l'utente non premeva Refresh a mano.
+    if row and not list_connections(row[0]):
+        cache.clear_snapshot(row[0])
 
 
 def _google_client() -> tuple[str, str] | None:

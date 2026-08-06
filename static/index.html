@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>Social Dashboard</title>
-<link rel="stylesheet" href="style.css?v=1.2.6">
+<link rel="stylesheet" href="style.css?v=1.2.7">
 </head>
 <body>
 <div class="app">
@@ -326,6 +326,21 @@
           <button class="btn-ghost" id="licence-remove" data-i18n="licence_remove">Remove</button>
         </div>
       </div>
+
+      <!-- Svuota solo cio' che si ricalcola da solo (statistiche, storico,
+           osservazioni): non tocca account collegati, licenza o app proprie.
+           Serve per i casi in cui un numero sembra sbagliato e riavviare
+           l'app non basta - piu' raro dopo il fix che pulisce da sola la
+           cache quando si scollega l'ultimo account di una piattaforma, ma
+           utile comunque per un dubbio o per liberare spazio. -->
+      <div class="licence-box">
+        <div class="licence-head">
+          <h2 data-i18n="cache_title">Cached data</h2>
+        </div>
+        <p class="muted" data-i18n="cache_hint">If a number looks wrong even after Refresh, clearing the local cache forces the dashboard to recompute everything from scratch. Your linked accounts and license stay untouched.</p>
+        <button class="btn-ghost" id="cache-clear" data-i18n="cache_clear_btn">Clear cached data</button>
+        <div class="licence-msg hidden" id="cache-msg"></div>
+      </div>
     </section>
 
     <!-- ---------------- Piani ---------------- -->
@@ -468,6 +483,6 @@
 
 <div class="toasts" id="toasts"></div>
 
-<script src="app.js?v=1.2.6"></script>
+<script src="app.js?v=1.2.7"></script>
 </body>
 </html>

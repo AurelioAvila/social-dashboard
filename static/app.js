@@ -22,6 +22,13 @@ const LANGS = [
 const I18N = {
   it: {
 
+    // --- Dati in cache ---
+    cache_title: "Dati in cache",
+    cache_hint: "Se un numero sembra sbagliato anche dopo aver aggiornato, svuotare la cache locale forza la dashboard a ricalcolare tutto da zero. Gli account collegati e la licenza restano intatti.",
+    cache_clear_btn: "Svuota cache",
+    cache_confirm: "Le statistiche e lo storico salvati verranno ricalcolati dal prossimo aggiornamento. Continuare?",
+    cache_cleared: "Cache svuotata.",
+
     // --- Controllo aggiornamenti ---
     update_available: "Aggiornamento disponibile",
     update_available_v: "Versione {v} disponibile",
@@ -290,6 +297,13 @@ const I18N = {
   },
   en: {
 
+    // --- Dati in cache ---
+    cache_title: "Cached data",
+    cache_hint: "If a number looks wrong even after Refresh, clearing the local cache forces the dashboard to recompute everything from scratch. Your linked accounts and license stay untouched.",
+    cache_clear_btn: "Clear cached data",
+    cache_confirm: "Saved stats and history will be recomputed from the next refresh. Continue?",
+    cache_cleared: "Cache cleared.",
+
     // --- Controllo aggiornamenti ---
     update_available: "Update available",
     update_available_v: "Version {v} available",
@@ -537,26 +551,33 @@ const I18N = {
     checkout_unavailable: "The payment service can't be reached. Try again shortly.",
     plan_unknown: "Invalid plan.",
     checkout_opened: "I've opened the payment page in your browser.",
-    licence_title: "Licence",
+    licence_title: "License",
     licence_hint: "Bought Pro or Studio? Paste the key you received after payment.",
     licence_placeholder: "SD-PRO-XXXX-XXXX-XXXX-XXXX",
     licence_activate: "Activate", licence_remove: "Remove",
     licence_state_free: "Free plan", licence_state_active: "{p} active",
-    licence_state_expired: "Licence needs checking",
-    licence_state_revoked: "Licence inactive",
+    licence_state_expired: "License needs checking",
+    licence_state_revoked: "License inactive",
     licence_revoked_note: "This subscription is no longer active. If you think this is a mistake, contact support.",
-    licence_active_on: "Licence active ({k})",
-    licence_recheck_failed: "We can't verify your licence right now. Check your connection — your plan stays active for a few more days.",
-    licence_enter_key: "Enter your licence key.",
-    licence_activated: "{p} activated!", licence_removed: "Licence removed from this computer.",
-    license_missing: "Enter your licence key.",
+    licence_active_on: "License active ({k})",
+    licence_recheck_failed: "We can't verify your license right now. Check your connection — your plan stays active for a few more days.",
+    licence_enter_key: "Enter your license key.",
+    licence_activated: "{p} activated!", licence_removed: "License removed from this computer.",
+    license_missing: "Enter your license key.",
     license_not_found: "Invalid key. Check that you copied all of it.",
-    license_inactive: "This licence is no longer active. If your subscription is current, contact support.",
+    license_inactive: "This license is no longer active. If your subscription is current, contact support.",
     license_service_unavailable: "We can't reach the verification service. Check your connection and try again.",
     palette_placeholder: "Go to…", palette_empty: "No results.",
     strength_labels: "weak,weak,fair,good,strong",
   },
   es: {
+
+    // --- Dati in cache ---
+    cache_title: "Datos en caché",
+    cache_hint: "Si un número parece incorrecto incluso después de actualizar, vaciar la caché local obliga al panel a recalcular todo desde cero. Tus cuentas vinculadas y tu licencia no se ven afectadas.",
+    cache_clear_btn: "Vaciar caché",
+    cache_confirm: "Las estadísticas y el historial guardados se recalcularán en la próxima actualización. ¿Continuar?",
+    cache_cleared: "Caché vaciada.",
 
     // --- Controllo aggiornamenti ---
     update_available: "Actualización disponible",
@@ -826,6 +847,13 @@ const I18N = {
   },
   fr: {
 
+    // --- Dati in cache ---
+    cache_title: "Données en cache",
+    cache_hint: "Si un chiffre semble faux même après actualisation, vider le cache local force le tableau de bord à tout recalculer depuis zéro. Vos comptes liés et votre licence restent intacts.",
+    cache_clear_btn: "Vider le cache",
+    cache_confirm: "Les statistiques et l'historique enregistrés seront recalculés à la prochaine actualisation. Continuer ?",
+    cache_cleared: "Cache vidé.",
+
     // --- Controllo aggiornamenti ---
     update_available: "Mise à jour disponible",
     update_available_v: "Version {v} disponible",
@@ -1094,6 +1122,13 @@ const I18N = {
   },
   de: {
 
+    // --- Dati in cache ---
+    cache_title: "Zwischengespeicherte Daten",
+    cache_hint: "Wenn eine Zahl auch nach dem Aktualisieren falsch erscheint, erzwingt das Leeren des lokalen Caches eine komplette Neuberechnung. Deine verknüpften Konten und deine Lizenz bleiben unberührt.",
+    cache_clear_btn: "Cache leeren",
+    cache_confirm: "Gespeicherte Statistiken und der Verlauf werden bei der nächsten Aktualisierung neu berechnet. Fortfahren?",
+    cache_cleared: "Cache geleert.",
+
     // --- Controllo aggiornamenti ---
     update_available: "Update verfügbar",
     update_available_v: "Version {v} verfügbar",
@@ -1361,6 +1396,13 @@ const I18N = {
     strength_labels: "schwach,schwach,mittel,gut,stark",
   },
   ja: {
+
+    // --- Dati in cache ---
+    cache_title: "キャッシュデータ",
+    cache_hint: "更新しても数値がおかしい場合、ローカルキャッシュを消去するとダッシュボードが最初から再計算します。連携アカウントとライセンスには影響しません。",
+    cache_clear_btn: "キャッシュを消去",
+    cache_confirm: "保存された統計と履歴は次回の更新時に再計算されます。続行しますか?",
+    cache_cleared: "キャッシュを消去しました。",
 
     // --- Controllo aggiornamenti ---
     update_available: "アップデートあり",
@@ -3177,6 +3219,32 @@ document.getElementById("licence-remove")?.addEventListener("click", async () =>
   await loadLicence();
   await loadSnapshot();
   if (plansData) renderPlans();
+});
+
+// ---------- Dati in cache ----------
+document.getElementById("cache-clear")?.addEventListener("click", async e => {
+  // Cancella statistiche e storico locali: chi lo preme deve sapere cosa
+  // sta per succedere, non e' un'azione reversibile con un solo clic.
+  if (!confirm(t("cache_confirm"))) return;
+  const btn = e.currentTarget;
+  const msg = document.getElementById("cache-msg");
+  btn.disabled = true;
+  msg.classList.add("hidden");
+  try {
+    await fetch("/api/cache/clear", { method: "POST" });
+    msg.textContent = t("cache_cleared");
+    msg.classList.remove("hidden", "err");
+    msg.classList.add("ok");
+    toast(t("cache_cleared"), "ok");
+    await loadSnapshot();
+    if (connectionsData) await loadConnections();
+  } catch (err) {
+    msg.textContent = t("generic_error");
+    msg.classList.remove("hidden", "ok");
+    msg.classList.add("err");
+  } finally {
+    btn.disabled = false;
+  }
 });
 
 // ---------- Piani ----------

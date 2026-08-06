@@ -196,6 +196,16 @@ def get_version():
     return version.status()
 
 
+@app.post("/api/cache/clear")
+def clear_cache():
+    """Svuota tutto cio' che si ricalcola da solo con un refresh (statistiche,
+    osservazioni, cache di diagnostica). Non tocca connessioni, licenza ne'
+    le app registrate dal cliente: sono configurazione, non cache, e un
+    pulsante "pulisci" non deve poterle cancellare per sbaglio."""
+    cache.clear_all()
+    return {"ok": True}
+
+
 # ------------------------------------------------------------ connessioni
 
 @app.get("/api/connections")
