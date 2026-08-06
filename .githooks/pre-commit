@@ -23,11 +23,18 @@ done
 #    segnaposto, e le righe di commento.
 #    Un valore che e' a sua volta un NOME_DI_VARIABILE tutto maiuscolo non
 #    e' una credenziale: capita nelle tabelle di corrispondenza fra nomi.
+#
+#    Stessa cosa per una chiave_di_traduzione: parole minuscole unite da
+#    underscore, senza cifre. L'interfaccia ne e' piena (auth_password_confirm,
+#    aria_toggle_password) e bloccavano il commit ogni volta. Le cifre restano
+#    fuori dall'esenzione apposta: un segreto esadecimale tutto minuscolo ne
+#    ha di sicuro, e deve continuare a far scattare il blocco.
 suspect=$(git diff --cached -U0 -- . ':(exclude)*example*' ':(exclude)*.md' \
     | grep '^+' \
     | grep -vE '^\+\s*(#|//|\*)' \
     | grep -inE '(APP_SECRET|CLIENT_SECRET|API_KEY|ACCESS_TOKEN|REFRESH_TOKEN|PASSWORD)[^=:]*[=:]\s*["'"'"'][A-Za-z0-9_/+-]{16,}["'"'"']' \
-    | grep -vE '[=:]\s*["'"'"'][A-Z][A-Z0-9_]*["'"'"']')
+    | grep -vE '[=:]\s*["'"'"'][A-Z][A-Z0-9_]*["'"'"']' \
+    | grep -vE '[=:]\s*["'"'"'][a-z]+(_[a-z]+)+["'"'"']')
 
 if [ -n "$suspect" ]; then
     echo "BLOCCATO: sembra esserci una credenziale reale nel commit:"

@@ -1600,8 +1600,21 @@ const I18N = {
   },
 };
 
-function currentLang() { return localStorage.getItem("dashboard-lang") || "it"; }
-function langMeta() { return LANGS.find(l => l.code === currentLang()) || LANGS[0]; }
+// L'inglese e' la lingua di partenza: il prodotto viene scaricato da
+// chiunque, e l'italiano era una scelta comprensibile solo a chi l'ha
+// scritto. La preferenza scelta dall'utente vive in localStorage, che la
+// finestra dell'app conserva tra un avvio e l'altro (private_mode=False e
+// storage_path in desktop_app.py), quindi va impostata una volta sola.
+const DEFAULT_LANG = "en";
+function currentLang() {
+  const saved = localStorage.getItem("dashboard-lang");
+  // Un codice non piu' previsto non deve inchiodare l'interfaccia su una
+  // lingua inesistente: si torna al default.
+  return LANGS.some(l => l.code === saved) ? saved : DEFAULT_LANG;
+}
+function langMeta() {
+  return LANGS.find(l => l.code === currentLang()) || LANGS.find(l => l.code === DEFAULT_LANG);
+}
 
 function t(key, vars) {
   const lang = currentLang();
@@ -1609,9 +1622,11 @@ function t(key, vars) {
   // quella la forma giusta. Senza, si leggeva "1 contenuti".
   if (vars && Number(vars.n) === 1) {
     const one = `${key}_one`;
-    if ((I18N[lang] && I18N[lang][one]) || I18N.it[one]) key = one;
+    if ((I18N[lang] && I18N[lang][one]) || I18N[DEFAULT_LANG][one]) key = one;
   }
-  let str = (I18N[lang] && I18N[lang][key]) || I18N.it[key] || key;
+  // Se una chiave mancasse, meglio ripiegare sulla lingua predefinita che su
+  // una frase italiana in mezzo a un'interfaccia inglese.
+  let str = (I18N[lang] && I18N[lang][key]) || I18N[DEFAULT_LANG][key] || key;
   if (vars) Object.keys(vars).forEach(k => { str = str.split(`{${k}}`).join(vars[k]); });
   return str;
 }
@@ -1630,7 +1645,7 @@ function tServer(msg, vars) {
  *  vede la frase di prima invece di un codice grezzo a schermo. */
 function tOr(key, vars, fallback) {
   const lang = currentLang();
-  const exists = (I18N[lang] && I18N[lang][key]) || I18N.it[key];
+  const exists = (I18N[lang] && I18N[lang][key]) || I18N[DEFAULT_LANG][key];
   return exists ? t(key, vars) : (fallback || "");
 }
 
@@ -1648,6 +1663,10 @@ function diagField(issue, field, suffix) {
 }
 
 function applyStaticTranslations() {
+  // Anche l'attributo lang deve seguire la scelta: e' quello su cui si
+  // regolano lettori di schermo e correttore ortografico, e restava fisso
+  // sull'italiano scritto nell'HTML.
+  document.documentElement.lang = currentLang();
   document.querySelectorAll("[data-i18n]").forEach(el => { el.textContent = t(el.dataset.i18n); });
   // I placeholder seguono la stessa strada del testo: dichiarati nell'HTML
   // con data-i18n-placeholder invece di essere scritti a mano in una lingua
@@ -2316,9 +2335,14 @@ function renderConnections() {
 
     const mode = connectionsData.modes?.[p] || "unsupported";
     const guided = mode === "guided";
+    // "In arrivo" passa dalla modale, che e' l'unico posto dove il cliente
+    // trova anche l'alternativa "usa la tua app". Chiamando startConnect da
+    // qui il server rispondeva connect_coming_soon e si vedeva solo un
+    // avviso, senza mai sapere che poteva collegarlo lo stesso.
+    const action = mode === "coming_soon" ? "modal" : (guided ? "guided" : "connect");
     const cta = unavailable
       ? `<button class="btn-connect soon" disabled>${t("connect_soon")}</button>`
-      : `<button class="btn-connect btn-analyze" data-${guided ? "guided" : "connect"}="${p}">${linked.length ? t("connect_add_another") : t("connect_now", { p: meta.name })}</button>`;
+      : `<button class="btn-connect btn-analyze" data-${action}="${p}">${linked.length ? t("connect_add_another") : t("connect_now", { p: meta.name })}</button>`;
 
     const guidedPanel = guided ? `
       <div class="guided-panel hidden" id="guided-${p}">
@@ -2350,6 +2374,9 @@ function renderConnections() {
 
   grid.querySelectorAll("[data-connect]").forEach(btn => {
     btn.addEventListener("click", () => startConnect(btn.dataset.connect, btn));
+  });
+  grid.querySelectorAll("[data-modal]").forEach(btn => {
+    btn.addEventListener("click", () => openConnectModal(btn.dataset.modal));
   });
   grid.querySelectorAll("[data-guided]").forEach(btn => {
     btn.addEventListener("click", () => startGuided(btn.dataset.guided, btn));
