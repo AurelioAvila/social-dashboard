@@ -1,23 +1,23 @@
 """
-Credenziali delle app OAuth del prodotto.
+OAuth app credentials for the product.
 
-Queste appartengono all'applicazione, non all'utente finale: vengono
-compilate dentro l'eseguibile una volta sola, cosi' chi scarica la
-dashboard non deve registrare nulla da nessuna parte. Preme "Collega",
-accede al proprio account, fine.
+These belong to the application, not the end user: they're compiled into
+the executable once, so whoever downloads the dashboard doesn't have to
+register anything anywhere. They press "Link", sign in to their account,
+done.
 
-Per le applicazioni desktop il "client secret" non e' una credenziale
-davvero segreta - Google e le altre piattaforme lo prevedono esplicitamente
-per questo tipo di client, che non puo' custodire segreti. Vale comunque la
-regola di non riusare qui le credenziali dei bot personali.
+For desktop applications the "client secret" isn't a truly confidential
+credential - Google and the other platforms explicitly design for this kind
+of client, which can't keep secrets. The rule still holds not to reuse
+personal bot credentials here.
 
-Ogni valore puo' essere sovrascritto da .env con lo stesso nome, utile in
-sviluppo senza dover ricompilare.
+Every value can be overridden by .env with the same name, useful in
+development without having to recompile.
 
 --------------------------------------------------------------------------
-COME USARLO: copia questo file in brand.py (che resta fuori da git, vedi
-.gitignore) e riempi i valori con le credenziali della tua app. brand.py
-non va MAI committato: contiene segreti reali una volta compilato.
+HOW TO USE IT: copy this file to brand.py (which stays out of git, see
+.gitignore) and fill in the values with your own app's credentials.
+brand.py must NEVER be committed: once filled in, it holds real secrets.
 --------------------------------------------------------------------------
 """
 import os
@@ -27,16 +27,16 @@ GOOGLE_CLIENT_ID = ""
 GOOGLE_CLIENT_SECRET = ""
 
 # --- Instagram (Meta) -------------------------------------------------
-# Il redirect deve essere un URL HTTPS registrato nell'app Meta. Non serve
-# che la pagina esista davvero: il login avviene dentro la finestra
-# dell'app, che intercetta il redirect prima che venga caricato.
+# The redirect must be an HTTPS URL registered on the Meta app. The page
+# doesn't actually need to exist: login happens inside the app's own
+# window, which intercepts the redirect before it loads.
 INSTAGRAM_APP_ID = ""
 INSTAGRAM_APP_SECRET = ""
 INSTAGRAM_REDIRECT_URI = ""
 
-# Endpoint che custodisce i client secret al posto dell'eseguibile: con
-# questo valorizzato, i due *_SECRET qui sotto restano vuoti e non finiscono
-# nella build. Vedi oauth-proxy/README.md.
+# Endpoint that holds the client secrets instead of the executable: with
+# this set, the two *_SECRET values below stay empty and never end up in
+# the build. See oauth-proxy/README.md.
 OAUTH_PROXY_URL = ""
 
 # --- TikTok -----------------------------------------------------------
@@ -46,7 +46,7 @@ TIKTOK_REDIRECT_URI = ""
 
 
 def get(name: str) -> str:
-    """Valore da .env se presente, altrimenti quello compilato nell'app."""
+    """Value from .env if present, otherwise the one compiled into the app."""
     return os.environ.get(name) or globals().get(name, "") or ""
 
 

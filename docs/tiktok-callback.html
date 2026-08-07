@@ -1,21 +1,20 @@
 <!doctype html>
-<html lang="it">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
-<title>Collegamento completato — Social Dashboard</title>
+<title>Authorization complete — Social Dashboard</title>
 <!--
-  Pagina di atterraggio dell'autorizzazione TikTok.
+  TikTok authorization landing page.
 
-  Deve restare deliberatamente stupida: nessun router, nessun redirect,
-  nessuno script che tocchi l'URL. E' l'app desktop a leggere il parametro
-  `code` dalla barra degli indirizzi di questa finestra, quindi qualunque
-  riscrittura lato client farebbe perdere il codice e il collegamento
-  resterebbe appeso.
+  Must stay deliberately dumb: no router, no redirect, no script touching
+  the URL. The desktop app reads the `code` parameter from this window's
+  address bar, so any client-side rewrite would lose the code and leave
+  the connection hanging.
 
-  Il codice non viene ne' mostrato ne' inviato da nessuna parte: resta
-  nell'URL, che vive solo dentro la finestra dell'app.
+  The code is never shown or sent anywhere: it stays in the URL, which
+  only ever lives inside the app's own window.
 -->
 <style>
   :root { color-scheme: dark; }
@@ -44,8 +43,8 @@
 <body>
   <div class="card">
     <div class="mark">✓</div>
-    <h1>Autorizzazione completata</h1>
-    <p>Puoi chiudere questa finestra e tornare a Social Dashboard.</p>
+    <h1>Authorization complete</h1>
+    <p>You can close this window and go back to Social Dashboard.</p>
   </div>
 </body>
 </html>
