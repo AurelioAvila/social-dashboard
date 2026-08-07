@@ -116,7 +116,11 @@ export async function createCheckout(env, body) {
 
   const yearly = body.cycle === 'yearly';
   const amount = yearly ? plan.yearly : plan.monthly;
-  const base = new URL(body.return_to || 'https://example.invalid').origin;
+  // Gli URL di ritorno sono i nostri (env.PUBLIC_URL), mai quelli mandati dal
+  // client: qui si costruiva anche un'origine a partire da body.return_to,
+  // che non veniva usata da nessuna parte ma bastava a far esplodere
+  // l'endpoint con un 500 se il valore non era un URL valido - e sarebbe
+  // diventata un redirect aperto il giorno in cui qualcuno l'avesse usata.
   const self = env.PUBLIC_URL || '';
 
   const form = new URLSearchParams({
@@ -268,6 +272,13 @@ export async function handleWebhook(env, request) {
 export async function verifyLicense(env, body) {
   const key = String(body.key || '').trim().toUpperCase();
   if (!key) return fail('license_missing');
+  // Una chiave che non ha la nostra forma non puo' esistere in KV: si
+  // risponde subito invece di andare a cercarla. Serve anche a non passare
+  // a KV valori lunghi o strani, che farebbero fallire la lettura con un 500
+  // invece di un "chiave non valida".
+  if (!/^SD-[A-Z]+-[A-Z0-9-]{4,40}$/.test(key)) {
+    return json({ valid: false, reason: 'license_not_found' });
+  }
 
   const rec = await env.LICENSES.get(`key:${key}`, 'json');
   if (!rec) return json({ valid: false, reason: 'license_not_found' });

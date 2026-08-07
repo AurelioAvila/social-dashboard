@@ -90,7 +90,7 @@ def _insight(kind: str, code: str, text: str, **params) -> dict:
 def _short(title: str, n: int = 60) -> str:
     title = (title or "").replace("\n", " ").strip()
     if not title:
-        return "(senza titolo)"
+        return "(untitled)"
     return title if len(title) <= n else title[: n - 1] + "…"
 
 
@@ -99,20 +99,20 @@ def _analyze_entity(name: str, items: list[dict]) -> list[dict]:
     with_views = [i for i in items if i["views"] > 0]
 
     if not items:
-        return [_insight("info", "ins_no_items", f"{name}: nessun contenuto recente da analizzare.", name=name)]
+        return [_insight("info", "ins_no_items", f"{name}: no recent content to analyze.", name=name)]
 
     # Contenuti a zero: utile saperlo prima di leggere qualsiasi media.
     zeros = len(items) - len(with_views)
     if zeros and zeros == len(items):
         return [_insight("warn", "ins_all_zero",
-                         f"{name}: nessuno degli ultimi {len(items)} contenuti ha ancora visualizzazioni.",
+                         f"{name}: none of the last {len(items)} posts have any views yet.",
                          name=name, n=len(items))]
     if zeros:
         # `n` e' il conteggio che decide singolare/plurale nella traduzione,
         # quindi deve essere quello che varia (i contenuti a zero), non il
         # totale: altrimenti si leggeva "1 contenuti".
         out.append(_insight("warn", "ins_some_zero",
-                            f"{name}: {zeros} degli ultimi {len(items)} contenuti sono ancora a zero visualizzazioni.",
+                            f"{name}: {zeros} of the last {len(items)} posts still have zero views.",
                             name=name, n=zeros, tot=len(items)))
 
     avg = sum(i["views"] for i in with_views) / len(with_views)
@@ -123,8 +123,8 @@ def _analyze_entity(name: str, items: list[dict]) -> list[dict]:
         best = max(with_views, key=lambda i: i["views"])
         if best["views"] >= avg * STAR_RATIO:
             out.append(_insight("good", "ins_star",
-                                f"{name}: \"{_short(best['title'])}\" ha fatto {best['views']:,} views, "
-                                f"{round(best['views'] / avg, 1)}x la media dell'account. Guarda cosa lo distingue e replicalo.",
+                                f"{name}: \"{_short(best['title'])}\" got {best['views']:,} views, "
+                                f"{round(best['views'] / avg, 1)}x the account average. Look at what sets it apart and do it again.",
                                 name=name, title=_short(best["title"]), v=best["views"],
                                 x=round(best["views"] / avg, 1)))
 
@@ -132,8 +132,8 @@ def _analyze_entity(name: str, items: list[dict]) -> list[dict]:
         if flops:
             worst = min(flops, key=lambda i: i["views"])
             out.append(_insight("warn", "ins_flop",
-                                f"{name}: {len(flops)} contenuti sotto il 40% della media, il piu' debole e' "
-                                f"\"{_short(worst['title'])}\" con {worst['views']:,} views.",
+                                f"{name}: {len(flops)} posts below 40% of the average, the weakest being "
+                                f"\"{_short(worst['title'])}\" with {worst['views']:,} views.",
                                 name=name, n=len(flops), title=_short(worst["title"]), v=worst["views"]))
 
     # Engagement: quanto una view si trasforma in interazione.

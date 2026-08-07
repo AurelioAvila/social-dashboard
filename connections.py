@@ -299,7 +299,23 @@ def _connect_in_window(auth_url: str, redirect_uri: str, title: str, timeout: in
         raise RuntimeError("connect_window_closed")
     if "error" in result["url"] and "code=" not in result["url"]:
         raise RuntimeError("connect_denied")
-    return _clean_code(result["url"])
+    # Torna l'URL intero, non il solo codice: chi chiama deve poter
+    # verificare anche lo state prima di fidarsi del codice.
+    return result["url"]
+
+
+def _state_from(raw: str) -> str:
+    """Il parametro state dell'URL di ritorno, se c'e'."""
+    raw = (raw or "").strip()
+    if "state=" not in raw:
+        return ""
+    value = raw.split("state=", 1)[1].split("&", 1)[0].split("#", 1)[0]
+    try:
+        from urllib.parse import unquote
+        value = unquote(value)
+    except Exception:
+        pass
+    return value
 
 
 def _clean_code(raw: str) -> str:
@@ -455,6 +471,33 @@ def credentials_ready(platform: str) -> bool:
         return False
 
 
+# Lo `state` di OAuth serve a una cosa sola: riconoscere che il codice che
+# torna indietro appartiene alla richiesta che abbiamo fatto noi. Veniva
+# generato e poi buttato via, il che lo rendeva decorativo: nel flusso con
+# incolla manuale bastava convincere qualcuno a incollare l'URL di ritorno di
+# un *altro* account per agganciare quell'account alla sua dashboard.
+#
+# Si tiene solo l'ultimo per piattaforma: i collegamenti sono uno alla volta
+# (lo impone gia' _connect_is_active) e cosi' non resta nulla da ripulire.
+_pending_state: dict[str, str] = {}
+
+
+def _remember_state(platform: str) -> str:
+    value = secrets.token_urlsafe(24)
+    _pending_state[platform] = value
+    return value
+
+
+def _check_state(platform: str, returned: str) -> None:
+    """Consuma lo state atteso. Non si accetta un ritorno senza state quando
+    ne avevamo chiesto uno: sarebbe come non averlo mai messo."""
+    expected = _pending_state.pop(platform, None)
+    if not expected:
+        raise RuntimeError("connect_state_missing")
+    if not returned or not secrets.compare_digest(expected, returned):
+        raise RuntimeError("connect_state_mismatch")
+
+
 def authorize_url(platform: str) -> dict:
     """URL da aprire nel browser per autorizzare l'account."""
     from urllib.parse import urlencode
@@ -476,7 +519,7 @@ def authorize_url(platform: str) -> dict:
                 "response_type": "code",
                 "scope": "instagram_business_basic,instagram_business_manage_insights",
                 "force_reauth": "true",
-                "state": secrets.token_urlsafe(8),
+                "state": _remember_state("instagram"),
             }
             return {"ok": True, "url": "https://www.instagram.com/oauth/authorize?" + urlencode(params)}
 
@@ -487,7 +530,7 @@ def authorize_url(platform: str) -> dict:
                 "scope": "user.info.basic,user.info.stats,video.list",
                 "response_type": "code",
                 "redirect_uri": redirect,
-                "state": secrets.token_urlsafe(8),
+                "state": _remember_state("tiktok"),
                 "disable_auto_auth": "1",
             }
             return {"ok": True, "url": "https://www.tiktok.com/v2/auth/authorize/?" + urlencode(params)}
@@ -629,10 +672,11 @@ def _connect_oneclick(platform: str) -> None:
     if not info.get("ok"):
         raise RuntimeError(info.get("message", "connect_guided_unavailable"))
 
-    code = _connect_in_window(
+    returned = _connect_in_window(
         info["url"], REDIRECT_GETTERS[platform](), WINDOW_TITLES.get(platform, "Collega account")
     )
-    _connect_state["account"] = GUIDED[platform](code)
+    _check_state(platform, _state_from(returned))
+    _connect_state["account"] = GUIDED[platform](_clean_code(returned))
 
 
 def finish_guided(platform: str, pasted: str) -> dict:
@@ -642,6 +686,11 @@ def finish_guided(platform: str, pasted: str) -> dict:
     if not finisher:
         return {"ok": False, "message": "connect_guided_unavailable"}
     try:
+        # Qui arriva un valore incollato a mano: e' il punto in cui qualcuno
+        # potrebbe essere convinto a incollare l'URL di ritorno di un altro
+        # account. Lo state va verificato prima di scambiare il codice, e
+        # per questo serve l'indirizzo intero, non il solo codice.
+        _check_state(platform, _state_from(pasted))
         account = finisher(_clean_code(pasted))
         return {"ok": True, "account": account}
     except Exception as exc:

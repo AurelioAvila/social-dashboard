@@ -28,6 +28,14 @@ import { createCheckout, handleWebhook, verifyLicense, claimPage } from './licen
 
 const JSON_HEADERS = { 'content-type': 'application/json' };
 
+// Gli unici indirizzi di ritorno che questo proxy accetta per lo scambio del
+// codice OAuth. Sono le pagine statiche su GitHub Pages registrate nelle app
+// Meta e TikTok: qualsiasi altro valore non puo' venire da un nostro login.
+const ALLOWED_REDIRECTS = new Set([
+  'https://aurelioavila.github.io/social-dashboard/instagram-callback',
+  'https://aurelioavila.github.io/social-dashboard/tiktok-callback',
+]);
+
 function json(body, status = 200) {
   return new Response(JSON.stringify(body), { status, headers: JSON_HEADERS });
 }
@@ -50,7 +58,7 @@ async function instagramExchange(env, code, redirectUri) {
       code,
     }),
   });
-  if (!short.ok) return fail('Instagram ha rifiutato il codice di autorizzazione.', 400);
+  if (!short.ok) return fail('instagram_code_rejected', 400);
   const shortData = await short.json();
 
   // Il token breve dura un'ora: si scambia subito con quello a 60 giorni.
@@ -59,7 +67,7 @@ async function instagramExchange(env, code, redirectUri) {
   longUrl.searchParams.set('client_secret', env.INSTAGRAM_APP_SECRET);
   longUrl.searchParams.set('access_token', shortData.access_token);
   const long = await fetch(longUrl);
-  if (!long.ok) return fail('Scambio del token Instagram fallito.', 400);
+  if (!long.ok) return fail('instagram_token_exchange_failed', 400);
   const longData = await long.json();
 
   return json({ access_token: longData.access_token, expires_in: longData.expires_in });
@@ -76,7 +84,7 @@ async function tiktokToken(env, params) {
     }),
   });
   const data = await resp.json().catch(() => ({}));
-  if (!resp.ok || !data.access_token) return fail('TikTok ha rifiutato la richiesta.', 400);
+  if (!resp.ok || !data.access_token) return fail('tiktok_request_rejected', 400);
   // Si restituisce solo ciò che serve all'app.
   return json({
     access_token: data.access_token,
@@ -136,6 +144,14 @@ export default {
 
     if (action === 'exchange') {
       if (!body.code || !body.redirect_uri) return fail('missing_params', 400);
+      // Il redirect deve essere uno dei nostri. Questo endpoint scambia un
+      // codice usando il NOSTRO client secret: accettare un indirizzo
+      // qualsiasi lo trasformerebbe in un servizio pubblico che converte in
+      // token qualunque codice della nostra app, per chiunque riesca a
+      // procurarsene uno.
+      if (!ALLOWED_REDIRECTS.has(String(body.redirect_uri).trim())) {
+        return fail('redirect_not_allowed', 400);
+      }
       if (platform === 'instagram') {
         return instagramExchange(env, body.code, body.redirect_uri);
       }
@@ -157,6 +173,6 @@ export default {
       });
     }
 
-    return fail('Endpoint sconosciuto.', 404);
+    return fail('unknown_endpoint', 404);
   },
 };

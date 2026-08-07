@@ -73,9 +73,9 @@ GOTO_CONNECTIONS = {"type": "goto", "section": "connections"}
 
 def _no_account_issue(platform: str, label: str) -> dict:
     return _issue(
-        "yellow", "Da collegare", f"Nessun account {label}",
-        f"Non hai ancora collegato nessun account {label}.",
-        "Premi Collega e accedi: bastano pochi secondi.",
+        "yellow", "Not linked", f"No {label} account",
+        f"You haven't linked any {label} account yet.",
+        "Press Link and sign in - it only takes a few seconds.",
         platform, GOTO_CONNECTIONS,
         code="diag_no_account", params={"p": label},
     )
@@ -83,17 +83,17 @@ def _no_account_issue(platform: str, label: str) -> dict:
 
 def _no_data_issue(platform: str, label: str) -> dict:
     return _issue(
-        "yellow", "Dati mancanti", f"{label} senza dati",
-        "Nessun dato ancora caricato.", "Premi Refresh per caricare i dati.",
+        "yellow", "No data", f"{label} has no data",
+        "No data has been loaded yet.", "Press Refresh to load your data.",
         platform, code="diag_no_data", params={"p": label},
     )
 
 
 def _all_ok_issue(platform: str, label: str, n: int) -> dict:
     return _issue(
-        "green", "Tutto a posto", f"{label}: {n} account in regola",
-        "Tutti gli account rispondono e pubblicano con costanza.",
-        "Nessuna azione richiesta.", platform,
+        "green", "All good", f"{label}: {n} accounts healthy",
+        "Every account responds and posts consistently.",
+        "No action needed.", platform,
         code="diag_all_ok", params={"p": label, "n": n},
     )
 
@@ -116,29 +116,29 @@ def _issue(severity, category, title, text, next_step, platform=None, action=Non
 
 # Pattern d'errore -> (categoria, prossimo passo, codice per la traduzione).
 _ERROR_PATTERNS = [
-    (("video.list",), "Permesso non concesso",
-     "Serve l'approvazione del permesso di lettura statistiche sul portale sviluppatori della piattaforma - non e' risolvibile dall'app.",
+    (("video.list",), "Permission not granted",
+     "The stats-read permission must be approved on the platform's developer portal - it cannot be fixed from the app.",
      "diagerr_scope_denied"),
-    (("invalid_grant", "expired", "revoked"), "Accesso scaduto",
-     "Ricollega questo account: l'autorizzazione e' scaduta o e' stata revocata.",
+    (("invalid_grant", "expired", "revoked"), "Access expired",
+     "Link this account again: the authorization expired or was revoked.",
      "diagerr_expired"),
-    (("invalid_scope",), "Permessi non allineati",
-     "I permessi richiesti non coincidono con quelli concessi in origine: ricollega l'account per riallinearli.",
+    (("invalid_scope",), "Permissions out of sync",
+     "The requested permissions don't match the ones originally granted: link the account again to realign them.",
      "diagerr_scope_mismatch"),
-    (("permission", "#10", "does not have permission"), "Permesso mancante",
-     "L'account non ha concesso il permesso richiesto: ricollegalo accettando tutte le richieste.",
+    (("permission", "#10", "does not have permission"), "Missing permission",
+     "The account didn't grant the required permission: link it again and accept every request.",
      "diagerr_permission"),
-    (("quota", "rate limit", "429"), "Troppe richieste",
-     "Attendi qualche minuto prima del prossimo aggiornamento: il limite della piattaforma e' stato raggiunto.",
+    (("quota", "rate limit", "429"), "Too many requests",
+     "Wait a few minutes before refreshing again: the platform's rate limit was reached.",
      "diagerr_rate"),
-    (("401", "unauthorized", "authentication"), "Credenziali non valide",
-     "Ricollega l'account per rigenerare l'accesso.",
+    (("401", "unauthorized", "authentication"), "Invalid credentials",
+     "Link the account again to reissue access.",
      "diagerr_auth"),
-    (("404", "not found"), "Account non trovato",
-     "L'account collegato non risulta piu' raggiungibile: potrebbe essere stato rimosso o rinominato.",
+    (("404", "not found"), "Account not found",
+     "The linked account can no longer be reached: it may have been removed or renamed.",
      "diagerr_notfound"),
-    (("timeout", "connection", "network"), "Problema di rete",
-     "Riprova l'aggiornamento: sembra un problema temporaneo di connessione.",
+    (("timeout", "connection", "network"), "Network problem",
+     "Try refreshing again: this looks like a temporary connection issue.",
      "diagerr_network"),
 ]
 
@@ -150,13 +150,13 @@ def _classify_error(err: str) -> tuple[str, str, str]:
     for needles, category, step, code in _ERROR_PATTERNS:
         if any(n in low for n in needles):
             return category, step, code
-    return ("Errore non classificato", "Riprova l'aggiornamento; se persiste, ricollega l'account.",
+    return ("Unclassified error", "Try refreshing again; if it persists, link the account again.",
             "diagerr_unknown")
 
 
 def _unreachable_issue(name: str, error: str, platform: str, action=None) -> dict:
     category, step, code = _classify_error(error)
-    return _issue("red", category, f"{name}: non risponde", str(error or "")[:220], step,
+    return _issue("red", category, f"{name}: not responding", str(error or "")[:220], step,
                   platform, action, code=code, params={"name": name})
 
 
@@ -166,14 +166,14 @@ def _check_content_freshness(label: str, name: str, days: float | None, platform
         return None
     d = int(days)
     if days >= STALE_BAD_DAYS:
-        return _issue("red", "Contenuto fermo", f"{name}: fermo da {d} giorni",
-                      f"L'ultimo contenuto su {label} risale a {d} giorni fa.",
-                      "Pubblica qualcosa: le piattaforme premiano la costanza e la copertura cala in fretta con i profili inattivi.",
+        return _issue("red", "Posting stalled", f"{name}: nothing for {d} days",
+                      f"The latest content on {label} is {d} days old.",
+                      "Post something: platforms reward consistency, and reach drops fast on inactive profiles.",
                       platform, code="diag_stale_bad", params={"name": name, "p": label, "d": d})
     if days >= STALE_WARN_DAYS:
-        return _issue("yellow", "Ritmo in calo", f"{name}: ultimo post {d} giorni fa",
-                      f"Su {label} non esce nulla da {d} giorni.",
-                      "Torna al ritmo abituale prima che la copertura inizi a scendere.",
+        return _issue("yellow", "Slowing down", f"{name}: last post {d} days ago",
+                      f"Nothing new on {label} for {d} days.",
+                      "Get back to your usual pace before reach starts to slide.",
                       platform, code="diag_stale_warn", params={"name": name, "p": label, "d": d})
     return None
 
@@ -198,9 +198,9 @@ def _check_youtube(data: dict) -> list[dict]:
             issues.append(stale)
 
         if c.get("video_count", 0) > 0 and c.get("recent_views_last10", 0) == 0:
-            issues.append(_issue("yellow", "Nessuna visualizzazione", f"{c.get('name')}: 0 views sugli ultimi video",
-                                 "Gli ultimi video pubblicati non hanno ancora nessuna visualizzazione.",
-                                 "Se sono appena usciti e' normale; se hanno qualche giorno, rivedi titolo, miniatura e primi secondi.",
+            issues.append(_issue("yellow", "No views", f"{c.get('name')}: 0 views on the latest videos",
+                                 "The most recent videos have no views yet.",
+                                 "That's normal if they just went up; if they are a few days old, revisit the title, thumbnail and opening seconds.",
                                  "youtube", code="diag_zero_views", params={"name": c.get("name")}))
 
     if not issues:
@@ -244,9 +244,9 @@ def _check_tiktok(data: dict) -> list[dict]:
 
     for a in accounts:
         if a.get("not_configured"):
-            issues.append(_issue("yellow", "Da configurare", f"{a.get('name')}: non configurato",
-                                 "L'account e' elencato ma non ha credenziali associate.",
-                                 "Collega l'account, oppure rimuovilo dall'elenco se non ti serve.",
+            issues.append(_issue("yellow", "Needs setup", f"{a.get('name')}: not configured",
+                                 "The account is listed but has no credentials attached.",
+                                 "Link the account, or remove it from the list if you don't need it.",
                                  "tiktok", GOTO_CONNECTIONS,
                                  code="diag_not_configured", params={"name": a.get("name")}))
             continue
@@ -267,13 +267,13 @@ def _check_x(data: dict) -> list[dict]:
     if not data:
         return [_no_data_issue("x", "X")]
     if not data.get("credentials_configured"):
-        return [_issue("yellow", "Non collegato", "X non collegato",
-                       "Nessuna credenziale X configurata.",
-                       "X non espone le statistiche di lettura sul piano gratuito: al momento la sezione resta informativa.",
+        return [_issue("yellow", "Not linked", "X not linked",
+                       "No X credentials configured.",
+                       "X doesn't expose read analytics on the free plan, so this section stays informational for now.",
                        "x", code="diag_x_not_linked", params={})]
-    return [_issue("green", "Collegato", "X collegato",
-                   "Credenziali presenti. Le statistiche di lettura non sono disponibili sul piano gratuito di X.",
-                   "Nessuna azione richiesta.", "x", code="diag_x_linked", params={})]
+    return [_issue("green", "Linked", "X linked",
+                   "Credentials are in place. Read analytics aren't available on X's free plan.",
+                   "No action needed.", "x", code="diag_x_linked", params={})]
 
 
 def _check_certsprint(data: dict) -> list[dict]:

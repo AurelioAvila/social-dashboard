@@ -22,6 +22,10 @@ const LANGS = [
 const I18N = {
   it: {
 
+    // --- state OAuth non valido ---
+    connect_state_missing: "Nessun collegamento in attesa. Riparti premendo di nuovo Collega.",
+    connect_state_mismatch: "Questo indirizzo non corrisponde al collegamento che hai avviato. Incolla l'indirizzo completo della pagina su cui sei atterrato, e se non è tuo non usarlo.",
+
     // --- Dati in cache ---
     cache_title: "Dati in cache",
     cache_hint: "Se un numero sembra sbagliato anche dopo aver aggiornato, svuotare la cache locale forza la dashboard a ricalcolare tutto da zero. Gli account collegati e la licenza restano intatti.",
@@ -296,6 +300,10 @@ const I18N = {
     strength_labels: "debole,debole,media,buona,ottima",
   },
   en: {
+
+    // --- state OAuth non valido ---
+    connect_state_missing: "No connection is waiting to be completed. Start again by pressing Link.",
+    connect_state_mismatch: "This address doesn't match the connection you started. Paste the full address of the page you landed on — and if it isn't yours, don't use it.",
 
     // --- Dati in cache ---
     cache_title: "Cached data",
@@ -572,6 +580,10 @@ const I18N = {
   },
   es: {
 
+    // --- state OAuth non valido ---
+    connect_state_missing: "No hay ninguna conexión pendiente. Vuelve a empezar pulsando Vincular.",
+    connect_state_mismatch: "Esta dirección no coincide con la conexión que iniciaste. Pega la dirección completa de la página a la que llegaste; si no es tuya, no la uses.",
+
     // --- Dati in cache ---
     cache_title: "Datos en caché",
     cache_hint: "Si un número parece incorrecto incluso después de actualizar, vaciar la caché local obliga al panel a recalcular todo desde cero. Tus cuentas vinculadas y tu licencia no se ven afectadas.",
@@ -846,6 +858,10 @@ const I18N = {
     strength_labels: "débil,débil,media,buena,excelente",
   },
   fr: {
+
+    // --- state OAuth non valido ---
+    connect_state_missing: "Aucune connexion en attente. Recommencez en appuyant sur Lier.",
+    connect_state_mismatch: "Cette adresse ne correspond pas à la connexion que vous avez lancée. Collez l'adresse complète de la page où vous êtes arrivé ; si elle n'est pas la vôtre, ne l'utilisez pas.",
 
     // --- Dati in cache ---
     cache_title: "Données en cache",
@@ -1122,6 +1138,10 @@ const I18N = {
   },
   de: {
 
+    // --- state OAuth non valido ---
+    connect_state_missing: "Es wartet keine Verknüpfung auf den Abschluss. Starte neu über Verknüpfen.",
+    connect_state_mismatch: "Diese Adresse gehört nicht zu der Verknüpfung, die du gestartet hast. Füge die vollständige Adresse der Seite ein, auf der du gelandet bist — und wenn sie nicht deine ist, verwende sie nicht.",
+
     // --- Dati in cache ---
     cache_title: "Zwischengespeicherte Daten",
     cache_hint: "Wenn eine Zahl auch nach dem Aktualisieren falsch erscheint, erzwingt das Leeren des lokalen Caches eine komplette Neuberechnung. Deine verknüpften Konten und deine Lizenz bleiben unberührt.",
@@ -1396,6 +1416,10 @@ const I18N = {
     strength_labels: "schwach,schwach,mittel,gut,stark",
   },
   ja: {
+
+    // --- state OAuth non valido ---
+    connect_state_missing: "完了待ちの連携はありません。「連携」を押してやり直してください。",
+    connect_state_mismatch: "このアドレスは開始した連携と一致しません。到達したページの完全なアドレスを貼り付けてください。自分のものでない場合は使用しないでください。",
 
     // --- Dati in cache ---
     cache_title: "キャッシュデータ",
