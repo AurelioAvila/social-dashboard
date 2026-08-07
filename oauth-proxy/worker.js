@@ -103,10 +103,10 @@ export default {
 
     if (action === 'license/cancelled') {
       return new Response(
-        '<!doctype html><meta charset="utf-8"><title>Payment cancelled</title>' +
+        '<!doctype html><meta charset="utf-8"><title>Payment canceled</title>' +
           '<style>body{margin:0;min-height:100vh;display:flex;align-items:center;' +
           'justify-content:center;background:#0f1115;color:#e8eaf0;font:16px system-ui}</style>' +
-          '<div>Payment cancelled — you can close this tab.</div>',
+          '<div>Payment canceled — you can close this tab.</div>',
         { headers: { 'content-type': 'text/html; charset=utf-8' } }
       );
     }

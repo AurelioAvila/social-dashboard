@@ -39,7 +39,7 @@ def _exchange_refresh(client_key: str, client_secret: str, refresh_token: str) -
     resp.raise_for_status()
     data = resp.json()
     if "access_token" not in data:
-        raise RuntimeError(f"Refresh token TikTok fallito: {data}")
+        raise RuntimeError(f"TikTok refresh token failed: {data}")
     granted_scope = data.get("scope", "")
     if "video.list" not in granted_scope:
         # Limite noto: l'app TikTok e' autorizzata solo per upload/publish,
@@ -48,8 +48,8 @@ def _exchange_refresh(client_key: str, client_secret: str, refresh_token: str) -
         # da qui, ma va segnalato in modo chiaro invece del generico 401
         # che arriverebbe dalla chiamata a /video/list/.
         raise RuntimeError(
-            f"Token valido ma senza permesso 'video.list' (scope concesso: {granted_scope or 'nessuno'}) - "
-            "serve una TikTok App Review per abilitare la lettura statistiche."
+            f"Token is valid but lacks the 'video.list' permission (granted scope: {granted_scope or 'none'}) - "
+            "TikTok App Review is required before stats can be read."
         )
     return data["access_token"]
 
@@ -105,8 +105,8 @@ def _access_token_from(source: dict) -> str:
         granted = data.get("scope", "")
         if "video.list" not in granted:
             raise RuntimeError(
-                f"Token valido ma senza permesso 'video.list' (scope concesso: {granted or 'nessuno'}) - "
-                "serve una TikTok App Review per abilitare la lettura statistiche."
+                f"Token is valid but lacks the 'video.list' permission (granted scope: {granted or 'none'}) - "
+                "TikTok App Review is required before stats can be read."
             )
         return data["access_token"]
     return _exchange_refresh(source["client_key"], source["client_secret"], source["refresh_token"])
@@ -125,7 +125,7 @@ def fetch_stats(limit: int = 10, on_item=None) -> dict:
             if source["kind"] == "env" and not _is_configured(source["prefix"]):
                 accounts_out.append({
                     "name": name, "ok": False, "not_configured": True,
-                    "error": f"Credenziali TikTok non configurate - collega l'account dalla sezione Collega account.",
+                    "error": f"TikTok is not connected yet - link the account from the Link account page.",
                 })
                 continue
             access_token = _access_token_from(source)

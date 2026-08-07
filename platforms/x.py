@@ -18,7 +18,7 @@ def fetch_stats(on_item=None) -> dict:
     return {
         "platform": "x",
         "ok": has_creds,
-        "limitation": "Il piano gratuito dell'API X non consente di leggere metriche (impressions/engagement). "
-                       "Solo la pubblicazione e' automatizzata; qui mostriamo solo lo stato delle credenziali.",
+        "limitation": "X's free API tier doesn't expose read metrics (impressions/engagement). "
+                       "Only publishing is automated; this section just shows credential status.",
         "credentials_configured": has_creds,
     }

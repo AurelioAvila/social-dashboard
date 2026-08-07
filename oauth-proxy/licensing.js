@@ -276,6 +276,16 @@ export async function verifyLicense(env, body) {
   return json({ valid: true, plan: rec.plan, email: rec.email, issued_at: rec.issued_at });
 }
 
+/** Neutralizza il testo che finisce dentro l'HTML. L'email arriva da Stripe,
+ *  che la valida, ma un valore di terze parti scritto in pagina senza filtro
+ *  e' una porta lasciata aperta per nulla: qui costa una riga chiuderla. */
+function escapeHtml(value) {
+  return String(value == null ? '' : value).replace(
+    /[&<>"']/g,
+    (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]
+  );
+}
+
 function page(title, bodyHtml) {
   return new Response(
     `<!doctype html><html lang="en"><head><meta charset="utf-8">
@@ -327,7 +337,7 @@ justify-content:center;background:#0f1115;color:#e8eaf0;font:16px system-ui}</st
   // fornita a Stripe, Resend non configurato, o l'invio e' fallito).
   const rec = await env.LICENSES.get(`key:${key}`, 'json');
   const hint = rec?.email_sent
-    ? `A copy was also emailed to ${rec.email}.`
+    ? `A copy was also emailed to ${escapeHtml(rec.email)}.`
     : 'This is the only copy of your key — no email is sent, so keep it somewhere safe before leaving this page.';
 
   return page(

@@ -25,6 +25,59 @@ import trends
 
 app = FastAPI(title="Social Stats Dashboard")
 
+
+# ------------------------------------------------- difesa del server locale
+#
+# Il server ascolta su 127.0.0.1, ma "solo locale" non vuol dire "solo la
+# nostra finestra": qualsiasi pagina web aperta nel browser mentre l'app gira
+# puo' parlare con questa porta. Due attacchi reali, verificati entrambi
+# prima di scrivere questa difesa:
+#
+#   1. CSRF. Una POST senza corpo JSON e' una "richiesta semplice": il
+#      browser la manda cross-origin senza chiedere permesso al server.
+#      Bastava una pagina malevola aperta in un'altra scheda per svuotare
+#      lo storico (/api/cache/clear) o togliere la licenza attivata
+#      (/api/license/remove). La risposta l'attaccante non la legge, ma il
+#      danno e' gia' fatto.
+#
+#   2. DNS rebinding. L'header Host non veniva controllato: un dominio che
+#      dopo qualche secondo punta a 127.0.0.1 diventa "stessa origine" per
+#      il browser, e da li' si leggono le risposte - cioe' le statistiche
+#      private del cliente.
+#
+# Il controllo sull'Origin scatta solo sui metodi che cambiano qualcosa, e
+# solo quando l'header c'e': un browser lo manda sempre in una POST
+# cross-origin, mentre una richiesta locale legittima (la finestra dell'app,
+# uno script dell'utente) o non lo manda o lo manda uguale al nostro.
+LOCAL_HOSTS = frozenset({"127.0.0.1", "localhost", "::1"})
+
+
+def _host_only(value: str) -> str:
+    """Nome host senza porta. Gli indirizzi IPv6 arrivano fra parentesi
+    quadre ("[::1]:8787"), quindi non basta tagliare sull'ultimo due punti."""
+    raw = (value or "").strip()
+    if raw.startswith("["):
+        end = raw.find("]")
+        return raw[1:end] if end != -1 else ""
+    return raw.rsplit(":", 1)[0] if ":" in raw else raw
+
+
+@app.middleware("http")
+async def _local_only_guard(request, call_next):
+    from fastapi.responses import JSONResponse
+
+    if _host_only(request.headers.get("host", "")) not in LOCAL_HOSTS:
+        return JSONResponse({"error": "bad_host"}, status_code=400)
+
+    if request.method not in ("GET", "HEAD", "OPTIONS"):
+        origin = request.headers.get("origin")
+        if origin:
+            from urllib.parse import urlparse
+            if (urlparse(origin).hostname or "") not in LOCAL_HOSTS:
+                return JSONResponse({"error": "bad_origin"}, status_code=403)
+
+    return await call_next(request)
+
 # Le piattaforme attive dipendono dalla modalita' (personale o cliente):
 # i moduli personali come CertSprint non esistono nella build distribuita.
 PLATFORM_NAMES = config.enabled_platforms()
@@ -171,7 +224,7 @@ def get_platform_insights(platform: str):
     quindi non serve piu' ne' cache ne' un pulsante che la chieda - viene
     gia' inclusa in /api/snapshot. L'endpoint resta per compatibilita'."""
     if platform not in PLATFORM_NAMES:
-        raise HTTPException(404, f"Piattaforma sconosciuta: {platform}")
+        raise HTTPException(404, f"Unknown platform: {platform}")
 
     import insights
     snap = cache.latest_snapshot(platform)
@@ -465,7 +518,9 @@ def export_csv(authorization: str | None = Header(default=None)):
 
     buf = io.StringIO()
     writer = csv.writer(buf)
-    writer.writerow(["piattaforma", "account", "metrica", "valore"])
+    # Il CSV lo apre il cliente in Excel: le intestazioni sono testo
+    # visibile, non nomi interni, e vanno nella lingua del prodotto.
+    writer.writerow(["platform", "account", "metric", "value"])
 
     yt = cache.latest_snapshot("youtube") or {}
     for c in yt.get("channels", []):
